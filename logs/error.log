@@ -1264,3 +1264,436 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'dashboard' not found. 'dashboard' is not a valid view function or pattern name.
 ERROR 2026-02-07 10:47:33,535 log 273100 140455155070656 "GET / HTTP/1.1" 500 184255
+ERROR 2026-02-07 13:42:19,744 log 385429 140429691451072 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/pages/views.py", line 6, in public_dashboard
+    return render(request, 'dashboard/public_dashboard.html')
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 211, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 176, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'membership_application_create' not found. 'membership_application_create' is not a valid view function or pattern name.
+ERROR 2026-02-07 13:42:19,752 log 385429 140429691451072 "GET / HTTP/1.1" 500 185648
+ERROR 2026-02-07 14:27:22,646 log 413815 139894783473344 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/pages/views.py", line 10, in public_dashboard
+    return render(request, 'dashboard/public_dashboard.html')
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 211, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 176, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'about' not found. 'about' is not a valid view function or pattern name.
+ERROR 2026-02-07 14:27:22,654 log 413815 139894783473344 "GET / HTTP/1.1" 500 171864
+ERROR 2026-02-07 14:31:44,827 log 413815 139894783473344 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/pages/views.py", line 10, in public_dashboard
+    return render(request, 'dashboard/public_dashboard.html')
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 211, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 176, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'membership_application_create' not found. 'membership_application_create' is not a valid view function or pattern name.
+ERROR 2026-02-07 14:31:44,834 log 413815 139894783473344 "GET / HTTP/1.1" 500 186003
+ERROR 2026-02-07 14:40:51,039 log 413815 139894771934912 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/pages/views.py", line 10, in public_dashboard
+    return render(request, 'dashboard/public_dashboard.html')
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 211, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 176, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'membership_application_create' not found. 'membership_application_create' is not a valid view function or pattern name.
+ERROR 2026-02-07 14:40:51,045 log 413815 139894771934912 "GET / HTTP/1.1" 500 186003
+ERROR 2026-02-07 14:44:12,510 log 424591 140402480903872 Internal Server Error: /
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/pages/views.py", line 10, in public_dashboard
+    return render(request, 'dashboard/public_dashboard.html')
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/backends/django.py", line 107, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 174, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 160, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 333, in render
+    return nodelist.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader_tags.py", line 211, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 176, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 166, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1091, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/base.py", line 1052, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/defaulttags.py", line 511, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/base.py", line 98, in reverse
+    resolved_url = resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/urls/resolvers.py", line 842, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'membership_application_create' not found. 'membership_application_create' is not a valid view function or pattern name.
+ERROR 2026-02-07 14:44:12,517 log 424591 140402480903872 "GET / HTTP/1.1" 500 185866
+ERROR 2026-02-07 15:00:37,810 log 433166 139856731698880 Internal Server Error: /swagger/
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/views/decorators/csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/views/generic/base.py", line 106, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/views.py", line 509, in dispatch
+    response = self.handle_exception(exc)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/views.py", line 469, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/views.py", line 480, in raise_uncaught_exception
+    raise exc
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/views.py", line 506, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/views.py", line 96, in get
+    schema = generator.get_schema(request, self.public)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/generators.py", line 276, in get_schema
+    paths, prefix = self.get_paths(endpoints, components, request, public)
+                    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/generators.py", line 482, in get_paths
+    operation = self.get_operation(view, path, prefix, method, components, request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/generators.py", line 524, in get_operation
+    operation = view_inspector.get_operation(operation_keys)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/view.py", line 45, in get_operation
+    responses = self.get_responses()
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/view.py", line 180, in get_responses
+    response_serializers = self.get_response_serializers()
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/view.py", line 235, in get_response_serializers
+    responses = self.get_default_responses()
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/view.py", line 211, in get_default_responses
+    default_schema = self.serializer_to_schema(default_schema) or ''
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/base.py", line 438, in serializer_to_schema
+    return self.probe_inspectors(
+           ~~~~~~~~~~~~~~~~~~~~~^
+        self.field_inspectors, 'get_schema', serializer, {'field_inspectors': self.field_inspectors}
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/field.py", line 38, in get_schema
+    return self.probe_field_inspectors(serializer, openapi.Schema, self.use_definitions)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/base.py", line 228, in probe_field_inspectors
+    return self.probe_inspectors(
+           ~~~~~~~~~~~~~~~~~~~~~^
+        self.field_inspectors, 'field_to_swagger_object', field, {'field_inspectors': self.field_inspectors},
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        swagger_object_type=swagger_object_type, use_references=use_references, **kwargs
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/base.py", line 110, in probe_inspectors
+    result = method(obj, **kwargs)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/field.py", line 129, in field_to_swagger_object
+    actual_schema = definitions.setdefault(ref_name, make_schema_definition)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/openapi.py", line 685, in setdefault
+    ret = maker()
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/drf_yasg/inspectors/field.py", line 98, in make_schema_definition
+    for property_name, child in serializer.fields.items():
+                                ^^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/serializers.py", line 356, in fields
+    for key, value in self.get_fields().items():
+                      ~~~~~~~~~~~~~~~^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/serializers.py", line 1086, in get_fields
+    fields[field_name] = field_class(**field_kwargs)
+                         ~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/rest_framework/fields.py", line 862, in __init__
+    validators, error_message = ip_address_validators(protocol, self.unpack_ipv4)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+ValueError: not enough values to unpack (expected 2, got 1)
+ERROR 2026-02-07 15:00:37,824 log 433166 139856731698880 "GET /swagger/?format=openapi HTTP/1.1" 500 232426

@@ -1,48 +1,44 @@
 <header class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
     <div class="container-fluid">
-        <!-- Brand -->
-        <a class="navbar-brand" href="{% url 'pages:public_dashboard' %}">
+        <a class="navbar-brand" href="{% url 'home' %}">
             <i class="fas fa-tree"></i>
             <span class="fw-bold">KACAF</span>
             <small class="d-none d-md-inline">Kenya Agroforestry & Climate Action Foundation</small>
         </a>
-
-        <!-- Mobile toggle button -->
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        
         <div class="collapse navbar-collapse" id="navbarMain">
-            <!-- Left navigation -->
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'programs:program-list' %}">
+                    <a class="nav-link" href="{% url 'programs:program_list' %}">
                         <i class="fas fa-seedling"></i> Programs
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'events:event-list' %}">
+                    <a class="nav-link" href="{% url 'events:event_list' %}">
                         <i class="fas fa-calendar-alt"></i> Events
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'documents:document-list' %}">
+                    <a class="nav-link" href="{% url 'documents:document_list' %}">
                         <i class="fas fa-file-alt"></i> Resources
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'communications:announcement-list' %}">
+                    <a class="nav-link" href="{% url 'communications:announcement_list' %}">
                         <i class="fas fa-bullhorn"></i> Announcements
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'communications:contact-message-list' %}">
+                    <a class="nav-link" href="{% url 'contact' %}">
                         <i class="fas fa-envelope"></i> Contact
                     </a>
                 </li>
             </ul>
-
-            <!-- Right navigation (user account) -->
+            
             <ul class="navbar-nav">
                 {% if user.is_authenticated %}
                 <li class="nav-item dropdown">
@@ -55,25 +51,21 @@
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu">
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-tachometer-alt"></i> Dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user"></i> My Profile
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a></li>
+                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                            <i class="fas fa-user"></i> My Profile
+                        </a></li>
                         <li><hr class="dropdown-divider"></li>
                         {% if user.is_staff %}
-                        <li>
-                            <a class="dropdown-item" href="{% url 'admin:index' %}">
-                                <i class="fas fa-cog"></i> Admin Panel
-                            </a>
-                        </li>
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                            <i class="fas fa-cog"></i> Admin Panel
+                        </a></li>
                         {% endif %}
-                        {# Logout link removed to prevent NoReverseMatch #}
+                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a></li>
                     </ul>
                 </li>
                 {% else %}

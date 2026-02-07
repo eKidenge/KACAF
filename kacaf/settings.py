@@ -51,8 +51,11 @@ INSTALLED_APPS = [
     'events.apps.EventsConfig',
     'documents.apps.DocumentsConfig',
     'communications.apps.CommunicationsConfig',
-    'pages.apps.PagesConfig',
+    #'pages.apps.PagesConfig',
 ]
+
+INSTALLED_APPS += ['django_extensions']
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

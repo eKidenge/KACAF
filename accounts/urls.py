@@ -13,21 +13,8 @@ router.register(r'executive-committee', views.ExecutiveCommitteeViewSet, basenam
 
 # URL patterns
 urlpatterns = [
-    # Traditional Django views (for HTML templates)
-    path('dashboard/', views.dashboard, name='dashboard'),
-    path('profile/', views.profile, name='profile'),
-    path('profile/edit/', views.profile_edit, name='profile_edit'),
-    path('settings/', views.settings, name='settings'),
-    path('user-list/', views.user_list, name='user_list'),
-    
-    # API endpoints (keep existing router)
-    path('', include((router.urls, 'accounts'), namespace='api')),
+    path('', include((router.urls, 'accounts'), namespace='accounts')),
     path('register/', views.UserRegistrationView.as_view(), name='register'),
     path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
-    
-    # Optional: Include DRF auth URLs if needed
-    # path('auth/', include('rest_framework.urls')),  # Optional DRF login/logout
+    #path('auth/', include('rest_framework.urls')),  # Optional DRF login/logout
 ]
-
-# Add app namespace
-app_name = 'accounts'

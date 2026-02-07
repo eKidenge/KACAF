@@ -26,7 +26,7 @@
             <!-- Breadcrumb -->
             <nav aria-label="breadcrumb" class="ms-auto">
                 <ol class="breadcrumb mb-0">
-                    <li class="breadcrumb-item"><a href="{% url 'pages:public_dashboard' %}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
                     {% block breadcrumb %}
                     {% if breadcrumbs %}
                         {% for crumb in breadcrumbs %}
