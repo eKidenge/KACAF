@@ -1,0 +1,45 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <div class="container-fluid">
+        <div class="collapse navbar-collapse" id="navbarSecondary">
+            <ul class="navbar-nav">
+                <!-- Quick Stats -->
+                <li class="nav-item">
+                    <span class="nav-link text-muted">
+                        <i class="fas fa-users text-success"></i>
+                        <strong>{{ total_members }}</strong> Members
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link text-muted">
+                        <i class="fas fa-tree text-success"></i>
+                        <strong>{{ total_trees }}</strong> Trees Planted
+                    </span>
+                </li>
+                <li class="nav-item">
+                    <span class="nav-link text-muted">
+                        <i class="fas fa-map-marked-alt text-success"></i>
+                        <strong>{{ active_projects }}</strong> Active Projects
+                    </span>
+                </li>
+            </ul>
+            
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="ms-auto">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'pages:public_dashboard' %}">Home</a></li>
+                    {% block breadcrumb %}
+                    {% if breadcrumbs %}
+                        {% for crumb in breadcrumbs %}
+                            {% if forloop.last %}
+                            <li class="breadcrumb-item active">{{ crumb.name }}</li>
+                            {% else %}
+                            <li class="breadcrumb-item"><a href="{{ crumb.url }}">{{ crumb.name }}</a></li>
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {% endblock %}
+                </ol>
+            </nav>
+        </div>
+    </div>
+</nav>

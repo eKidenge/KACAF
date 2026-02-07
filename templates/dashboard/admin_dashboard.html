@@ -1,0 +1,839 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Admin Dashboard - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-stat-card {
+        border-left: 4px solid;
+        transition: transform 0.3s;
+    }
+    .dashboard-stat-card:hover {
+        transform: translateY(-3px);
+    }
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .quick-action-btn {
+        transition: all 0.3s;
+    }
+    .quick-action-btn:hover {
+        transform: scale(1.05);
+    }
+    .recent-activity-item {
+        border-left: 3px solid #198754;
+        padding-left: 15px;
+        margin-bottom: 15px;
+    }
+    .system-health-card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    .performance-metric {
+        height: 10px;
+        border-radius: 5px;
+        background: #e9ecef;
+    }
+    .performance-metric .progress {
+        height: 100%;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-tachometer-alt text-success me-2"></i>
+            Admin Dashboard
+            <small class="text-muted fs-6">System Administration Panel</small>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="exportDashboardData()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-success dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-cog me-1"></i> Admin Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                        <i class="fas fa-cogs me-2"></i> Django Admin
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'accounts:user_create' %}">
+                        <i class="fas fa-user-plus me-2"></i> Create User
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'finance:financial_report' %}">
+                        <i class="fas fa-file-invoice-dollar me-2"></i> Financial Report
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'system:backup' %}">
+                        <i class="fas fa-database me-2"></i> Backup System
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'system:logs' %}">
+                        <i class="fas fa-clipboard-list me-2"></i> System Logs
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-heartbeat me-2"></i>System Health & Status
+                    </h6>
+                    <span class="badge bg-light text-dark">
+                        Last updated: {% now "H:i:s" %}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="system-health-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Server Status</h6>
+                                    {% if server_health.status == 'healthy' %}
+                                    <span class="badge bg-success">Healthy</span>
+                                    {% elif server_health.status == 'warning' %}
+                                    <span class="badge bg-warning">Warning</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Critical</span>
+                                    {% endif %}
+                                </div>
+                                <div class="performance-metric mb-2">
+                                    <div class="progress bg-{% if server_health.cpu < 70 %}success{% elif server_health.cpu < 90 %}warning{% else %}danger{% endif %}" 
+                                         style="width: {{ server_health.cpu }}%;"></div>
+                                </div>
+                                <small class="text-muted">CPU: {{ server_health.cpu }}% | Memory: {{ server_health.memory }}%</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-health-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Database</h6>
+                                    {% if db_health.status == 'healthy' %}
+                                    <span class="badge bg-success">OK</span>
+                                    {% else %}
+                                    <span class="badge bg-danger">Error</span>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Size: {{ db_health.size|filesizeformat }}</small>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small>Connections: {{ db_health.connections }}</small>
+                                    <small>Tables: {{ db_health.tables }}</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-health-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Backup Status</h6>
+                                    {% if backup_health.last_successful %}
+                                    <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                    <span class="badge bg-warning">Pending</span>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        Last: {{ backup_health.last_backup|naturaltime|default:"Never" }}
+                                    </small>
+                                </div>
+                                <small class="text-muted">
+                                    Next: {{ backup_health.next_backup|naturaltime|default:"Scheduled" }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="system-health-card">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Security Status</h6>
+                                    <span class="badge bg-success">Secure</span>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        SSL: {% if security_health.ssl_enabled %}Enabled{% else %}Disabled{% endif %}
+                                    </small>
+                                </div>
+                                <small class="text-muted">
+                                    Failed logins: {{ security_health.failed_logins }}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Key Statistics -->
+    <div class="row mb-4">
+        <!-- User Statistics -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-stat-card border-start border-primary border-4 h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ total_users }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-success me-2">
+                                    <i class="fas fa-user-check me-1"></i>
+                                    {{ verified_users }} verified
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-icon bg-primary bg-opacity-10">
+                                <i class="fas fa-users fa-2x text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                {{ regular_members }} members
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'accounts:user_list' %}" class="small">Manage</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Statistics -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-stat-card border-start border-success border-4 h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                Financial Overview
+                            </div>
+                            <div class="h5 mb-0 fw-bold">KES {{ total_income|intcomma }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-danger me-2">
+                                    <i class="fas fa-money-bill-wave me-1"></i>
+                                    Expenses: KES {{ total_expenses|intcomma }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-icon bg-success bg-opacity-10">
+                                <i class="fas fa-chart-line fa-2x text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-hand-holding-usd me-1"></i>
+                                Balance: KES {{ net_balance|intcomma }}
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'finance:financial_report' %}" class="small">Reports</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Program Statistics -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-stat-card border-start border-info border-4 h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                                Programs & Projects
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ total_programs }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-info me-2">
+                                    <i class="fas fa-tasks me-1"></i>
+                                    {{ active_projects }} active projects
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-icon bg-info bg-opacity-10">
+                                <i class="fas fa-project-diagram fa-2x text-info"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-tree me-1"></i>
+                                {{ total_trees }} trees
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'programs:program_list' %}" class="small">View All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- System Statistics -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card dashboard-stat-card border-start border-warning border-4 h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                System Usage
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ total_logins_today }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-warning me-2">
+                                    <i class="fas fa-database me-1"></i>
+                                    Storage: {{ storage_used|filesizeformat }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="stat-icon bg-warning bg-opacity-10">
+                                <i class="fas fa-server fa-2x text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-bug me-1"></i>
+                                {{ error_logs_count }} errors
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'system:logs' %}" class="small">Logs</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions & Recent Activity -->
+    <div class="row">
+        <!-- Quick Actions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Admin Actions
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'accounts:user_create' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-primary bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-user-plus text-primary"></i>
+                            </div>
+                            <div>
+                                <strong>Create New User</strong>
+                                <small class="text-muted d-block">Add staff or executive members</small>
+                            </div>
+                        </a>
+                        <a href="{% url 'governance:assembly_create' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-success bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-users text-success"></i>
+                            </div>
+                            <div>
+                                <strong>Schedule Assembly</strong>
+                                <small class="text-muted d-block">Create general meeting</small>
+                            </div>
+                        </a>
+                        <a href="{% url 'finance:income_create' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-info bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-money-bill-wave text-info"></i>
+                            </div>
+                            <div>
+                                <strong>Record Income</strong>
+                                <small class="text-muted d-block">Add donation or grant</small>
+                            </div>
+                        </a>
+                        <a href="{% url 'programs:program_create' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-warning bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-project-diagram text-warning"></i>
+                            </div>
+                            <div>
+                                <strong>Create Program</strong>
+                                <small class="text-muted d-block">Start new initiative</small>
+                            </div>
+                        </a>
+                        <a href="{% url 'communications:announcement_create' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-danger bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-bullhorn text-danger"></i>
+                            </div>
+                            <div>
+                                <strong>Post Announcement</strong>
+                                <small class="text-muted d-block">Broadcast to members</small>
+                            </div>
+                        </a>
+                        <a href="{% url 'system:backup' %}" 
+                           class="list-group-item list-group-item-action d-flex align-items-center quick-action-btn">
+                            <div class="bg-dark bg-opacity-10 rounded-circle p-2 me-3">
+                                <i class="fas fa-database text-dark"></i>
+                            </div>
+                            <div>
+                                <strong>System Backup</strong>
+                                <small class="text-muted d-block">Create data backup</small>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Recent System Activity
+                    </h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown">
+                            Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Activities</a></li>
+                            <li><a class="dropdown-item" href="#">User Activities</a></li>
+                            <li><a class="dropdown-item" href="#">System Events</a></li>
+                            <li><a class="dropdown-item" href="#">Financial Transactions</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                    <div class="timeline">
+                        {% for activity in recent_activities %}
+                        <div class="recent-activity-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">{{ activity.title }}</h6>
+                                    <p class="mb-1 small">{{ activity.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ activity.user.get_full_name|default:"System" }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ activity.timestamp|timesince }} ago
+                                    </small>
+                                    {% if activity.type == 'user' %}
+                                    <span class="badge bg-primary">User</span>
+                                    {% elif activity.type == 'financial' %}
+                                    <span class="badge bg-success">Financial</span>
+                                    {% elif activity.type == 'system' %}
+                                    <span class="badge bg-warning">System</span>
+                                    {% elif activity.type == 'security' %}
+                                    <span class="badge bg-danger">Security</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activities found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'system:activity_log' %}" class="btn btn-sm btn-outline-success">
+                        <i class="fas fa-list me-1"></i> View Full Activity Log
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals & Alerts -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Pending Approvals
+                        {% if pending_approvals.count > 0 %}
+                        <span class="badge bg-light text-dark ms-2">{{ pending_approvals.count }}</span>
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if pending_approvals %}
+                    <div class="list-group list-group-flush">
+                        {% for item in pending_approvals %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ item.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ item.submitted_by.get_full_name }}
+                                        • {{ item.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                <div>
+                                    <a href="{{ item.approve_url }}" class="btn btn-sm btn-success me-1">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    <a href="{{ item.reject_url }}" class="btn btn-sm btn-danger">
+                                        <i class="fas fa-times"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No pending approvals.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>System Alerts
+                        {% if system_alerts.count > 0 %}
+                        <span class="badge bg-light text-dark ms-2">{{ system_alerts.count }}</span>
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if system_alerts %}
+                    <div class="list-group list-group-flush">
+                        {% for alert in system_alerts %}
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    {% if alert.level == 'critical' %}
+                                    <i class="fas fa-exclamation-circle text-danger fa-lg"></i>
+                                    {% elif alert.level == 'warning' %}
+                                    <i class="fas fa-exclamation-triangle text-warning fa-lg"></i>
+                                    {% else %}
+                                    <i class="fas fa-info-circle text-info fa-lg"></i>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ alert.title }}</h6>
+                                    <p class="mb-1 small">{{ alert.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ alert.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="dismissAlert({{ alert.id }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No system alerts.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Management & Reports -->
+    <div class="row">
+        <!-- Recent Registrations -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Recent Registrations
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in recent_users %}
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if user.profile_picture %}
+                                            <img src="{{ user.profile_picture.url }}" 
+                                                 class="rounded-circle me-2" 
+                                                 width="30" 
+                                                 alt="{{ user.get_full_name }}">
+                                            {% else %}
+                                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center me-2" 
+                                                 style="width: 30px; height: 30px;">
+                                                <i class="fas fa-user text-white"></i>
+                                            </div>
+                                            {% endif %}
+                                            {{ user.get_full_name|truncatechars:20 }}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-{% if user.user_type == 'executive' %}warning{% else %}info{% endif %}">
+                                            {{ user.get_user_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>{{ user.date_joined|date:"M d" }}</td>
+                                    <td>
+                                        {% if user.is_verified %}
+                                        <span class="badge bg-success">Verified</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'accounts:user_detail' user.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'accounts:user_list' %}" class="btn btn-sm btn-primary">
+                        <i class="fas fa-users me-1"></i> Manage All Users
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Overview -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Financial Overview
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="financialChart" height="200"></canvas>
+                    <div class="row mt-3 text-center">
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">Today</small>
+                                <strong class="text-success">KES {{ today_income|intcomma }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">This Week</small>
+                                <strong class="text-success">KES {{ weekly_income|intcomma }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">This Month</small>
+                                <strong class="text-success">KES {{ monthly_income|intcomma }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'finance:financial_report' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-file-invoice-dollar me-1"></i> View Financial Reports
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Information -->
+    <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-info-circle me-2"></i>System Information
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <div class="text-muted mb-2">Django Version</div>
+                        <div class="h5">4.2.0</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <div class="text-muted mb-2">Database</div>
+                        <div class="h5">PostgreSQL</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <div class="text-muted mb-2">Uptime</div>
+                        <div class="h5">{{ system_uptime }}</div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="border rounded p-3 text-center">
+                        <div class="text-muted mb-2">Last Backup</div>
+                        <div class="h5">{{ last_backup_time|naturaltime }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Refresh dashboard
+    function refreshDashboard() {
+        window.location.reload();
+    }
+    
+    // Export dashboard data
+    function exportDashboardData() {
+        // Implement export functionality
+        alert('Export feature coming soon!');
+    }
+    
+    // Dismiss alert
+    function dismissAlert(alertId) {
+        fetch(`/api/system/alerts/${alertId}/dismiss/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+    
+    // Financial Chart
+    const financialCtx = document.getElementById('financialChart').getContext('2d');
+    const financialChart = new Chart(financialCtx, {
+        type: 'line',
+        data: {
+            labels: {{ financial_labels|safe }},
+            datasets: [
+                {
+                    label: 'Income',
+                    data: {{ income_data|safe }},
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Expenses',
+                    data: {{ expense_data|safe }},
+                    borderColor: '#dc3545',
+                    backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Financial Trends'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'KES ' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Auto-refresh every 5 minutes
+    setTimeout(function() {
+        refreshDashboard();
+    }, 300000);
+</script>
+{% endblock %}

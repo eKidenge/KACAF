@@ -1,0 +1,695 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Member Dashboard - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .member-card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .member-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .achievement-badge {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+    }
+    .tree-counter {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #198754;
+    }
+    .progress-ring {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto;
+    }
+    .impact-card {
+        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+        color: white;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .quick-link {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 15px;
+        text-align: center;
+        transition: all 0.3s;
+        height: 100%;
+    }
+    .quick-link:hover {
+        background: #f8f9fa;
+        border-color: #198754;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="jumbotron bg-success text-white rounded-3 p-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-6 fw-bold">
+                            Welcome back, {{ user.get_full_name|default:user.username }}!
+                        </h1>
+                        <p class="lead mb-0">
+                            {% if user.is_verified %}
+                            <i class="fas fa-check-circle me-2"></i>
+                            Verified Member since {{ user.join_date|date:"F Y" }}
+                            {% else %}
+                            <i class="fas fa-clock me-2"></i>
+                            Membership Pending Verification
+                            {% endif %}
+                        </p>
+                        <div class="mt-3">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-user-tag me-1"></i>
+                                {{ user.get_membership_type_display|default:"Member" }}
+                            </span>
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ user.county }}
+                            </span>
+                            {% if user.member_profile.farm_size %}
+                            <span class="badge bg-light text-dark">
+                                <i class="fas fa-tractor me-1"></i>
+                                {{ user.member_profile.farm_size }} acres
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="bg-white rounded-3 p-3">
+                            <div class="tree-counter">{{ user_trees_count }}</div>
+                            <p class="text-muted mb-0">Trees Planted</p>
+                            <small class="text-muted">
+                                {{ carbon_sequestration|floatformat:1 }} tons CO₂ sequestered
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member Statistics -->
+    <div class="row mb-4">
+        <!-- Membership Status -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card member-card h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                Membership Status
+                            </div>
+                            <div class="h5 mb-0 fw-bold">
+                                {% if user.is_verified %}
+                                <span class="text-success">Active</span>
+                                {% else %}
+                                <span class="text-warning">Pending</span>
+                                {% endif %}
+                            </div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-success me-2">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    Joined {{ user.join_date|date:"M Y" }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            {% if user.is_verified %}
+                            <div class="achievement-badge bg-success">
+                                <i class="fas fa-check fa-2x text-white"></i>
+                            </div>
+                            {% else %}
+                            <div class="achievement-badge bg-warning">
+                                <i class="fas fa-clock fa-2x text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    {% if not user.is_verified %}
+                    <a href="{% url 'accounts:profile_edit' %}" class="btn btn-sm btn-warning w-100">
+                        <i class="fas fa-user-check me-1"></i> Complete Verification
+                    </a>
+                    {% else %}
+                    <div class="text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-id-card me-1"></i>
+                            ID: {{ user.id_number|default:"Not provided" }}
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- My Trees -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card member-card h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                My Trees
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ user_trees_count }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-success me-2">
+                                    <i class="fas fa-leaf me-1"></i>
+                                    {{ user_trees_survival_rate }}% survival rate
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="progress-ring">
+                                <svg width="100" height="100" viewBox="0 0 100 100">
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#e9ecef" stroke-width="10"/>
+                                    <circle cx="50" cy="50" r="45" fill="none" stroke="#198754" stroke-width="10" 
+                                            stroke-dasharray="{{ user_trees_survival_rate }} 100" 
+                                            stroke-linecap="round" transform="rotate(-90 50 50)"/>
+                                    <text x="50" y="55" text-anchor="middle" font-size="20" font-weight="bold" fill="#198754">
+                                        {{ user_trees_survival_rate }}%
+                                    </text>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-seedling me-1"></i>
+                                {{ recent_trees_count }} this month
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'programs:my_trees' %}" class="small">View All</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Events -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card member-card h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                My Events
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ registered_events }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-success me-2">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ upcoming_events_count }} upcoming
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="achievement-badge bg-info">
+                                <i class="fas fa-calendar-alt fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-running me-1"></i>
+                                {{ attended_events }} attended
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'events:event_list' %}" class="small">View Calendar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Contributions -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card member-card h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                My Contributions
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ total_contributions }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-success me-2">
+                                    <i class="fas fa-hands-helping me-1"></i>
+                                    {{ volunteer_hours }} volunteer hours
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <div class="achievement-badge bg-warning">
+                                <i class="fas fa-trophy fa-2x text-white"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-star me-1"></i>
+                                Level {{ user_level }} Member
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="#" class="small">View Badges</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4 class="mb-3">
+                <i class="fas fa-rocket text-success me-2"></i>
+                Quick Actions
+            </h4>
+            <div class="row g-3">
+                <div class="col-md-3 col-6">
+                    <a href="{% url 'programs:tree_planting_create' %}" class="quick-link text-decoration-none">
+                        <div class="text-success display-6 mb-2">
+                            <i class="fas fa-tree"></i>
+                        </div>
+                        <h6>Plant a Tree</h6>
+                        <small class="text-muted">Report tree planting activity</small>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{% url 'events:event_list' %}" class="quick-link text-decoration-none">
+                        <div class="text-success display-6 mb-2">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <h6>Register for Events</h6>
+                        <small class="text-muted">View upcoming activities</small>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{% url 'accounts:profile_edit' %}" class="quick-link text-decoration-none">
+                        <div class="text-success display-6 mb-2">
+                            <i class="fas fa-user-edit"></i>
+                        </div>
+                        <h6>Update Profile</h6>
+                        <small class="text-muted">Keep information current</small>
+                    </a>
+                </div>
+                <div class="col-md-3 col-6">
+                    <a href="{% url 'documents:document_list' %}" class="quick-link text-decoration-none">
+                        <div class="text-success display-6 mb-2">
+                            <i class="fas fa-file-download"></i>
+                        </div>
+                        <h6>Download Resources</h6>
+                        <small class="text-muted">Guides and templates</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Impact & Progress -->
+    <div class="row mb-4">
+        <!-- Environmental Impact -->
+        <div class="col-md-6 mb-4">
+            <div class="impact-card">
+                <h4 class="mb-3">
+                    <i class="fas fa-leaf me-2"></i>
+                    Your Environmental Impact
+                </h4>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="display-4">{{ user_trees_count }}</div>
+                        <small>Trees Planted</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="display-4">{{ carbon_sequestration|floatformat:1 }}</div>
+                        <small>Tons CO₂</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="display-4">{{ equivalent_cars }}</div>
+                        <small>Cars off road</small>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <p class="mb-0">
+                        <i class="fas fa-quote-left me-2"></i>
+                        Thank you for contributing to a greener Kenya!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress to Next Level -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>
+                        Member Level Progress
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="display-4 text-warning mb-2">Level {{ user_level }}</div>
+                        <p class="text-muted">{{ user_level_title }}</p>
+                    </div>
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Progress to Level {{ user_level|add:1 }}</small>
+                            <small>{{ current_points }}/{{ next_level_points }} points</small>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar bg-warning progress-bar-striped" 
+                                 role="progressbar" 
+                                 style="width: {{ level_progress }}%;"
+                                 aria-valuenow="{{ level_progress }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {{ level_progress }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <small class="text-muted d-block">Trees</small>
+                            <strong>{{ tree_points }}/50</strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Events</small>
+                            <strong>{{ event_points }}/20</strong>
+                        </div>
+                        <div class="col-4">
+                            <small class="text-muted d-block">Training</small>
+                            <strong>{{ training_points }}/30</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity & Upcoming Events -->
+    <div class="row">
+        <!-- Recent Activity -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Your Recent Activity
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                    <div class="timeline">
+                        {% for activity in recent_activities %}
+                        <div class="recent-activity-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">{{ activity.title }}</h6>
+                                    <p class="mb-1 small">{{ activity.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ activity.timestamp|timesince }} ago
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if activity.type == 'tree_planting' %}
+                                    <span class="badge bg-success">Tree Planting</span>
+                                    {% elif activity.type == 'event' %}
+                                    <span class="badge bg-info">Event</span>
+                                    {% elif activity.type == 'training' %}
+                                    <span class="badge bg-warning">Training</span>
+                                    {% elif activity.type == 'achievement' %}
+                                    <span class="badge bg-purple">Achievement</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activities found.</p>
+                        <a href="{% url 'programs:program_list' %}" class="btn btn-success">
+                            <i class="fas fa-rocket me-1"></i> Get Started
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Upcoming Events
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_events %}
+                    <div class="list-group list-group-flush">
+                        {% for event in upcoming_events|slice:":3" %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ event.title|truncatechars:30 }}</h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ event.start_datetime|date:"M d, h:i A" }}
+                                    </small>
+                                </div>
+                                <div>
+                                    {% if event in registered_events_list %}
+                                    <span class="badge bg-success">Registered</span>
+                                    {% else %}
+                                    <a href="{% url 'events:event_register' event.id %}" 
+                                       class="btn btn-sm btn-outline-info">
+                                        Register
+                                    </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No upcoming events.</p>
+                    </div>
+                    {% endif %}
+                    <div class="text-center mt-3">
+                        <a href="{% url 'events:event_list' %}" class="btn btn-sm btn-info w-100">
+                            <i class="fas fa-calendar me-1"></i> View All Events
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Trees & Achievements -->
+    <div class="row mt-4">
+        <!-- My Trees Summary -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-tree me-2"></i>My Trees Summary
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="myTreesChart" height="200"></canvas>
+                    <div class="row mt-3 text-center">
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">This Month</small>
+                                <strong class="text-success">{{ monthly_trees }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">This Year</small>
+                                <strong class="text-success">{{ yearly_trees }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border rounded p-2">
+                                <small class="text-muted d-block">Survival Rate</small>
+                                <strong class="text-success">{{ user_trees_survival_rate }}%</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-award me-2"></i>Your Achievements
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if achievements %}
+                    <div class="row">
+                        {% for achievement in achievements|slice:":4" %}
+                        <div class="col-6 mb-3">
+                            <div class="card border-0 shadow-sm text-center h-100">
+                                <div class="card-body">
+                                    <div class="achievement-badge mx-auto mb-3" 
+                                         style="background-color: {{ achievement.color }};">
+                                        <i class="{{ achievement.icon }} fa-2x text-white"></i>
+                                    </div>
+                                    <h6>{{ achievement.name }}</h6>
+                                    <p class="small text-muted mb-0">{{ achievement.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        {{ achievement.date_earned|date:"M Y" }}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-award fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No achievements yet.</p>
+                        <p class="small">Participate in events and plant trees to earn badges!</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="#" class="btn btn-sm btn-warning w-100">
+                        <i class="fas fa-trophy me-1"></i> View All Achievements
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- KACAF News -->
+    <div class="card mt-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-newspaper me-2"></i>Latest from KACAF
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for announcement in announcements|slice:":3" %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if announcement.featured_image %}
+                        <img src="{{ announcement.featured_image.url }}" 
+                             class="card-img-top" 
+                             alt="{{ announcement.title }}"
+                             style="height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" 
+                             style="height: 150px;">
+                            <i class="fas fa-newspaper fa-3x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">{{ announcement.title|truncatechars:50 }}</h6>
+                            <p class="card-text small text-muted">
+                                {{ announcement.summary|truncatechars:100 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ announcement.publish_date|timesince }} ago
+                                </small>
+                                <a href="{% url 'communications:announcement_detail' announcement.id %}" 
+                                   class="btn btn-sm btn-outline-success">
+                                    Read
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="card-footer bg-transparent">
+            <a href="{% url 'communications:announcement_list' %}" class="btn btn-sm btn-success">
+                <i class="fas fa-newspaper me-1"></i> Read All News
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // My Trees Chart
+    const treesCtx = document.getElementById('myTreesChart').getContext('2d');
+    const treesChart = new Chart(treesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ tree_species_labels|safe }},
+            datasets: [{
+                data: {{ tree_species_data|safe }},
+                backgroundColor: [
+                    '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
+                    '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Trees by Species'
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

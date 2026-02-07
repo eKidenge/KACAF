@@ -1,0 +1,771 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Our Programs - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .program-card {
+        transition: transform 0.3s, box-shadow 0.3s;
+        height: 100%;
+        border-top: 4px solid;
+    }
+    .program-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .program-agroforestry {
+        border-top-color: #198754;
+    }
+    .program-climate_smart_ag {
+        border-top-color: #20c997;
+    }
+    .program-biodiversity {
+        border-top-color: #0dcaf0;
+    }
+    .program-restoration {
+        border-top-color: #ffc107;
+    }
+    .program-education {
+        border-top-color: #6f42c1;
+    }
+    .program-card-img {
+        height: 200px;
+        object-fit: cover;
+    }
+    .progress-circle {
+        width: 80px;
+        height: 80px;
+    }
+    .stat-badge {
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Hero Section -->
+    <div class="bg-success text-white rounded-3 p-5 mb-5 position-relative overflow-hidden">
+        <div class="position-absolute top-0 end-0 opacity-25">
+            <i class="fas fa-seedling fa-10x"></i>
+        </div>
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-5 fw-bold mb-3">
+                    <i class="fas fa-project-diagram me-3"></i>
+                    Our Programs
+                </h1>
+                <p class="lead mb-4">
+                    Transforming West Pokot County through sustainable agroforestry, 
+                    biodiversity conservation, and climate action initiatives.
+                </p>
+                <div class="d-flex flex-wrap gap-3">
+                    <span class="badge bg-light text-dark fs-6 py-2">
+                        <i class="fas fa-tree me-2"></i>{{ total_trees_planted|intcomma }} Trees Planted
+                    </span>
+                    <span class="badge bg-light text-dark fs-6 py-2">
+                        <i class="fas fa-users me-2"></i>{{ total_beneficiaries|intcomma }} Beneficiaries
+                    </span>
+                    <span class="badge bg-light text-dark fs-6 py-2">
+                        <i class="fas fa-map-marked-alt me-2"></i>{{ total_area_coverage }} Hectares
+                    </span>
+                </div>
+            </div>
+            <div class="col-lg-4 text-center">
+                <div class="bg-white rounded-3 p-4 shadow">
+                    <div class="display-6 text-success mb-2">{{ carbon_sequestered|floatformat:0 }}</div>
+                    <p class="text-muted mb-0">Tons of CO₂ Sequestered</p>
+                    <small class="text-muted">Equivalent to {{ equivalent_cars }} cars off the road</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Program Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-success text-white">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" id="searchPrograms" placeholder="Search programs...">
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="programTypeFilter">
+                        <option value="">All Program Types</option>
+                        {% for type in program_types %}
+                        <option value="{{ type.0 }}">{{ type.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="planning">Planning</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select class="form-select" id="countyFilter">
+                        <option value="">All Counties</option>
+                        {% for county in counties %}
+                        <option value="{{ county }}">{{ county }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="featuredFilter" value="featured">
+                        <label class="form-check-label" for="featuredFilter">
+                            Show Featured Only
+                        </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="checkbox" id="myProgramsFilter" value="my-programs">
+                        <label class="form-check-label" for="myProgramsFilter">
+                            My Programs Only
+                        </label>
+                    </div>
+                    <button class="btn btn-sm btn-outline-success float-end" id="resetFiltersBtn">
+                        <i class="fas fa-redo"></i> Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Program Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-success display-6 mb-2">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="h4 mb-0">{{ total_programs }}</div>
+                    <p class="text-muted mb-0">Total Programs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-success display-6 mb-2">
+                        <i class="fas fa-tasks"></i>
+                    </div>
+                    <div class="h4 mb-0">{{ active_programs }}</div>
+                    <p class="text-muted mb-0">Active Programs</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-success display-6 mb-2">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="h4 mb-0">{{ total_team_members }}</div>
+                    <p class="text-muted mb-0">Team Members</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 col-6 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="text-success display-6 mb-2">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="h5 mb-0">KES {{ total_budget|intcomma }}</div>
+                    <p class="text-muted mb-0">Total Budget</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Program Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h3 class="h4 mb-3">
+                <i class="fas fa-layer-group text-success me-2"></i>
+                Program Categories
+            </h3>
+            <div class="row g-3">
+                {% for type in program_types %}
+                <div class="col-md-4 col-lg-2 mb-3">
+                    <div class="card text-center program-type-card" data-type="{{ type.0 }}">
+                        <div class="card-body">
+                            {% if type.0 == 'agroforestry' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-tree"></i>
+                            </div>
+                            <h6 class="mb-0">Agroforestry</h6>
+                            {% elif type.0 == 'climate_smart_ag' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-cloud-sun"></i>
+                            </div>
+                            <h6 class="mb-0">Climate-Smart Ag</h6>
+                            {% elif type.0 == 'biodiversity' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-dove"></i>
+                            </div>
+                            <h6 class="mb-0">Biodiversity</h6>
+                            {% elif type.0 == 'restoration' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-mountain"></i>
+                            </div>
+                            <h6 class="mb-0">Restoration</h6>
+                            {% elif type.0 == 'education' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h6 class="mb-0">Education</h6>
+                            {% elif type.0 == 'capacity' %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                            <h6 class="mb-0">Capacity Building</h6>
+                            {% else %}
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-hands-helping"></i>
+                            </div>
+                            <h6 class="mb-0">{{ type.1 }}</h6>
+                            {% endif %}
+                            <small class="text-muted">
+                                {{ programs_by_type|get_item:type.0 }} programs
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Programs Grid -->
+    <div class="row mb-4" id="programsGrid">
+        {% for program in programs %}
+        <div class="col-lg-4 col-md-6 mb-4 program-item" 
+             data-type="{{ program.program_type }}"
+             data-status="{{ program.status }}"
+             data-county="{{ program.county }}"
+             data-featured="{{ program.is_featured|yesno:'true,false' }}"
+             data-myprogram="{{ program|is_my_program:user|yesno:'true,false' }}">
+            <div class="card program-card program-{{ program.program_type }} h-100">
+                <!-- Program Header -->
+                <div class="card-header position-relative">
+                    {% if program.is_featured %}
+                    <span class="position-absolute top-0 start-0 translate-middle-y badge bg-warning">
+                        <i class="fas fa-star me-1"></i> Featured
+                    </span>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-1">{{ program.title|truncatechars:40 }}</h5>
+                            <div class="d-flex flex-wrap gap-1">
+                                <span class="badge bg-{% if program.program_type == 'agroforestry' %}success{% elif program.program_type == 'climate_smart_ag' %}info{% elif program.program_type == 'biodiversity' %}primary{% else %}secondary{% endif %} stat-badge">
+                                    {{ program.get_program_type_display }}
+                                </span>
+                                <span class="badge bg-{% if program.status == 'active' %}success{% elif program.status == 'completed' %}secondary{% else %}warning{% endif %} stat-badge">
+                                    {{ program.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-success dropdown-toggle" 
+                                    type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'programs:program_detail' program.id %}">
+                                        <i class="fas fa-eye me-2"></i> View Details
+                                    </a>
+                                </li>
+                                {% if user in program.team_members.all or perms.programs.change_program %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'programs:program_edit' program.id %}">
+                                        <i class="fas fa-edit me-2"></i> Edit
+                                    </a>
+                                </li>
+                                {% endif %}
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'programs:program_report' program.id %}">
+                                        <i class="fas fa-download me-2"></i> Download Report
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Program Image -->
+                {% if program.featured_image %}
+                <img src="{{ program.featured_image.url }}" 
+                     class="card-img-top program-card-img" 
+                     alt="{{ program.title }}">
+                {% else %}
+                <div class="program-card-img bg-light d-flex align-items-center justify-content-center">
+                    <i class="fas fa-project-diagram fa-5x text-muted"></i>
+                </div>
+                {% endif %}
+                
+                <!-- Card Body -->
+                <div class="card-body">
+                    <!-- Description -->
+                    <p class="card-text">{{ program.description|truncatechars:150 }}</p>
+                    
+                    <!-- Location -->
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-map-marker-alt me-1"></i>
+                            {{ program.county }}
+                            {% if program.sub_counties %}
+                            - {{ program.sub_counties|truncatechars:30 }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <small>Progress</small>
+                            <small>{{ program.progress }}%</small>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                            <div class="progress-bar bg-success" role="progressbar" 
+                                 style="width: {{ program.progress }}%;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="row g-2 mb-3">
+                        <div class="col-4 text-center">
+                            <div class="border rounded py-1">
+                                <small class="text-muted d-block">Trees</small>
+                                <strong>{{ program.total_trees_planted }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="border rounded py-1">
+                                <small class="text-muted d-block">Farmers</small>
+                                <strong>{{ program.beneficiaries_reached }}</strong>
+                            </div>
+                        </div>
+                        <div class="col-4 text-center">
+                            <div class="border rounded py-1">
+                                <small class="text-muted d-block">Projects</small>
+                                <strong>{{ program.projects_count }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Timeline -->
+                    <div class="mb-3">
+                        <small class="text-muted d-block mb-1">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {{ program.start_date|date:"M Y" }} - 
+                            {% if program.end_date %}
+                            {{ program.end_date|date:"M Y" }}
+                            {% else %}
+                            Ongoing
+                            {% endif %}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            {{ program.duration_months }} months
+                        </small>
+                    </div>
+                    
+                    <!-- Program Manager -->
+                    {% if program.program_manager %}
+                    <div class="d-flex align-items-center">
+                        <div class="flex-shrink-0">
+                            {% if program.program_manager.profile_picture %}
+                            <img src="{{ program.program_manager.profile_picture.url }}" 
+                                 class="rounded-circle" 
+                                 width="30" 
+                                 alt="{{ program.program_manager.get_full_name }}">
+                            {% else %}
+                            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" 
+                                 style="width: 30px; height: 30px;">
+                                <i class="fas fa-user text-white"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1 ms-2">
+                            <small class="d-block">Program Manager</small>
+                            <small class="fw-bold">{{ program.program_manager.get_full_name }}</small>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            {% if user in program.team_members.all %}
+                            <span class="badge bg-success">
+                                <i class="fas fa-user-check me-1"></i> Team Member
+                            </span>
+                            {% else %}
+                            <a href="{% url 'programs:program_join' program.id %}" 
+                               class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-user-plus me-1"></i> Join Program
+                            </a>
+                            {% endif %}
+                        </div>
+                        <a href="{% url 'programs:program_detail' program.id %}" 
+                           class="btn btn-sm btn-success">
+                            View Details <i class="fas fa-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Programs Found</h5>
+                    <p class="text-muted">There are no programs matching your criteria.</p>
+                    {% if perms.programs.add_program %}
+                    <a href="{% url 'programs:program_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i> Create First Program
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Map View -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="fas fa-map me-2"></i>Program Locations Map
+            </h6>
+            <button class="btn btn-sm btn-light" id="toggleMapView">
+                <i class="fas fa-expand-alt"></i> Full Screen
+            </button>
+        </div>
+        <div class="card-body p-0">
+            <div id="programMap" style="height: 400px;"></div>
+        </div>
+    </div>
+
+    <!-- Featured Programs -->
+    {% if featured_programs %}
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-star me-2"></i>Featured Programs
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                {% for program in featured_programs|slice:":3" %}
+                <div class="col-md-4 mb-3">
+                    <div class="card border-success h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-star text-white"></i>
+                                </div>
+                                <div class="ms-3">
+                                    <h5 class="card-title mb-1">{{ program.title }}</h5>
+                                    <p class="card-text small text-muted">{{ program.description|truncatechars:100 }}</p>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        {{ program.county }}
+                                    </small>
+                                </div>
+                                <a href="{% url 'programs:program_detail' program.id %}" 
+                                   class="btn btn-sm btn-outline-success">
+                                    Learn More
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Program Impact Statistics -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i>Program Impact Statistics
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <canvas id="impactChart" height="250"></canvas>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <canvas id="budgetChart" height="250"></canvas>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Program</th>
+                            <th>Trees Planted</th>
+                            <th>Beneficiaries</th>
+                            <th>Area (ha)</th>
+                            <th>Budget (KES)</th>
+                            <th>Progress</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for program in top_programs %}
+                        <tr>
+                            <td>{{ program.title|truncatechars:30 }}</td>
+                            <td>{{ program.total_trees_planted }}</td>
+                            <td>{{ program.beneficiaries_reached }}</td>
+                            <td>{{ program.total_area|floatformat:2 }}</td>
+                            <td>{{ program.estimated_budget|floatformat:0 }}</td>
+                            <td>
+                                <div class="progress" style="height: 10px; width: 100px;">
+                                    <div class="progress-bar bg-success" style="width: {{ program.progress }}%;"></div>
+                                </div>
+                                <small>{{ program.progress }}%</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet Maps -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    // Program filtering
+    function filterPrograms() {
+        const searchTerm = document.getElementById('searchPrograms').value.toLowerCase();
+        const typeFilter = document.getElementById('programTypeFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const countyFilter = document.getElementById('countyFilter').value;
+        const featuredFilter = document.getElementById('featuredFilter').checked;
+        const myProgramsFilter = document.getElementById('myProgramsFilter').checked;
+        
+        const programItems = document.querySelectorAll('.program-item');
+        
+        programItems.forEach(item => {
+            const title = item.querySelector('.card-title').textContent.toLowerCase();
+            const type = item.dataset.type;
+            const status = item.dataset.status;
+            const county = item.dataset.county;
+            const featured = item.dataset.featured === 'true';
+            const myprogram = item.dataset.myprogram === 'true';
+            
+            let show = true;
+            
+            // Search filter
+            if (searchTerm && !title.includes(searchTerm)) {
+                show = false;
+            }
+            
+            // Type filter
+            if (typeFilter && type !== typeFilter) {
+                show = false;
+            }
+            
+            // Status filter
+            if (statusFilter && status !== statusFilter) {
+                show = false;
+            }
+            
+            // County filter
+            if (countyFilter && county !== countyFilter) {
+                show = false;
+            }
+            
+            // Featured filter
+            if (featuredFilter && !featured) {
+                show = false;
+            }
+            
+            // My programs filter
+            if (myProgramsFilter && !myprogram) {
+                show = false;
+            }
+            
+            item.style.display = show ? 'block' : 'none';
+        });
+    }
+    
+    // Event listeners for filters
+    document.getElementById('searchPrograms').addEventListener('keyup', filterPrograms);
+    document.getElementById('programTypeFilter').addEventListener('change', filterPrograms);
+    document.getElementById('statusFilter').addEventListener('change', filterPrograms);
+    document.getElementById('countyFilter').addEventListener('change', filterPrograms);
+    document.getElementById('featuredFilter').addEventListener('change', filterPrograms);
+    document.getElementById('myProgramsFilter').addEventListener('change', filterPrograms);
+    
+    // Reset filters
+    document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+        document.getElementById('searchPrograms').value = '';
+        document.getElementById('programTypeFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('countyFilter').value = '';
+        document.getElementById('featuredFilter').checked = false;
+        document.getElementById('myProgramsFilter').checked = false;
+        
+        const programItems = document.querySelectorAll('.program-item');
+        programItems.forEach(item => {
+            item.style.display = 'block';
+        });
+    });
+    
+    // Program type card click
+    document.querySelectorAll('.program-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const type = this.dataset.type;
+            document.getElementById('programTypeFilter').value = type;
+            filterPrograms();
+        });
+    });
+    
+    // Initialize map
+    let programMap;
+    document.addEventListener('DOMContentLoaded', function() {
+        programMap = L.map('programMap').setView([1.9167, 35.1667], 9);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(programMap);
+        
+        // Add markers for programs
+        {% for program in programs %}
+        {% if program.gps_coordinates %}
+        const coords = "{{ program.gps_coordinates }}".split(',').map(Number);
+        if (coords.length === 2) {
+            L.marker(coords)
+                .addTo(programMap)
+                .bindPopup(`
+                    <strong>{{ program.title }}</strong><br>
+                    <small>{{ program.get_program_type_display }}</small><br>
+                    <a href="{% url 'programs:program_detail' program.id %}" class="btn btn-sm btn-success mt-1">
+                        View Details
+                    </a>
+                `);
+        }
+        {% endif %}
+        {% endfor %}
+    });
+    
+    // Toggle map view
+    document.getElementById('toggleMapView').addEventListener('click', function() {
+        const mapElement = document.getElementById('programMap');
+        mapElement.requestFullscreen();
+    });
+    
+    // Impact Chart
+    const impactCtx = document.getElementById('impactChart').getContext('2d');
+    const impactChart = new Chart(impactCtx, {
+        type: 'line',
+        data: {
+            labels: {{ monthly_labels|safe }},
+            datasets: [
+                {
+                    label: 'Trees Planted',
+                    data: {{ monthly_trees|safe }},
+                    borderColor: '#198754',
+                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'Beneficiaries',
+                    data: {{ monthly_beneficiaries|safe }},
+                    borderColor: '#0dcaf0',
+                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Monthly Impact'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Budget Chart
+    const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+    const budgetChart = new Chart(budgetCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ program_names|safe }},
+            datasets: [{
+                label: 'Budget (KES)',
+                data: {{ program_budgets|safe }},
+                backgroundColor: [
+                    '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
+                    '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Program Budgets'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'KES ' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

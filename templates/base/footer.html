@@ -1,0 +1,79 @@
+<footer class="footer mt-auto py-3 bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <!-- About Section -->
+            <div class="col-md-4 mb-3">
+                <h5 class="text-success">
+                    <i class="fas fa-tree"></i> KACAF
+                </h5>
+                <p class="small">
+                    Kenya Agroforestry and Climate Action Foundation<br>
+                    Empowering communities through sustainable agroforestry, 
+                    biodiversity conservation, and climate resilience.
+                </p>
+                <div class="social-links">
+                    <a href="#" class="text-light me-2"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-light me-2"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light me-2"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light me-2"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="text-light"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="col-md-2 mb-3">
+                <h6>Quick Links</h6>
+                <ul class="list-unstyled small">
+                    <li><a href="{% url 'about' %}" class="text-light">About Us</a></li>
+                    <li><a href="{% url 'programs:program_list' %}" class="text-light">Our Programs</a></li>
+                    <li><a href="{% url 'events:event_list' %}" class="text-light">Events</a></li>
+                    <li><a href="{% url 'contact' %}" class="text-light">Contact</a></li>
+                    <li><a href="{% url 'privacy' %}" class="text-light">Privacy Policy</a></li>
+                </ul>
+            </div>
+            
+            <!-- Contact Info -->
+            <div class="col-md-3 mb-3">
+                <h6>Contact Us</h6>
+                <ul class="list-unstyled small">
+                    <li><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</li>
+                    <li><i class="fas fa-phone me-2"></i> +254 700 000 000</li>
+                    <li><i class="fas fa-envelope me-2"></i> info@kacaf.org</li>
+                    <li><i class="fas fa-clock me-2"></i> Mon - Fri: 8:00 AM - 5:00 PM</li>
+                </ul>
+            </div>
+            
+            <!-- Newsletter -->
+            <div class="col-md-3 mb-3">
+                <h6>Newsletter</h6>
+                <p class="small">Subscribe to our newsletter for updates</p>
+                <form method="post" action="{% url 'communications:newsletter_subscribe' %}">
+                    {% csrf_token %}
+                    <div class="input-group input-group-sm">
+                        <input type="email" class="form-control" placeholder="Your email" name="email" required>
+                        <button class="btn btn-success" type="submit">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <hr class="border-light">
+        
+        <!-- Copyright -->
+        <div class="row">
+            <div class="col-md-6">
+                <p class="small mb-0">
+                    &copy; {% now "Y" %} Kenya Agroforestry and Climate Action Foundation. All rights reserved.
+                </p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <p class="small mb-0">
+                    <a href="#" class="text-light me-3">Terms of Service</a>
+                    <a href="#" class="text-light">Sitemap</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</footer>

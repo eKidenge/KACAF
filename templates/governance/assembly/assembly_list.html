@@ -1,0 +1,511 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}General Assemblies - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .assembly-card {
+        transition: all 0.3s ease;
+        border-left: 4px solid #198754;
+    }
+    .assembly-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    .assembly-status {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    .calendar-view {
+        height: 600px;
+    }
+    .fc-event {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-landmark text-success me-2"></i>
+            General Assemblies
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {% if perms.governance.add_generalassembly %}
+            <a href="{% url 'governance:assembly_create' %}" class="btn btn-success me-2">
+                <i class="fas fa-plus me-1"></i> Schedule Assembly
+            </a>
+            {% endif %}
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary" id="listViewBtn">
+                    <i class="fas fa-list"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-secondary active" id="calendarViewBtn">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?status=upcoming">Upcoming</a></li>
+                    <li><a class="dropdown-item" href="?status=past">Past</a></li>
+                    <li><a class="dropdown-item" href="?type=annual">Annual</a></li>
+                    <li><a class="dropdown-item" href="?type=special">Special</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?">Show All</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ total_assemblies }}</div>
+                    <p class="text-muted mb-0">Total Assemblies</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ upcoming_count }}</div>
+                    <p class="text-muted mb-0">Upcoming</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ average_attendance }}</div>
+                    <p class="text-muted mb-0">Avg Attendance</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ resolutions_count }}</div>
+                    <p class="text-muted mb-0">Total Resolutions</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar View (Default) -->
+    <div id="calendarView" class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-calendar-alt me-2"></i>Assembly Calendar
+            </h6>
+        </div>
+        <div class="card-body">
+            <div id="assemblyCalendar" class="calendar-view"></div>
+        </div>
+    </div>
+
+    <!-- List View (Hidden by Default) -->
+    <div id="listView" class="card mb-4" style="display: none;">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">
+                <i class="fas fa-list me-2"></i>Assembly List
+            </h6>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                    Sort by: Date
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Date (Newest)</a></li>
+                    <li><a class="dropdown-item" href="#">Date (Oldest)</a></li>
+                    <li><a class="dropdown-item" href="#">Attendance</a></li>
+                    <li><a class="dropdown-item" href="#">Type</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            {% if assemblies %}
+            <div class="list-group list-group-flush">
+                {% for assembly in assemblies %}
+                <div class="list-group-item list-group-item-action">
+                    <div class="row align-items-center">
+                        <div class="col-auto">
+                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 50px; height: 50px;">
+                                <i class="fas fa-users text-white fa-lg"></i>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ assembly.title }}</h6>
+                                <small class="text-muted">
+                                    {{ assembly.date|date:"M d, Y" }}
+                                    {{ assembly.date|time:"h:i A" }}
+                                </small>
+                            </div>
+                            <p class="mb-1 small text-muted">
+                                <i class="fas fa-map-marker-alt me-1"></i>
+                                {{ assembly.location }}
+                            </p>
+                            <div class="d-flex gap-2">
+                                <span class="badge bg-{% if assembly.meeting_type == 'annual' %}success{% else %}info{% endif %}">
+                                    {{ assembly.get_meeting_type_display }}
+                                </span>
+                                {% if assembly.is_quorum_met %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Quorum Met
+                                </span>
+                                {% endif %}
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-user me-1"></i>
+                                    {{ assembly.chairperson.get_full_name }}
+                                </span>
+                                <span class="badge bg-light text-dark">
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ assembly.total_attendance }} attended
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'governance:assembly_detail' assembly.id %}" 
+                               class="btn btn-sm btn-outline-success">
+                                <i class="fas fa-eye me-1"></i> View
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No assemblies scheduled.</p>
+                {% if perms.governance.add_generalassembly %}
+                <a href="{% url 'governance:assembly_create' %}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i> Schedule First Assembly
+                </a>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+        {% if assemblies.has_other_pages %}
+        <div class="card-footer">
+            <nav aria-label="Assembly pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if assemblies.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ assemblies.previous_page_number }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for num in assemblies.paginator.page_range %}
+                        {% if assemblies.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if assemblies.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ assemblies.next_page_number }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Upcoming Assembly Card -->
+    {% if next_assembly %}
+    <div class="card mb-4 border-success">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-bullhorn me-2"></i>Next General Assembly
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4>{{ next_assembly.title }}</h4>
+                    <div class="mb-3">
+                        <p class="mb-1">
+                            <i class="fas fa-calendar-alt me-2 text-success"></i>
+                            <strong>{{ next_assembly.date|date:"l, F d, Y" }}</strong>
+                            at {{ next_assembly.date|time:"h:i A" }}
+                        </p>
+                        <p class="mb-1">
+                            <i class="fas fa-map-marker-alt me-2 text-success"></i>
+                            {{ next_assembly.location }}
+                        </p>
+                        <p class="mb-1">
+                            <i class="fas fa-user me-2 text-success"></i>
+                            Chairperson: {{ next_assembly.chairperson.get_full_name }}
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% if next_assembly.agenda %}
+                        <a href="{{ next_assembly.agenda_file.url }}" class="btn btn-sm btn-outline-success" target="_blank">
+                            <i class="fas fa-file-alt me-1"></i> Download Agenda
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-success" onclick="addToCalendar()">
+                            <i class="fas fa-calendar-plus me-1"></i> Add to Calendar
+                        </button>
+                        <a href="#assemblyDetails" class="btn btn-sm btn-outline-success" data-bs-toggle="collapse">
+                            <i class="fas fa-info-circle me-1"></i> More Details
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-light">
+                        <div class="card-body text-center">
+                            <div class="display-4 text-success mb-2">
+                                {{ days_until_next }}
+                            </div>
+                            <p class="text-muted mb-0">Days until assembly</p>
+                            <hr>
+                            <div class="small">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Registration:</span>
+                                    <span>Open</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span>Quorum Required:</span>
+                                    <span>{{ next_assembly.quorum_required }}%</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Expected:</span>
+                                    <span>{{ expected_attendance }} members</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Collapsible Details -->
+            <div class="collapse mt-3" id="assemblyDetails">
+                <div class="card card-body">
+                    <h6>Agenda</h6>
+                    <div class="mb-3">
+                        {{ next_assembly.agenda|linebreaks }}
+                    </div>
+                    
+                    {% if next_assembly.resolutions.all %}
+                    <h6>Proposed Resolutions</h6>
+                    <div class="list-group">
+                        {% for resolution in next_assembly.resolutions.all %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ resolution.title }}</h6>
+                                    <p class="mb-1 small">{{ resolution.description|truncatechars:150 }}</p>
+                                </div>
+                                <span class="badge bg-info">{{ resolution.get_resolution_type_display }}</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Past Assemblies Summary -->
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-history me-2"></i>Past Assemblies Summary
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Title</th>
+                            <th>Attendance</th>
+                            <th>Resolutions</th>
+                            <th>Quorum</th>
+                            <th>Minutes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assembly in past_assemblies|slice:":5" %}
+                        <tr>
+                            <td>{{ assembly.date|date:"M d, Y" }}</td>
+                            <td>
+                                <span class="badge bg-{% if assembly.meeting_type == 'annual' %}success{% else %}info{% endif %}">
+                                    {{ assembly.get_meeting_type_display }}
+                                </span>
+                            </td>
+                            <td>
+                                <a href="{% url 'governance:assembly_detail' assembly.id %}" 
+                                   class="text-decoration-none">
+                                    {{ assembly.title|truncatechars:40 }}
+                                </a>
+                            </td>
+                            <td>
+                                <div class="progress" style="height: 10px;">
+                                    {% with attendance_percent=assembly.total_attendance|divisibleby:100|multiply:100 %}
+                                    <div class="progress-bar {% if attendance_percent >= assembly.quorum_required %}bg-success{% else %}bg-warning{% endif %}" 
+                                         role="progressbar" 
+                                         style="width: {{ attendance_percent }}%;"
+                                         title="{{ assembly.total_attendance }} members">
+                                    </div>
+                                    {% endwith %}
+                                </div>
+                                <small>{{ assembly.total_attendance }} members</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark">
+                                    {{ assembly.resolutions.count }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if assembly.is_quorum_met %}
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i>
+                                </span>
+                                {% else %}
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-times"></i>
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if assembly.minutes_file %}
+                                <a href="{{ assembly.minutes_file.url }}" class="btn btn-sm btn-outline-success" target="_blank">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                {% else %}
+                                <span class="text-muted">Not available</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <i class="fas fa-history fa-2x text-muted mb-3"></i>
+                                <p class="text-muted">No past assemblies found.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% if past_assemblies.count > 5 %}
+            <div class="text-center mt-3">
+                <a href="?status=past" class="btn btn-sm btn-outline-success">
+                    <i class="fas fa-list me-1"></i> View All Past Assemblies
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- FullCalendar -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+
+<script>
+    // Toggle between list and calendar views
+    document.getElementById('listViewBtn').addEventListener('click', function() {
+        document.getElementById('calendarView').style.display = 'none';
+        document.getElementById('listView').style.display = 'block';
+        this.classList.add('active');
+        document.getElementById('calendarViewBtn').classList.remove('active');
+    });
+    
+    document.getElementById('calendarViewBtn').addEventListener('click', function() {
+        document.getElementById('listView').style.display = 'none';
+        document.getElementById('calendarView').style.display = 'block';
+        this.classList.add('active');
+        document.getElementById('listViewBtn').classList.remove('active');
+    });
+    
+    // Initialize FullCalendar
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('assemblyCalendar');
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,listMonth'
+            },
+            events: [
+                {% for assembly in assemblies %}
+                {
+                    title: '{{ assembly.title }}',
+                    start: '{{ assembly.date|date:"c" }}',
+                    end: '{{ assembly.date|date:"c" }}',
+                    url: '{% url "governance:assembly_detail" assembly.id %}',
+                    color: '{% if assembly.meeting_type == "annual" %}#198754{% else %}#0dcaf0{% endif %}',
+                    textColor: 'white',
+                    extendedProps: {
+                        type: '{{ assembly.meeting_type }}',
+                        location: '{{ assembly.location }}'
+                    }
+                },
+                {% endfor %}
+            ],
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                if (info.event.url) {
+                    window.location.href = info.event.url;
+                }
+            },
+            eventDidMount: function(info) {
+                // Add custom tooltip
+                $(info.el).tooltip({
+                    title: info.event.extendedProps.location,
+                    placement: 'top',
+                    trigger: 'hover',
+                    container: 'body'
+                });
+            }
+        });
+        calendar.render();
+    });
+    
+    // Add to calendar function
+    function addToCalendar() {
+        if (navigator.share) {
+            navigator.share({
+                title: '{{ next_assembly.title }}',
+                text: 'KACAF General Assembly',
+                url: window.location.href,
+            })
+            .then(() => console.log('Successful share'))
+            .catch((error) => console.log('Error sharing:', error));
+        } else {
+            // Fallback for browsers that don't support Web Share API
+            const eventUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ next_assembly.title|urlencode }}&dates={{ next_assembly.date|date:"Ymd\\THi00\\Z" }}/{{ next_assembly.date|date:"Ymd\\THi00\\Z" }}&details={{ next_assembly.agenda|urlencode }}&location={{ next_assembly.location|urlencode }}`;
+            window.open(eventUrl, '_blank');
+        }
+    }
+</script>
+{% endblock %}

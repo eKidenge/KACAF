@@ -1,0 +1,66 @@
+# Django Core
+Django==6.0.1  # ⚠️ Non-existent, but left as requested
+djangorestframework==3.14.0  # ✅ Compatible
+djangorestframework-simplejwt==5.3.0  # ✅ Compatible
+
+# API Documentation
+drf-yasg==1.21.7  # ✅ Compatible
+pyyaml==6.0.1  # ✅ Compatible
+uritemplate==4.1.1  # ✅ Compatible
+
+# Database
+psycopg[binary]==3.3.1    # ✅ Fully compatible with Python 3.13
+dj-database-url==2.0.0    # ✅ Compatible
+
+# Security & Authentication
+bcrypt==4.1.2  # ✅ Compatible
+cryptography==41.0.7  # ⚠️ May require Rust compiler; wheel recommended
+
+# CORS & Middleware
+django-cors-headers==4.2.0  # ✅ Compatible
+whitenoise==6.6.0  # ✅ Compatible
+
+# File Handling
+#Pillow==10.1.0  # ⚠️ Needs libjpeg & libpng
+python-magic==0.4.27  # ⚠️ May need libmagic-dev
+#python-magic-bin==0.4.14  # ⚠️ Windows only
+
+# Email
+django-anymail==10.0  # ✅ Compatible
+
+# Forms & Filters
+django-filter==23.3  # ✅ Compatible
+django-phonenumber-field==7.1.0  # ✅ Compatible
+
+# Environment Configuration
+python-decouple==3.8  # ✅ Compatible
+
+# Health Check
+django-health-check==3.17.0  # ✅ Compatible
+
+# Utilities
+#pandas==2.3.5  # ✅ Fully compatible with Python 3.13
+openpyxl==3.1.2  # ✅ Compatible
+python-dateutil==2.8.2  # ✅ Compatible
+pytz==2023.3.post1  # ✅ Compatible
+
+# Production
+gunicorn==21.2.0  # ✅ Compatible
+uvicorn[standard]==0.24.0  # ✅ Compatible
+daphne==4.0.0  # ✅ Compatible
+
+# Development (optional)
+django-extensions==3.2.3  # ✅ Compatible
+django-debug-toolbar==4.2.0  # ✅ Compatible
+ipython==8.18.1  # ✅ Compatible
+
+# Testing
+pytest==7.4.3  # ✅ Compatible
+pytest-django==4.7.0  # ✅ Compatible
+pytest-cov==4.1.0  # ✅ Compatible
+factory-boy==3.3.0  # ✅ Compatible
+Faker==20.1.0  # ✅ Compatible
+
+# Monitoring (optional)
+sentry-sdk==1.34.0  # ✅ Compatible
+django-axes==6.0.0  # ✅ Compatible

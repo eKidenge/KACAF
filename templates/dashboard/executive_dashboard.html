@@ -1,0 +1,894 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Executive Dashboard - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .executive-card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        transition: transform 0.3s;
+    }
+    .executive-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .position-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    .decision-card {
+        border-left: 4px solid;
+        padding-left: 15px;
+    }
+    .decision-approval {
+        border-left-color: #198754;
+    }
+    .decision-pending {
+        border-left-color: #ffc107;
+    }
+    .decision-rejection {
+        border-left-color: #dc3545;
+    }
+    .meeting-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    .vote-result {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin: 0 auto;
+    }
+    .vote-for {
+        background: #198754;
+        color: white;
+    }
+    .vote-against {
+        background: #dc3545;
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Dashboard Header -->
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-user-tie text-warning me-2"></i>
+            Executive Dashboard
+            <small class="text-muted fs-6">Committee Management Panel</small>
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-warning" onclick="refreshDashboard()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+                <button type="button" class="btn btn-sm btn-outline-warning" onclick="printDashboard()">
+                    <i class="fas fa-print"></i> Print
+                </button>
+            </div>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-warning dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="fas fa-tasks me-1"></i> Executive Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'governance:assembly_create' %}">
+                        <i class="fas fa-users me-2"></i> Schedule Assembly
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'governance:resolution_create' %}">
+                        <i class="fas fa-gavel me-2"></i> Propose Resolution
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'finance:expense_create' %}">
+                        <i class="fas fa-file-invoice-dollar me-2"></i> Record Expense
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'governance:disciplinary_action_create' %}">
+                        <i class="fas fa-user-slash me-2"></i> Disciplinary Action
+                    </a></li>
+                    <li><a class="dropdown-item" href="{% url 'accounts:user_list' %}">
+                        <i class="fas fa-user-check me-2"></i> Verify Members
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Committee Status -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-users-cog me-2"></i>
+                        Executive Committee Status
+                        <small class="float-end">Term: {{ current_term }}</small>
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for member in committee_members %}
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="executive-card p-3 position-relative">
+                                <div class="position-badge">
+                                    <span class="badge bg-{% if member.position == 'chairperson' %}danger{% elif member.position == 'vice_chairperson' %}warning{% else %}info{% endif %}">
+                                        {{ member.get_position_display }}
+                                    </span>
+                                </div>
+                                <div class="text-center mb-3">
+                                    {% if member.user.profile_picture %}
+                                    <img src="{{ member.user.profile_picture.url }}" 
+                                         class="rounded-circle" 
+                                         width="80" 
+                                         alt="{{ member.user.get_full_name }}">
+                                    {% else %}
+                                    <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center mx-auto" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="fas fa-user-tie fa-2x text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <h6 class="text-center mb-1">{{ member.user.get_full_name }}</h6>
+                                <small class="text-muted d-block text-center">{{ member.responsibilities|truncatechars:40 }}</small>
+                                <div class="text-center mt-2">
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar-alt me-1"></i>
+                                        Since {{ member.term_start|date:"M Y" }}
+                                    </small>
+                                </div>
+                                <div class="text-center mt-2">
+                                    <a href="mailto:{{ member.user.email }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <a href="tel:{{ member.user.phone }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="fas fa-phone"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Executive Statistics -->
+    <div class="row mb-4">
+        <!-- Pending Decisions -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Pending Decisions
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ pending_decisions }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-warning me-2">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ pending_resolutions }} resolutions
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gavel fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-file-alt me-1"></i>
+                                {{ pending_applications }} applications
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'governance:resolution_list' %}" class="small">Review</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Authority -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Financial Authority
+                            </div>
+                            <div class="h5 mb-0 fw-bold">KES {{ pending_approvals_amount|intcomma }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-warning me-2">
+                                    <i class="fas fa-money-check-alt me-1"></i>
+                                    {{ pending_financial_approvals }} items
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-invoice-dollar fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-check-circle me-1"></i>
+                                {{ approved_this_month }} approved
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'finance:expense_list' %}" class="small">Approve</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Committee Performance -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Committee Performance
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ performance_score }}%</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-warning me-2">
+                                    <i class="fas fa-chart-line me-1"></i>
+                                    {{ meetings_attended }}/{{ total_meetings }} meetings
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-trophy fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-bullhorn me-1"></i>
+                                {{ resolutions_passed }} passed
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'governance:assembly_list' %}" class="small">Meetings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Management -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card h-100 border-warning">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-warning text-uppercase mb-1">
+                                Member Management
+                            </div>
+                            <div class="h5 mb-0 fw-bold">{{ pending_membership_applications }}</div>
+                            <div class="mt-2 mb-0 text-muted text-xs">
+                                <span class="text-warning me-2">
+                                    <i class="fas fa-user-clock me-1"></i>
+                                    {{ disciplinary_cases }} disciplinary cases
+                                </span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-shield fa-2x text-warning"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">
+                                <i class="fas fa-user-check me-1"></i>
+                                {{ verified_members }} verified
+                            </small>
+                        </div>
+                        <div class="col-6 text-end">
+                            <a href="{% url 'governance:membership_application_list' %}" class="small">Review</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Decisions & Recent Activity -->
+    <div class="row">
+        <!-- Quick Decisions -->
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Quick Decisions Required
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if quick_decisions %}
+                    <div class="list-group list-group-flush">
+                        {% for decision in quick_decisions %}
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="mb-1">{{ decision.title }}</h6>
+                                    <p class="mb-1 small text-muted">{{ decision.description|truncatechars:80 }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ decision.submitted_by.get_full_name }}
+                                        • {{ decision.created_at|timesince }} ago
+                                    </small>
+                                </div>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-success" onclick="approveDecision({{ decision.id }})">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" onclick="rejectDecision({{ decision.id }})">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No pending decisions.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Committee Activity -->
+        <div class="col-lg-8 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Committee Activity
+                    </h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-light dropdown-toggle" type="button" 
+                                data-bs-toggle="dropdown">
+                            Filter
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">All Activities</a></li>
+                            <li><a class="dropdown-item" href="#">Decisions</a></li>
+                            <li><a class="dropdown-item" href="#">Meetings</a></li>
+                            <li><a class="dropdown-item" href="#">Financial</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if committee_activities %}
+                    <div class="timeline">
+                        {% for activity in committee_activities %}
+                        <div class="recent-activity-item">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">{{ activity.title }}</h6>
+                                    <p class="mb-1 small">{{ activity.description }}</p>
+                                    <small class="text-muted">
+                                        <i class="fas fa-user me-1"></i>
+                                        {{ activity.user.get_full_name }}
+                                    </small>
+                                </div>
+                                <div class="text-end">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ activity.timestamp|timesince }} ago
+                                    </small>
+                                    {% if activity.type == 'decision' %}
+                                    <span class="badge bg-success">Decision</span>
+                                    {% elif activity.type == 'meeting' %}
+                                    <span class="badge bg-info">Meeting</span>
+                                    {% elif activity.type == 'financial' %}
+                                    <span class="badge bg-warning">Financial</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent activities found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'governance:activity_log' %}" class="btn btn-sm btn-warning">
+                        <i class="fas fa-list me-1"></i> View Full Activity Log
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Meetings & Decisions -->
+    <div class="row mb-4">
+        <!-- Upcoming Meetings -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Upcoming Meetings
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_meetings %}
+                    {% for meeting in upcoming_meetings %}
+                    <div class="meeting-card">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div>
+                                <h5 class="mb-1">{{ meeting.title }}</h5>
+                                <p class="mb-0 text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ meeting.location }}
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                <div class="h4 mb-0">{{ meeting.date|date:"d" }}</div>
+                                <small class="text-muted">{{ meeting.date|date:"M, Y" }}</small>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted d-block">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ meeting.start_time|time:"h:i A" }} - {{ meeting.end_time|time:"h:i A" }}
+                                </small>
+                            </div>
+                            <div class="col-6 text-end">
+                                {% if meeting.agenda %}
+                                <a href="{{ meeting.agenda_file.url }}" class="btn btn-sm btn-outline-info">
+                                    <i class="fas fa-file-alt me-1"></i> Agenda
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% if meeting.agenda_items %}
+                        <div class="mt-3">
+                            <h6>Agenda Items:</h6>
+                            <ul class="list-unstyled">
+                                {% for item in meeting.agenda_items|slice:":3" %}
+                                <li class="mb-1">
+                                    <i class="fas fa-circle text-info fa-xs me-2"></i>
+                                    {{ item|truncatechars:50 }}
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        <div class="mt-3">
+                            <a href="{% url 'governance:assembly_detail' meeting.id %}" 
+                               class="btn btn-sm btn-info w-100">
+                                <i class="fas fa-eye me-1"></i> View Meeting Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No upcoming meetings scheduled.</p>
+                        <a href="{% url 'governance:assembly_create' %}" class="btn btn-info">
+                            <i class="fas fa-plus me-1"></i> Schedule Meeting
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Decisions -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-gavel me-2"></i>Recent Decisions
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_decisions %}
+                    <div class="list-group list-group-flush">
+                        {% for decision in recent_decisions %}
+                        <div class="list-group-item">
+                            <div class="d-flex align-items-start">
+                                <div class="me-3">
+                                    {% if decision.status == 'approved' %}
+                                    <div class="vote-result vote-for">
+                                        ✓
+                                    </div>
+                                    {% elif decision.status == 'rejected' %}
+                                    <div class="vote-result vote-against">
+                                        ✗
+                                    </div>
+                                    {% else %}
+                                    <div class="vote-result bg-secondary text-white">
+                                        ?
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">{{ decision.title }}</h6>
+                                    <p class="mb-1 small text-muted">{{ decision.description|truncatechars:100 }}</p>
+                                    <div class="d-flex justify-content-between">
+                                        <small class="text-muted">
+                                            <i class="fas fa-user me-1"></i>
+                                            {{ decision.decided_by.get_full_name }}
+                                        </small>
+                                        <small class="text-muted">
+                                            {{ decision.decision_date|date:"M d, Y" }}
+                                        </small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-gavel fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">No recent decisions found.</p>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'governance:resolution_list' %}" class="btn btn-sm btn-success">
+                        <i class="fas fa-list me-1"></i> View All Resolutions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Financial Approvals & Member Management -->
+    <div class="row">
+        <!-- Financial Approvals Needed -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Financial Approvals Needed
+                        {% if financial_approvals_needed %}
+                        <span class="badge bg-light text-dark ms-2">{{ financial_approvals_needed|length }}</span>
+                        {% endif %}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {% if financial_approvals_needed %}
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for approval in financial_approvals_needed %}
+                                <tr>
+                                    <td>{{ approval.description|truncatechars:30 }}</td>
+                                    <td>
+                                        <strong class="text-danger">
+                                            KES {{ approval.amount|intcomma }}
+                                        </strong>
+                                    </td>
+                                    <td>{{ approval.date_incurred|date:"M d" }}</td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <button class="btn btn-outline-success" 
+                                                    onclick="approveExpense({{ approval.id }})">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                            <button class="btn btn-outline-danger"
+                                                    onclick="rejectExpense({{ approval.id }})">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                            <a href="{% url 'finance:expense_detail' approval.id %}" 
+                                               class="btn btn-outline-info">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No financial approvals needed.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Member Management -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-users me-2"></i>Member Management
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-primary mb-2">{{ pending_membership_applications }}</div>
+                                    <p class="text-muted mb-0">Pending Applications</p>
+                                    <a href="{% url 'governance:membership_application_list' %}" 
+                                       class="btn btn-sm btn-primary mt-2">
+                                        Review
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <div class="display-6 text-primary mb-2">{{ disciplinary_cases }}</div>
+                                    <p class="text-muted mb-0">Disciplinary Cases</p>
+                                    <a href="{% url 'governance:disciplinary_action_list' %}" 
+                                       class="btn btn-sm btn-primary mt-2">
+                                        Manage
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Member</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for member in recent_members %}
+                                <tr>
+                                    <td>{{ member.get_full_name|truncatechars:20 }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ member.membership_type|default:'info' }}">
+                                            {{ member.get_membership_type_display|default:"Member" }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if member.is_verified %}
+                                        <span class="badge bg-success">Verified</span>
+                                        {% else %}
+                                        <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'accounts:user_detail' member.id %}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Committee Performance Dashboard -->
+    <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-chart-line me-2"></i>Committee Performance Dashboard
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <canvas id="performanceChart" height="250"></canvas>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">Performance Metrics</h6>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Meeting Attendance</small>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-success" style="width: {{ attendance_rate }}%;"></div>
+                                </div>
+                                <small>{{ attendance_rate }}%</small>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Decision Making</small>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-info" style="width: {{ decision_rate }}%;"></div>
+                                </div>
+                                <small>{{ decision_rate }}% timely decisions</small>
+                            </div>
+                            <div class="mb-3">
+                                <small class="text-muted d-block">Financial Oversight</small>
+                                <div class="progress" style="height: 10px;">
+                                    <div class="progress-bar bg-warning" style="width: {{ oversight_rate }}%;"></div>
+                                </div>
+                                <small>{{ oversight_rate }}% approvals</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Refresh dashboard
+    function refreshDashboard() {
+        window.location.reload();
+    }
+    
+    // Print dashboard
+    function printDashboard() {
+        window.print();
+    }
+    
+    // Approve decision
+    function approveDecision(decisionId) {
+        fetch(`/api/governance/decisions/${decisionId}/approve/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+    
+    // Reject decision
+    function rejectDecision(decisionId) {
+        fetch(`/api/governance/decisions/${decisionId}/reject/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+    
+    // Approve expense
+    function approveExpense(expenseId) {
+        fetch(`/api/finance/expenses/${expenseId}/approve/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+    
+    // Reject expense
+    function rejectExpense(expenseId) {
+        fetch(`/api/finance/expenses/${expenseId}/reject/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            }
+        });
+    }
+    
+    // Performance Chart
+    const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+    const performanceChart = new Chart(performanceCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ performance_months|safe }},
+            datasets: [
+                {
+                    label: 'Decisions Made',
+                    data: {{ decisions_data|safe }},
+                    backgroundColor: '#198754',
+                    borderColor: '#198754',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Meetings Held',
+                    data: {{ meetings_data|safe }},
+                    backgroundColor: '#0dcaf0',
+                    borderColor: '#0dcaf0',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Financial Approvals',
+                    data: {{ approvals_data|safe }},
+                    backgroundColor: '#ffc107',
+                    borderColor: '#ffc107',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Committee Performance Trends'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

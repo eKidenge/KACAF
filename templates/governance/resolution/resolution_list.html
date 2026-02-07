@@ -1,0 +1,481 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Resolutions - KACAF{% endblock %}
+
+{% block extra_css %}
+<style>
+    .resolution-card {
+        border-left: 4px solid;
+        transition: transform 0.3s;
+    }
+    .resolution-card:hover {
+        transform: translateY(-3px);
+    }
+    .resolution-advisory {
+        border-left-color: #0dcaf0;
+    }
+    .resolution-binding {
+        border-left-color: #198754;
+    }
+    .resolution-financial {
+        border-left-color: #ffc107;
+    }
+    .resolution-governance {
+        border-left-color: #6f42c1;
+    }
+    .vote-progress {
+        height: 10px;
+    }
+    .timeline-resolution {
+        position: relative;
+        padding-left: 20px;
+    }
+    .timeline-resolution::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #dee2e6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">
+            <i class="fas fa-gavel text-success me-2"></i>
+            Resolutions
+        </h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            {% if perms.governance.add_resolution %}
+            <a href="{% url 'governance:resolution_create' %}" class="btn btn-success me-2">
+                <i class="fas fa-plus me-1"></i> Propose Resolution
+            </a>
+            {% endif %}
+            <div class="dropdown">
+                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" 
+                        data-bs-toggle="dropdown">
+                    <i class="fas fa-filter me-1"></i> Filter
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?status=pending">Pending</a></li>
+                    <li><a class="dropdown-item" href="?status=approved">Approved</a></li>
+                    <li><a class="dropdown-item" href="?status=implemented">Implemented</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?type=advisory">Advisory</a></li>
+                    <li><a class="dropdown-item" href="?type=binding">Binding</a></li>
+                    <li><a class="dropdown-item" href="?type=financial">Financial</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="?">Show All</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ total_resolutions }}</div>
+                    <p class="text-muted mb-0">Total Resolutions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ approved_resolutions }}</div>
+                    <p class="text-muted mb-0">Approved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ pending_resolutions }}</div>
+                    <p class="text-muted mb-0">Pending Review</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <div class="display-6 text-success">{{ implementation_rate }}%</div>
+                    <p class="text-muted mb-0">Implementation Rate</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Resolution Type</label>
+                    <select class="form-select" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="advisory">Advisory</option>
+                        <option value="binding">Binding</option>
+                        <option value="financial">Financial</option>
+                        <option value="governance">Governance</option>
+                        <option value="strategic">Strategic</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Status</label>
+                    <select class="form-select" id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="proposed">Proposed</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                        <option value="implemented">Implemented</option>
+                    </select>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Date Range</label>
+                    <input type="date" class="form-control" id="dateFrom">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">Assembly</label>
+                    <select class="form-select" id="assemblyFilter">
+                        <option value="">All Assemblies</option>
+                        {% for assembly in assemblies %}
+                        <option value="{{ assembly.id }}">{{ assembly.title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="text-end">
+                <button class="btn btn-success" id="applyFilters">
+                    <i class="fas fa-filter me-1"></i> Apply Filters
+                </button>
+                <button class="btn btn-outline-secondary" id="resetFilters">
+                    <i class="fas fa-redo me-1"></i> Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution List -->
+    <div class="row" id="resolutionList">
+        {% for resolution in resolutions %}
+        <div class="col-lg-6 mb-4 resolution-item" 
+             data-type="{{ resolution.resolution_type }}"
+             data-status="{{ resolution.status }}"
+             data-assembly="{{ resolution.general_assembly.id }}">
+            <div class="card h-100 resolution-card resolution-{{ resolution.resolution_type }}">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">
+                            {{ resolution.title }}
+                            {% if resolution.chairperson_decision == 'approved' %}
+                            <span class="badge bg-success ms-2">Approved</span>
+                            {% elif resolution.chairperson_decision == 'rejected' %}
+                            <span class="badge bg-danger ms-2">Rejected</span>
+                            {% else %}
+                            <span class="badge bg-warning ms-2">Pending</span>
+                            {% endif %}
+                        </h6>
+                        <small class="text-muted">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            {{ resolution.created_at|date:"M d, Y" }}
+                        </small>
+                    </div>
+                    <span class="badge bg-{% if resolution.resolution_type == 'advisory' %}info{% elif resolution.resolution_type == 'binding' %}success{% elif resolution.resolution_type == 'financial' %}warning{% else %}primary{% endif %}">
+                        {{ resolution.get_resolution_type_display }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">{{ resolution.description|truncatechars:200 }}</p>
+                    
+                    <!-- Assembly Info -->
+                    <div class="mb-3">
+                        <small class="text-muted">
+                            <i class="fas fa-users me-1"></i>
+                            {{ resolution.general_assembly.title }}
+                        </small>
+                    </div>
+                    
+                    <!-- Voting Stats -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span>Advisory Voting:</span>
+                            <span>{{ resolution.votes_for }} for, {{ resolution.votes_against }} against</span>
+                        </div>
+                        <div class="progress vote-progress">
+                            {% with total_votes=resolution.votes_for|add:resolution.votes_against %}
+                            {% if total_votes > 0 %}
+                            <div class="progress-bar bg-success" 
+                                 style="width: {% widthratio resolution.votes_for total_votes 100 %}%;"
+                                 title="{{ resolution.votes_for }} for">
+                            </div>
+                            <div class="progress-bar bg-danger" 
+                                 style="width: {% widthratio resolution.votes_against total_votes 100 %}%;"
+                                 title="{{ resolution.votes_against }} against">
+                            </div>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                        <small class="text-muted">
+                            {{ resolution.votes_abstain }} abstentions
+                        </small>
+                    </div>
+                    
+                    <!-- Chairperson Decision -->
+                    <div class="alert alert-{% if resolution.chairperson_decision == 'approved' %}success{% elif resolution.chairperson_decision == 'rejected' %}danger{% else %}warning{% endif %} py-2 mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>
+                                    <i class="fas fa-gavel me-1"></i>
+                                    Chairperson Decision:
+                                </strong>
+                                {{ resolution.get_chairperson_decision_display }}
+                            </div>
+                            {% if resolution.decision_date %}
+                            <small>{{ resolution.decision_date|date:"M d, Y" }}</small>
+                            {% endif %}
+                        </div>
+                        {% if resolution.chairperson_comments %}
+                        <p class="mb-0 small mt-1">{{ resolution.chairperson_comments }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Proposed By -->
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">
+                                <i class="fas fa-user me-1"></i>
+                                Proposed by: {{ resolution.proposed_by.get_full_name }}
+                            </small>
+                            {% if resolution.seconded_by %}
+                            <small class="text-muted ms-3">
+                                <i class="fas fa-user-check me-1"></i>
+                                Seconded by: {{ resolution.seconded_by.get_full_name }}
+                            </small>
+                            {% endif %}
+                        </div>
+                        {% if resolution.status == 'implemented' %}
+                        <span class="badge bg-success">
+                            <i class="fas fa-check me-1"></i> Implemented
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Resolution #{{ resolution.id }}
+                        </small>
+                        <div>
+                            {% if user == resolution.proposed_by or user.user_type == 'executive' %}
+                            <a href="{% url 'governance:resolution_edit' resolution.id %}" 
+                               class="btn btn-sm btn-outline-success me-1">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% endif %}
+                            <a href="{% url 'governance:resolution_detail' resolution.id %}" 
+                               class="btn btn-sm btn-success">
+                                <i class="fas fa-eye me-1"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted">No Resolutions Found</h5>
+                    <p class="text-muted">There are no resolutions matching your criteria.</p>
+                    {% if perms.governance.add_resolution %}
+                    <a href="{% url 'governance:resolution_create' %}" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i> Propose First Resolution
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Resolution Timeline -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <h6 class="mb-0">
+                <i class="fas fa-stream me-2"></i>Resolution Timeline
+            </h6>
+        </div>
+        <div class="card-body">
+            <div class="timeline-resolution">
+                {% for milestone in timeline_milestones %}
+                <div class="mb-4">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
+                                 style="width: 40px; height: 40px;">
+                                {% if milestone.type == 'resolution' %}
+                                <i class="fas fa-file-alt text-white"></i>
+                                {% elif milestone.type == 'decision' %}
+                                <i class="fas fa-gavel text-white"></i>
+                                {% elif milestone.type == 'implementation' %}
+                                <i class="fas fa-check-circle text-white"></i>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">{{ milestone.title }}</h6>
+                            <p class="mb-1 small">{{ milestone.description }}</p>
+                            <small class="text-muted">
+                                <i class="fas fa-clock me-1"></i>
+                                {{ milestone.date|date:"F d, Y" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution Statistics -->
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-pie me-2"></i>Resolutions by Type
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="resolutionTypeChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>Resolution Status
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="resolutionStatusChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    // Filter resolutions
+    document.getElementById('applyFilters').addEventListener('click', function() {
+        const typeFilter = document.getElementById('typeFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const dateFrom = document.getElementById('dateFrom').value;
+        const assemblyFilter = document.getElementById('assemblyFilter').value;
+        
+        const resolutionItems = document.querySelectorAll('.resolution-item');
+        
+        resolutionItems.forEach(item => {
+            let show = true;
+            
+            if (typeFilter && item.dataset.type !== typeFilter) {
+                show = false;
+            }
+            
+            if (statusFilter && item.dataset.status !== statusFilter) {
+                show = false;
+            }
+            
+            if (assemblyFilter && item.dataset.assembly !== assemblyFilter) {
+                show = false;
+            }
+            
+            item.style.display = show ? 'block' : 'none';
+        });
+    });
+    
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        document.getElementById('typeFilter').value = '';
+        document.getElementById('statusFilter').value = '';
+        document.getElementById('dateFrom').value = '';
+        document.getElementById('assemblyFilter').value = '';
+        
+        const resolutionItems = document.querySelectorAll('.resolution-item');
+        resolutionItems.forEach(item => {
+            item.style.display = 'block';
+        });
+    });
+    
+    // Resolution Type Chart
+    const typeCtx = document.getElementById('resolutionTypeChart').getContext('2d');
+    const typeChart = new Chart(typeCtx, {
+        type: 'pie',
+        data: {
+            labels: {{ type_labels|safe }},
+            datasets: [{
+                data: {{ type_data|safe }},
+                backgroundColor: [
+                    '#0dcaf0', // advisory
+                    '#198754', // binding
+                    '#ffc107', // financial
+                    '#6f42c1', // governance
+                    '#fd7e14'  // strategic
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                }
+            }
+        }
+    });
+    
+    // Resolution Status Chart
+    const statusCtx = document.getElementById('resolutionStatusChart').getContext('2d');
+    const statusChart = new Chart(statusCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ status_labels|safe }},
+            datasets: [{
+                label: 'Resolutions',
+                data: {{ status_data|safe }},
+                backgroundColor: [
+                    '#6c757d', // proposed
+                    '#198754', // approved
+                    '#dc3545', // rejected
+                    '#20c997', // implemented
+                    '#0dcaf0'  // under discussion
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}
