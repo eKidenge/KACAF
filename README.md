@@ -223,20 +223,3 @@ GitHub: [https://github.com/eKidenge](https://github.com/eKidenge)
 **Kenya Association of Community Action Facilitators (KACAF)**
 
 Empowering communities through action, governance, and technology.
-
-<pre class="overflow-visible! px-0!" data-start="3949" data-end="4277" data-is-last-node=""><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="sticky top-[calc(var(--sticky-padding-top)+9*var(--spacing))]"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>
----
-
-</span><span>## Next steps (recommended)</span><span>
-</span><span>-</span><span> Add screenshots to README
-</span><span>-</span><span> Add </span><span>`requirements.txt`</span><span>
-</span><span>-</span><span> Add </span><span>`.env.example`</span><span>
-</span><span>-</span><span> Enable GitHub Actions (CI)
-
-If you want, I can:
-</span><span>-</span><span> Customize this for </span><span>**funders / NGOs**</span><span>
-</span><span>-</span><span> Add </span><span>**badges**</span><span> (Django, Python, License)
-</span><span>-</span><span> Write </span><span>**API documentation**</span><span>
-</span><span>-</span><span> Prepare </span><span>**deployment docs**</span><span>
-
-Just say the word </span></span></code></div></div></pre>
