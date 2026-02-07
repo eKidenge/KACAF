@@ -103,7 +103,7 @@ templates/
 
 
 ---
-## 🧩 Core Modules
+##  Core Modules
 
 ###  Accounts & Authentication
 - User registration and login
