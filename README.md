@@ -105,7 +105,7 @@ templates/
 ---
 ## 🧩 Core Modules
 
-### 👥 Accounts & Authentication
+###  Accounts & Authentication
 - User registration and login
 - Role-based access control
 - Admin user management
@@ -120,29 +120,29 @@ templates/
 - Project tracking
 - Training sessions
 
-### 💰 Finance
+###  Finance
 - Income and expense tracking
 - Budget and financial reports
 
-### 📅 Events
+###  Events
 - Event listing and details
 - Event registration and calendar
 
-### 📁 Documents
+###  Documents
 - Document repository
 - Categorized document management
 
-### 📢 Communications
+###  Communications
 - Announcements
 - Contact and feedback forms
 
-### 📈 Dashboards
+###  Dashboards
 - Admin dashboard
 - Executive dashboard
 - Member dashboard
 - Public dashboard
 ---
-## 🛠️ Technology Stack
+## Technology Stack
 
 - **Backend:** Django (Python)
 - **Frontend:** Django Templates (HTML, CSS, JS)
@@ -152,7 +152,7 @@ templates/
 
 ---
 
-## 🚀 Installation & Setup
+## Installation & Setup
 
 ```bash
 # Clone repository
@@ -174,7 +174,7 @@ python manage.py runserver
 ```
 
 
-## 🔐 Security & Best Practices
+## Security & Best Practices
 
 * Environment variables for sensitive data
 * Role-based authorization
@@ -183,7 +183,7 @@ python manage.py runserver
 
 ---
 
-## 🧪 Development Status
+## Development Status
 
 * Core template architecture implemented
 * Dashboard structure completed
@@ -191,7 +191,7 @@ python manage.py runserver
 
 ---
 
-## 🤝 Contribution
+## Contribution
 
 Contributions are welcome.
 
@@ -202,13 +202,13 @@ Contributions are welcome.
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the  **MIT License** .
 
 ---
 
-## 👤 Author
+## Author
 
 **Elisha Kidenge**
 
@@ -218,7 +218,7 @@ GitHub: [https://github.com/eKidenge](https://github.com/eKidenge)
 
 ---
 
-## 🌍 Organization
+## Organization
 
 **Kenya Association of Community Action Facilitators (KACAF)**
 
@@ -227,7 +227,7 @@ Empowering communities through action, governance, and technology.
 <pre class="overflow-visible! px-0!" data-start="3949" data-end="4277" data-is-last-node=""><div class="contain-inline-size rounded-2xl corner-superellipse/1.1 relative bg-token-sidebar-surface-primary"><div class="sticky top-[calc(var(--sticky-padding-top)+9*var(--spacing))]"><div class="absolute end-0 bottom-0 flex h-9 items-center pe-2"><div class="bg-token-bg-elevated-secondary text-token-text-secondary flex items-center gap-4 rounded-sm px-2 font-sans text-xs"></div></div></div><div class="overflow-y-auto p-4" dir="ltr"><code class="whitespace-pre!"><span><span>
 ---
 
-</span><span>## ✅ Next steps (recommended)</span><span>
+</span><span>## Next steps (recommended)</span><span>
 </span><span>-</span><span> Add screenshots to README
 </span><span>-</span><span> Add </span><span>`requirements.txt`</span><span>
 </span><span>-</span><span> Add </span><span>`.env.example`</span><span>
@@ -239,4 +239,4 @@ If you want, I can:
 </span><span>-</span><span> Write </span><span>**API documentation**</span><span>
 </span><span>-</span><span> Prepare </span><span>**deployment docs**</span><span>
 
-Just say the word 🔥</span></span></code></div></div></pre>
+Just say the word </span></span></code></div></div></pre>
