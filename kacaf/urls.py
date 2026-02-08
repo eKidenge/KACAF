@@ -24,13 +24,13 @@ def root_redirect(request):
     - Member -> member dashboard
     - Anonymous -> public home
     """
-    if request.user.is_authenticated:
-        if request.user.is_superuser or request.user.is_staff:
-            return HttpResponseRedirect('/dashboard/admin/')
-        elif getattr(request.user, "user_type", None) == 'executive':
-            return HttpResponseRedirect('/dashboard/executive/')
-        elif getattr(request.user, "user_type", None) == 'member':
-            return HttpResponseRedirect('/dashboard/member/')
+    #if request.user.is_authenticated:
+    #    if request.user.is_superuser or request.user.is_staff:
+     #       return HttpResponseRedirect('/dashboard/admin/')
+      #  elif getattr(request.user, "user_type", None) == 'executive':
+     #       return HttpResponseRedirect('/dashboard/executive/')
+     #   elif getattr(request.user, "user_type", None) == 'member':
+     #       return HttpResponseRedirect('/dashboard/member/')
     return HttpResponseRedirect('/home/')
 
 

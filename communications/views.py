@@ -452,3 +452,26 @@ def announcement_create(request):
         'form': form,
     }
     return render(request, 'communications/announcement_form.html', context)
+
+# communications/views.py
+from django.shortcuts import render
+
+def contact(request):
+    """
+    Render the 'Contact Us' page.
+    """
+    return render(request, "communications/contact.html")
+
+# communications/views.py
+from django.shortcuts import redirect
+from .models import Newsletter  # replace with your actual model
+
+def newsletter_subscribe(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        if name and email:
+            Newsletter.objects.create(name=name, email=email)
+    return redirect('/')  # redirect to home or wherever you want
+
+

@@ -20,6 +20,8 @@ urlpatterns = [
     
     # ⚡ Added: web URL for creating announcements
     path('announcement/create/', views.announcement_create, name='announcement_create'),
+    path('contact/', views.contact, name='contact'),  # ✅ This is what your template needs
+    path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
 
     # API routes (router URLs)
     path('', include(router.urls)),

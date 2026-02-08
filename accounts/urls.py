@@ -26,12 +26,17 @@ urlpatterns = [
     # Public home
     path("", views.public_dashboard, name="home"),
 
+    #path("", views.public_dashboard, name="home"),  # <-- this is for '/'
+    path("home/", views.public_dashboard, name="public_dashboard"),  # <-- add this
+
     # Dashboards
     path("dashboard/", views.dashboard_redirect, name="dashboard"),
     path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/executive/", views.executive_dashboard, name="executive_dashboard"),
     path("dashboard/member/", views.member_dashboard, name="member_dashboard"),
-    path('about/', views.about_view, name='about'),  # <-- add this
+
+    # About page
+    path("about/", views.about_view, name="about"),
 
     # User profile
     path("profile/", views.profile, name="profile"),
@@ -55,6 +60,8 @@ urlpatterns = [
     path("register/", views.UserRegistrationView.as_view(), name="register"),
     path("change-password/", views.ChangePasswordView.as_view(), name="change-password"),
 
-    # API
+    # API endpoints via DRF router
     path("api/", include((router.urls, "accounts"), namespace="api")),
+
+    path('donate/', views.donate, name='donate'),
 ]

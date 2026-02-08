@@ -300,3 +300,7 @@ class ChangePasswordView(generics.UpdateAPIView):
     
 def about_view(request):
     return render(request, "base/about.html")
+
+def donate(request):
+    """Render a donation page."""
+    return render(request, "accounts/donate.html")
