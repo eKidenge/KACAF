@@ -2,11 +2,13 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from . import views
 
-# Create router and disable DRF format suffixes
-router = DefaultRouter()
-router.include_format_suffixes = False  # Important: prevents "drf_format_suffix already registered" error
+app_name = 'governance'  # important for {% url 'governance:...' %}
 
-# Register all viewsets for this app
+# DRF router for API endpoints
+router = DefaultRouter()
+router.include_format_suffixes = False
+
+# Register viewsets
 router.register(r'assemblies', views.GeneralAssemblyViewSet, basename='assembly')
 router.register(r'resolutions', views.ResolutionViewSet, basename='resolution')
 router.register(r'membership-applications', views.MembershipApplicationViewSet, basename='membership-application')
@@ -14,13 +16,11 @@ router.register(r'disciplinary-actions', views.DisciplinaryActionViewSet, basena
 
 # Web interface URLs
 urlpatterns = [
-    # Web views for templates (these should come BEFORE the router)
+    # Web views
     path('membership/apply/', views.membership_application_create, name='membership_application_create'),
     path('membership/', views.membership_dashboard, name='membership_dashboard'),
-    
-    # API routes (router URLs)
-    path('', include(router.urls)),
-]
+    path('assemblies/create/', views.assembly_create, name='assembly_create'),
 
-# Set the app_name
-app_name = 'governance'
+    # API routes
+    path('api/', include(router.urls)),
+]

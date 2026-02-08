@@ -27,13 +27,19 @@ urlpatterns = [
     path("", views.public_dashboard, name="home"),
 
     # Dashboards
-    path("dashboard/", views.dashboard_redirect, name="dashboard"),  # Add this line!
+    path("dashboard/", views.dashboard_redirect, name="dashboard"),
     path("dashboard/admin/", views.admin_dashboard, name="admin_dashboard"),
     path("dashboard/executive/", views.executive_dashboard, name="executive_dashboard"),
     path("dashboard/member/", views.member_dashboard, name="member_dashboard"),
+    path('about/', views.about_view, name='about'),  # <-- add this
 
     # User profile
     path("profile/", views.profile, name="profile"),
+    
+    # User management (web interface)
+    path("users/create/", views.UserCreateView.as_view(), name="user_create"),
+    path("users/<int:pk>/", views.UserDetailView.as_view(), name="user_detail"),
+    path("users/", views.UserListView.as_view(), name="user_list"),
 
     # Authentication
     path(

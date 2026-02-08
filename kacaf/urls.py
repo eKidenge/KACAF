@@ -3,6 +3,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponseRedirect
+from django.views.generic import TemplateView
 from rest_framework import permissions
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -76,6 +77,8 @@ urlpatterns = [
     path("api/events/", include("events.urls")),
     path("api/documents/", include("documents.urls")),
     path("api/communications/", include("communications.urls")),
+    path("about/", TemplateView.as_view(template_name="base/about.html"), name="about"),
+
 
     # API Docs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

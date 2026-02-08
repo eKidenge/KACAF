@@ -27,8 +27,8 @@
                     <li><a href="{% url 'about' %}" class="text-light">About Us</a></li>
                     <li><a href="{% url 'programs:program_list' %}" class="text-light">Our Programs</a></li>
                     <li><a href="{% url 'events:event_list' %}" class="text-light">Events</a></li>
-                    <li><a href="{% url 'contact' %}" class="text-light">Contact</a></li>
-                    <li><a href="{% url 'privacy' %}" class="text-light">Privacy Policy</a></li>
+                    <li><a href="/contact/" class="text-light">Contact</a></li>
+                    <li><a href="/privacy/" class="text-light">Privacy Policy</a></li>
                 </ul>
             </div>
             
@@ -47,7 +47,7 @@
             <div class="col-md-3 mb-3">
                 <h6>Newsletter</h6>
                 <p class="small">Subscribe to our newsletter for updates</p>
-                <form method="post" action="{% url 'communications:newsletter_subscribe' %}">
+                <form method="post" action="#">
                     {% csrf_token %}
                     <div class="input-group input-group-sm">
                         <input type="email" class="form-control" placeholder="Your email" name="email" required>

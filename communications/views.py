@@ -433,3 +433,22 @@ def communications_dashboard(request):
         'contact_response_rate': (ContactMessage.objects.filter(status='replied').count() / total_contact_messages * 100) if total_contact_messages > 0 else 0,
     }
     return render(request, 'communications/communications_dashboard.html', context)
+
+from django.shortcuts import render, redirect
+from .models import Announcement
+from .forms import AnnouncementForm  # make sure you have a form for Announcement
+
+# ⚡ Web view for creating an announcement
+def announcement_create(request):
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('communications:communications_dashboard')  # Redirect after save
+    else:
+        form = AnnouncementForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'communications/announcement_form.html', context)

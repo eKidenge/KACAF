@@ -16,6 +16,7 @@ router.register(r'trainings', views.TrainingViewSet, basename='training')
 urlpatterns = [
     # Web views for templates
     path('programs/', views.program_list, name='program_list'),
+    path('programs/create/', views.program_create, name='program_create'),  # ✅ Added create view
     path('dashboard/', views.program_dashboard, name='program_dashboard'),
     
     # API routes (router URLs)

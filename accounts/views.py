@@ -1,10 +1,16 @@
-from django.shortcuts import render, redirect  # Added redirect import
+from django.shortcuts import render, redirect
 from django.contrib.auth import get_user_model
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.decorators import login_required
+from django.views.generic import CreateView, DetailView, ListView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.urls import reverse_lazy
+from django.contrib import messages
+import random
+import string
 
 from .models import MemberProfile, ExecutiveCommittee
 from .serializers import (
@@ -52,7 +58,54 @@ def dashboard_redirect(request):
 
 @login_required
 def admin_dashboard(request):
-    return render(request, "dashboard/admin_dashboard.html")
+    # Add context data for admin dashboard
+    context = {
+        "total_users": User.objects.count(),
+        "verified_users": User.objects.filter(is_verified=True).count(),
+        "regular_members": User.objects.filter(user_type='member').count(),
+        "total_income": 0,  # Placeholder - replace with actual data
+        "total_expenses": 0,  # Placeholder - replace with actual data
+        "net_balance": 0,  # Placeholder - replace with actual data
+        "total_programs": 0,  # Placeholder - replace with actual data
+        "active_projects": 0,  # Placeholder - replace with actual data
+        "total_trees": 0,  # Placeholder - replace with actual data
+        "total_logins_today": 0,  # Placeholder - replace with actual data
+        "storage_used": "0 MB",  # Placeholder - replace with actual data
+        "error_logs_count": 0,  # Placeholder - replace with actual data
+        "recent_activities": [],  # Placeholder - replace with actual data
+        "pending_approvals": [],  # Placeholder - replace with actual data
+        "system_alerts": [],  # Placeholder - replace with actual data
+        "recent_users": User.objects.order_by('-date_joined')[:5],
+        "today_income": 0,  # Placeholder - replace with actual data
+        "weekly_income": 0,  # Placeholder - replace with actual data
+        "monthly_income": 0,  # Placeholder - replace with actual data
+        "financial_labels": [],  # Placeholder - replace with actual data
+        "income_data": [],  # Placeholder - replace with actual data
+        "expense_data": [],  # Placeholder - replace with actual data
+        "server_health": {  # Placeholder - replace with actual data
+            "status": "healthy",
+            "cpu": 45,
+            "memory": 60
+        },
+        "db_health": {  # Placeholder - replace with actual data
+            "status": "healthy",
+            "size": 1024 * 1024 * 10,  # 10 MB
+            "connections": 5,
+            "tables": 15
+        },
+        "backup_health": {  # Placeholder - replace with actual data
+            "last_successful": True,
+            "last_backup": None,
+            "next_backup": None
+        },
+        "security_health": {  # Placeholder - replace with actual data
+            "ssl_enabled": False,
+            "failed_logins": 0
+        },
+        "system_uptime": "24h 30m",  # Placeholder - replace with actual data
+        "last_backup_time": None,  # Placeholder - replace with actual data
+    }
+    return render(request, "dashboard/admin_dashboard.html", context)
 
 
 @login_required
@@ -84,6 +137,63 @@ def profile(request):
         "profile": user_profile,
     }
     return render(request, "accounts/profile.html", context)
+
+
+# ---------------------------
+# Class-based views for web interface
+# ---------------------------
+class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
+    """View for creating new users (staff only)"""
+    model = User
+    template_name = 'accounts/user_form.html'
+    fields = ['email', 'first_name', 'last_name', 'user_type', 'is_active']
+    success_url = reverse_lazy('accounts:admin_dashboard')
+    
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def form_valid(self, form):
+        # Generate a temporary password
+        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        user = form.save(commit=False)
+        user.set_password(temp_password)
+        user.save()
+        
+        # Create member profile for certain user types
+        if user.user_type in ['member', 'executive']:
+            MemberProfile.objects.create(user=user)
+        
+        messages.success(
+            self.request, 
+            f'User {user.email} created successfully. Temporary password: {temp_password}'
+        )
+        return super().form_valid(form)
+
+
+class UserDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    """View for viewing user details"""
+    model = User
+    template_name = 'accounts/user_detail.html'
+    context_object_name = 'user_obj'
+    
+    def test_func(self):
+        # Allow staff to view any user, or users to view their own profile
+        user_obj = self.get_object()
+        return self.request.user.is_staff or self.request.user.id == user_obj.id
+
+
+class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
+    """View for listing all users (staff only)"""
+    model = User
+    template_name = 'accounts/user_list.html'
+    context_object_name = 'users'
+    paginate_by = 20
+    
+    def test_func(self):
+        return self.request.user.is_staff
+    
+    def get_queryset(self):
+        return User.objects.all().order_by('-date_joined')
 
 
 # ---------------------------
@@ -187,3 +297,6 @@ class ChangePasswordView(generics.UpdateAPIView):
             {"message": "Password updated successfully."},
             status=status.HTTP_200_OK,
         )
+    
+def about_view(request):
+    return render(request, "base/about.html")

@@ -245,3 +245,11 @@ def membership_dashboard(request):
     }
     # Use the existing template
     return render(request, 'governance/membership/application_list.html', context)
+
+
+def assembly_create(request):
+    """
+    Render the 'Create Assembly' page.
+    """
+    return render(request, 'governance/assembly/assembly_create.html')
+

@@ -6,6 +6,8 @@ from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from .models import Income, Expense, Grant, Budget
+from django.contrib import messages
+from django.shortcuts import redirect
 from .serializers import (
     IncomeSerializer, ExpenseSerializer, 
     GrantSerializer, BudgetSerializer,
@@ -303,3 +305,43 @@ def budget_dashboard(request):
         'budget_utilization_percentage': (total_spent / total_budget * 100) if total_budget > 0 else 0,
     }
     return render(request, 'finance/budget_dashboard.html', context)
+
+def income_create(request):
+    # Replace with your real form handling logic later
+    return render(request, 'finance/income/income_create.html')
+
+@login_required
+def expense_create(request):
+    # Replace with real form handling later
+    if request.method == 'POST':
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            expense = form.save(commit=False)
+            expense.created_by = request.user
+            expense.save()
+            messages.success(request, "Expense recorded successfully.")
+            return redirect('finance:transaction_list')
+    else:
+        form = ExpenseForm()
+    
+    return render(request, 'finance/expense/expense_create.html', {'form': form})
+
+from django.contrib import messages
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def grant_create(request):
+    # TODO: Replace with real form handling logic
+    if request.method == 'POST':
+        form = GrantForm(request.POST)
+        if form.is_valid():
+            grant = form.save(commit=False)
+            grant.created_by = request.user
+            grant.save()
+            messages.success(request, "Grant created successfully.")
+            return redirect('finance:transaction_list')
+    else:
+        form = GrantForm()
+    
+    return render(request, 'finance/grant/grant_create.html', {'form': form})

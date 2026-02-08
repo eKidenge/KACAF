@@ -253,3 +253,19 @@ def program_dashboard(request):
         'current_month': timezone.now().month,
     }
     return render(request, 'programs/program_dashboard.html', context)
+
+@login_required
+def program_create(request):
+    """Web view for creating a new program"""
+    from .forms import ProgramForm  # make sure you have a form
+
+    if request.method == "POST":
+        form = ProgramForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('programs:program_list')
+    else:
+        form = ProgramForm()
+    
+    context = {'form': form}
+    return render(request, 'programs/program_create.html', context)

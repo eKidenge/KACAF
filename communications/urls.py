@@ -18,6 +18,9 @@ urlpatterns = [
     path('messages/', views.message_list, name='message_list'),
     path('dashboard/', views.communications_dashboard, name='communications_dashboard'),
     
+    # ⚡ Added: web URL for creating announcements
+    path('announcement/create/', views.announcement_create, name='announcement_create'),
+
     # API routes (router URLs)
     path('', include(router.urls)),
 ]
