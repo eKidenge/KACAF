@@ -1,66 +1,103 @@
 # Django Core
-Django==6.0.1  # ⚠️ Non-existent, but left as requested
-djangorestframework==3.14.0  # ✅ Compatible
-djangorestframework-simplejwt==5.3.0  # ✅ Compatible
+Django==6.0.1
+djangorestframework==3.14.0
+djangorestframework-simplejwt==5.3.0
 
 # API Documentation
-drf-yasg==1.21.7  # ✅ Compatible
-pyyaml==6.0.1  # ✅ Compatible
-uritemplate==4.1.1  # ✅ Compatible
+drf-yasg==1.21.7
+pyyaml==6.0.1
+uritemplate==4.1.1
 
 # Database
-psycopg[binary]==3.3.1    # ✅ Fully compatible with Python 3.13
-dj-database-url==2.0.0    # ✅ Compatible
+psycopg-binary==3.3.1
+dj-database-url==2.0.0
 
 # Security & Authentication
-bcrypt==4.1.2  # ✅ Compatible
-cryptography==41.0.7  # ⚠️ May require Rust compiler; wheel recommended
+bcrypt==4.1.2
+cryptography==41.0.7
 
 # CORS & Middleware
-django-cors-headers==4.2.0  # ✅ Compatible
-whitenoise==6.6.0  # ✅ Compatible
+django-cors-headers==4.2.0
+whitenoise==6.6.0
 
 # File Handling
-#Pillow==10.1.0  # ⚠️ Needs libjpeg & libpng
-python-magic==0.4.27  # ⚠️ May need libmagic-dev
-#python-magic-bin==0.4.14  # ⚠️ Windows only
+python-magic==0.4.27
 
 # Email
-django-anymail==10.0  # ✅ Compatible
+django-anymail==10.0
 
 # Forms & Filters
-django-filter==23.3  # ✅ Compatible
-django-phonenumber-field==7.1.0  # ✅ Compatible
+django-filter==23.5  # UPDATED: Changed from 23.3 to 23.5 for Django 6.0 compatibility
+django-phonenumber-field==7.1.0
 
 # Environment Configuration
-python-decouple==3.8  # ✅ Compatible
+python-decouple==3.8
 
 # Health Check
-django-health-check==3.17.0  # ✅ Compatible
+django-health-check==3.17.0
 
 # Utilities
-#pandas==2.3.5  # ✅ Fully compatible with Python 3.13
-openpyxl==3.1.2  # ✅ Compatible
-python-dateutil==2.8.2  # ✅ Compatible
-pytz==2023.3.post1  # ✅ Compatible
+openpyxl==3.1.2
+python-dateutil==2.8.2
+pytz==2023.3.post1
 
 # Production
-gunicorn==21.2.0  # ✅ Compatible
-uvicorn[standard]==0.24.0  # ✅ Compatible
-daphne==4.0.0  # ✅ Compatible
+gunicorn==21.2.0
+uvicorn[standard]==0.24.0
+daphne==4.0.0
 
 # Development (optional)
-django-extensions==3.2.3  # ✅ Compatible
-django-debug-toolbar==4.2.0  # ✅ Compatible
-ipython==8.18.1  # ✅ Compatible
+django-extensions==3.2.3
+django-debug-toolbar==4.2.0
+ipython==8.18.1
 
 # Testing
-pytest==7.4.3  # ✅ Compatible
-pytest-django==4.7.0  # ✅ Compatible
-pytest-cov==4.1.0  # ✅ Compatible
-factory-boy==3.3.0  # ✅ Compatible
-Faker==20.1.0  # ✅ Compatible
+pytest==7.4.3
+pytest-django==4.7.0
+pytest-cov==4.1.0
+factory-boy==3.3.0
+Faker==20.1.0
 
 # Monitoring (optional)
-sentry-sdk==1.34.0  # ✅ Compatible
-django-axes==6.0.0  # ✅ Compatible
+sentry-sdk==1.34.0
+django-axes==6.0.0
+
+# Additional dependencies (from your install log)
+asgiref==3.11.1
+asttokens==3.0.1
+attrs==25.4.0
+anyio==4.12.1
+certifi==2026.1.4
+cffi==2.0.0
+charset-normalizer==3.4.4
+click==8.3.1
+decorator==5.2.1
+executing==2.2.1
+h11==0.16.0
+httptools==0.7.1
+idna==3.11
+iniconfig==2.3.0
+jedi==0.19.2
+matplotlib-inline==0.2.1
+msgpack==1.1.2
+packaging==26.0
+parso==0.8.5
+pexpect==4.9.0
+pluggy==1.6.0
+prompt-toolkit==3.0.52
+ptyprocess==0.7.0
+pure-eval==0.2.3
+pygments==2.19.2
+pyjwt==2.11.0
+pycparser==3.0
+requests==2.32.5
+six==1.17.0
+sqlparse==0.5.5
+stack-data==0.6.3
+traitlets==5.14.3
+typing-extensions==4.15.0
+ujson==5.11.0
+urllib3==2.6.3
+watchfiles==1.1.1
+wcwidth==0.6.0
+websockets==16.0
