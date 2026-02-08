@@ -1,9 +1,11 @@
 from django.db.models import Q
 from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 from django.conf import settings
 from rest_framework import viewsets, permissions, status
-from rest_framework import filters  # keep this for SearchFilter and OrderingFilter
+from rest_framework import filters
 import django_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -318,3 +320,116 @@ class ContactMessageViewSet(viewsets.ModelViewSet):
         else:
             ip = request.META.get('REMOTE_ADDR')
         return ip
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def message_list(request):
+    """Web view for listing messages and announcements"""
+    # Get announcements based on user role
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        announcements = Announcement.objects.filter(is_published=True)
+    elif request.user.is_authenticated:
+        # FIXED: Use chained filters instead of mixing kwargs with Q objects
+        announcements = Announcement.objects.filter(
+            Q(is_published=True) &
+            (Q(target_audience='all') | 
+             Q(target_audience='members') |
+             Q(specific_users=request.user))
+        ).distinct()
+    else:
+        announcements = Announcement.objects.filter(is_published=True, target_audience='all')
+    
+    # Filter by expiry date
+    now = timezone.now()
+    announcements = announcements.filter(
+        Q(expiry_date__isnull=True) | Q(expiry_date__gt=now)
+    )
+    
+    # Get newsletters
+    newsletters = Newsletter.objects.filter(status='sent').order_by('-sent_at')[:10]
+    
+    # Get recent feedback if user is staff/executive
+    recent_feedback = None
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        recent_feedback = Feedback.objects.all().order_by('-created_at')[:5]
+    
+    # Get user's own feedback submissions
+    my_feedback = Feedback.objects.filter(submitted_by=request.user).order_by('-created_at')[:10]
+    
+    context = {
+        'user': request.user,
+        'announcements': announcements.order_by('-publish_date'),
+        'newsletters': newsletters,
+        'recent_feedback': recent_feedback,
+        'my_feedback': my_feedback,
+        'urgent_announcements': announcements.filter(priority='urgent').count(),
+        'total_announcements': announcements.count(),
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
+    }
+    return render(request, 'communications/message_list.html', context)
+
+
+@login_required
+def communications_dashboard(request):
+    """Web view for communications dashboard"""
+    # Get announcement statistics
+    total_announcements = Announcement.objects.count()
+    published_announcements = Announcement.objects.filter(is_published=True).count()
+    urgent_announcements = Announcement.objects.filter(priority='urgent', is_published=True).count()
+    
+    # Get newsletter statistics
+    total_newsletters = Newsletter.objects.count()
+    sent_newsletters = Newsletter.objects.filter(status='sent').count()
+    newsletter_templates = Newsletter.objects.filter(is_template=True).count()
+    
+    # Get feedback statistics
+    total_feedback = Feedback.objects.count()
+    unresolved_feedback = Feedback.objects.filter(status__in=['new', 'acknowledged', 'in_progress']).count()
+    
+    # Get contact message statistics
+    total_contact_messages = ContactMessage.objects.count()
+    new_contact_messages = ContactMessage.objects.filter(status='new').count()
+    
+    # Get recent announcements
+    recent_announcements = Announcement.objects.filter(is_published=True).order_by('-publish_date')[:10]
+    
+    # Get recent newsletters
+    recent_newsletters = Newsletter.objects.filter(status='sent').order_by('-sent_at')[:5]
+    
+    # Get recent feedback (if user is staff/executive)
+    recent_feedback = None
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        recent_feedback = Feedback.objects.all().order_by('-created_at')[:5]
+    
+    # Get recent contact messages (if user is staff/executive)
+    recent_contact_messages = None
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        recent_contact_messages = ContactMessage.objects.all().order_by('-created_at')[:5]
+    
+    context = {
+        'user': request.user,
+        'total_announcements': total_announcements,
+        'published_announcements': published_announcements,
+        'urgent_announcements': urgent_announcements,
+        'total_newsletters': total_newsletters,
+        'sent_newsletters': sent_newsletters,
+        'newsletter_templates': newsletter_templates,
+        'total_feedback': total_feedback,
+        'unresolved_feedback': unresolved_feedback,
+        'total_contact_messages': total_contact_messages,
+        'new_contact_messages': new_contact_messages,
+        'recent_announcements': recent_announcements,
+        'recent_newsletters': recent_newsletters,
+        'recent_feedback': recent_feedback,
+        'recent_contact_messages': recent_contact_messages,
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
+        'feedback_resolution_rate': ((total_feedback - unresolved_feedback) / total_feedback * 100) if total_feedback > 0 else 0,
+        'contact_response_rate': (ContactMessage.objects.filter(status='replied').count() / total_contact_messages * 100) if total_contact_messages > 0 else 0,
+    }
+    return render(request, 'communications/communications_dashboard.html', context)

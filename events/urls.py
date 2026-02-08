@@ -4,7 +4,7 @@ from . import views
 
 # Create router and disable format suffixes
 router = DefaultRouter()
-router.include_format_suffixes = False  # ⚡ Prevent "drf_format_suffix already registered" error
+router.include_format_suffixes = False
 
 # Register all viewsets
 router.register(r'events', views.EventViewSet, basename='event')
@@ -12,7 +12,15 @@ router.register(r'event-registrations', views.EventRegistrationViewSet, basename
 router.register(r'event-photos', views.EventPhotoViewSet, basename='event-photo')
 router.register(r'event-resources', views.EventResourceViewSet, basename='event-resource')
 
-# Include router URLs with namespace
+# Web interface URLs (add these BEFORE the router)
 urlpatterns = [
-    path('', include((router.urls, 'events'), namespace='events')),
+    # Web views for templates
+    path('events/', views.event_list, name='event_list'),
+    path('events/calendar/', views.event_calendar, name='event_calendar'),
+    
+    # API routes (router URLs)
+    path('', include(router.urls)),
 ]
+
+# Set the app_name (important for URL reversing)
+app_name = 'events'

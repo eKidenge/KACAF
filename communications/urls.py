@@ -12,7 +12,15 @@ router.register(r'newsletters', views.NewsletterViewSet, basename='newsletter')
 router.register(r'feedback', views.FeedbackViewSet, basename='feedback')
 router.register(r'contact-messages', views.ContactMessageViewSet, basename='contact-message')
 
-# Include router URLs with namespace
+# Web interface URLs (add these BEFORE the router)
 urlpatterns = [
-    path('', include((router.urls, 'communications'), namespace='communications')),
+    # Web views for templates
+    path('messages/', views.message_list, name='message_list'),
+    path('dashboard/', views.communications_dashboard, name='communications_dashboard'),
+    
+    # API routes (router URLs)
+    path('', include(router.urls)),
 ]
+
+# Set the app_name (important for URL reversing)
+app_name = 'communications'

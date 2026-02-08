@@ -1,45 +1,37 @@
 from rest_framework import permissions
 
-
+# ---------------------------
+# Only owner can update/delete
+# ---------------------------
 class IsOwnerOrReadOnly(permissions.BasePermission):
     """
-    Object-level permission to only allow owners of an object to edit it.
+    Custom permission to only allow owners of an object to edit it.
     """
-    
     def has_object_permission(self, request, view, obj):
-        # Read permissions are allowed to any request
+        # Read-only permissions for any request
         if request.method in permissions.SAFE_METHODS:
             return True
-        
-        # Write permissions are only allowed to the owner
-        return obj == request.user
+        # Write permissions only for owner
+        return obj.user == request.user
 
 
-class IsExecutiveMember(permissions.BasePermission):
-    """
-    Permission to check if user is an executive committee member.
-    """
-    
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and (
-            request.user.user_type == 'executive' or 
-            request.user.is_staff
-        )
-
-
+# ---------------------------
+# Chairperson-only actions
+# ---------------------------
 class IsChairperson(permissions.BasePermission):
     """
-    Permission to check if user is the chairperson.
+    Custom permission for Chairperson only
     """
-    
     def has_permission(self, request, view):
-        if not request.user.is_authenticated:
-            return False
-        
-        # Check if user is chairperson in executive committee
-        from .models import ExecutiveCommittee
-        return ExecutiveCommittee.objects.filter(
-            user=request.user, 
-            position='chairperson',
-            is_active=True
-        ).exists() or request.user.is_superuser
+        return request.user.is_authenticated and getattr(request.user, "user_type", None) == 'chairperson'
+
+
+# ---------------------------
+# Executive Committee member
+# ---------------------------
+class IsExecutiveMember(permissions.BasePermission):
+    """
+    Custom permission for executive members
+    """
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and getattr(request.user, "user_type", None) == 'executive'

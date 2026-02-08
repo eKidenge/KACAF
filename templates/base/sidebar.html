@@ -2,7 +2,7 @@
     <ul class="nav flex-column">
         <!-- Dashboard -->
         <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" 
+            <a class="nav-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}" 
                href="{% url 'accounts:dashboard' %}">
                 <i class="fas fa-tachometer-alt"></i>
                 Dashboard
@@ -41,8 +41,8 @@
         
         <!-- My Trees -->
         <li class="nav-item">
-            <a class="nav-link {% if 'tree-planting' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'programs:my_trees' %}">
+            <a class="nav-link {% if 'tree' in request.resolver_match.url_name %}active{% endif %}" 
+               href="/api/programs/tree-plantings/my_trees/">
                 <i class="fas fa-tree"></i>
                 My Trees
             </a>
@@ -78,7 +78,7 @@
         {% if perms.finance.view_income %}
         <li class="nav-item">
             <a class="nav-link {% if 'finance' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'finance:income_list' %}">
+               href="{% url 'finance:transaction_list' %}">
                 <i class="fas fa-money-bill-wave"></i>
                 Finance
             </a>
@@ -88,8 +88,8 @@
         <!-- Governance -->
         {% if perms.governance.view_generalassembly %}
         <li class="nav-item">
-            <a class="nav-link {% if 'assembly' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'governance:assembly_list' %}">
+            <a class="nav-link {% if 'governance' in request.resolver_match.url_name %}active{% endif %}" 
+               href="/api/governance/assemblies/">
                 <i class="fas fa-landmark"></i>
                 Governance
             </a>
@@ -100,7 +100,7 @@
         {% if perms.accounts.view_customuser %}
         <li class="nav-item">
             <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'accounts:user_list' %}">
+               href="/api/accounts/users/">
                 <i class="fas fa-users-cog"></i>
                 User Management
             </a>
@@ -111,7 +111,7 @@
         {% if perms.finance.view_report %}
         <li class="nav-item">
             <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'finance:financial_report' %}">
+               href="/api/finance/financial-report/">
                 <i class="fas fa-chart-bar"></i>
                 Reports
             </a>
@@ -121,7 +121,8 @@
         
         <!-- Settings -->
         <li class="nav-item mt-3">
-            <a class="nav-link" href="{% url 'accounts:settings' %}">
+            <a class="nav-link disabled" 
+               href="#">
                 <i class="fas fa-cog"></i>
                 Settings
             </a>
@@ -129,7 +130,8 @@
         
         <!-- Help & Support -->
         <li class="nav-item">
-            <a class="nav-link" href="{% url 'help' %}">
+            <a class="nav-link disabled" 
+               href="#">
                 <i class="fas fa-question-circle"></i>
                 Help & Support
             </a>

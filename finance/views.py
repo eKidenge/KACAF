@@ -1,5 +1,7 @@
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -221,3 +223,83 @@ class BudgetViewSet(viewsets.ModelViewSet):
             })
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def transaction_list(request):
+    """Web view for listing transactions (income and expenses)"""
+    # Get recent transactions
+    recent_incomes = Income.objects.all().order_by('-date_received')[:10]
+    recent_expenses = Expense.objects.all().order_by('-date_incurred')[:10]
+    
+    # Calculate totals
+    total_income = Income.objects.aggregate(total=Sum('amount'))['total'] or 0
+    total_expenses = Expense.objects.aggregate(total=Sum('amount'))['total'] or 0
+    net_balance = total_income - total_expenses
+    
+    # Get pending approvals
+    pending_expenses = Expense.objects.filter(
+        requires_chairperson_approval=True,
+        approved_by__isnull=True
+    ).count()
+    
+    context = {
+        'user': request.user,
+        'recent_incomes': recent_incomes,
+        'recent_expenses': recent_expenses,
+        'total_income': total_income,
+        'total_expenses': total_expenses,
+        'net_balance': net_balance,
+        'pending_expenses': pending_expenses,
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
+    }
+    return render(request, 'finance/transaction_list.html', context)
+
+
+@login_required
+def budget_dashboard(request):
+    """Web view for budget dashboard"""
+    # Get current year budgets
+    current_year = timezone.now().year
+    current_budgets = Budget.objects.filter(
+        year=current_year,
+        status='approved'
+    )
+    
+    # Calculate totals
+    total_budget = current_budgets.aggregate(total=Sum('allocated_amount'))['total'] or 0
+    total_spent = current_budgets.aggregate(total=Sum('spent_amount'))['total'] or 0
+    remaining_budget = total_budget - total_spent
+    
+    # Get budgets by type
+    budgets_by_type = current_budgets.values('budget_type').annotate(
+        allocated=Sum('allocated_amount'),
+        spent=Sum('spent_amount')
+    )
+    
+    # Get active grants
+    active_grants = Grant.objects.filter(status='active')
+    total_grant_amount = active_grants.aggregate(total=Sum('amount'))['total'] or 0
+    total_grant_spent = active_grants.aggregate(total=Sum('amount_spent'))['total'] or 0
+    total_grant_balance = total_grant_amount - total_grant_spent
+    
+    context = {
+        'user': request.user,
+        'current_budgets': current_budgets,
+        'total_budget': total_budget,
+        'total_spent': total_spent,
+        'remaining_budget': remaining_budget,
+        'budgets_by_type': budgets_by_type,
+        'active_grants': active_grants,
+        'total_grant_amount': total_grant_amount,
+        'total_grant_spent': total_grant_spent,
+        'total_grant_balance': total_grant_balance,
+        'current_year': current_year,
+        'budget_utilization_percentage': (total_spent / total_budget * 100) if total_budget > 0 else 0,
+    }
+    return render(request, 'finance/budget_dashboard.html', context)

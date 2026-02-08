@@ -12,7 +12,15 @@ router.register(r'documents', views.DocumentViewSet, basename='document')
 router.register(r'document-reviews', views.DocumentReviewViewSet, basename='document-review')
 router.register(r'templates', views.DocumentTemplateViewSet, basename='document-template')
 
-# Include router URLs with namespace
+# Web interface URLs (add these BEFORE the router)
 urlpatterns = [
-    path('', include((router.urls, 'documents'), namespace='documents')),
+    # Web views for templates
+    path('documents/', views.document_list, name='document_list'),
+    path('dashboard/', views.document_dashboard, name='document_dashboard'),
+    
+    # API routes (router URLs)
+    path('', include(router.urls)),
 ]
+
+# Set the app_name (important for URL reversing)
+app_name = 'documents'

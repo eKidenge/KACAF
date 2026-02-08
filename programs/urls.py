@@ -12,7 +12,15 @@ router.register(r'projects', views.ProjectViewSet, basename='project')
 router.register(r'tree-plantings', views.TreePlantingViewSet, basename='tree-planting')
 router.register(r'trainings', views.TrainingViewSet, basename='training')
 
-# Include router URLs
+# Web interface URLs (add these BEFORE the router)
 urlpatterns = [
-    path('', include((router.urls, 'programs'), namespace='programs')),
+    # Web views for templates
+    path('programs/', views.program_list, name='program_list'),
+    path('dashboard/', views.program_dashboard, name='program_dashboard'),
+    
+    # API routes (router URLs)
+    path('', include(router.urls)),
 ]
+
+# Set the app_name (important for URL reversing)
+app_name = 'programs'

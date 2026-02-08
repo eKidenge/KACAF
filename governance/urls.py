@@ -12,7 +12,15 @@ router.register(r'resolutions', views.ResolutionViewSet, basename='resolution')
 router.register(r'membership-applications', views.MembershipApplicationViewSet, basename='membership-application')
 router.register(r'disciplinary-actions', views.DisciplinaryActionViewSet, basename='disciplinary-action')
 
-# Include router URLs
+# Web interface URLs
 urlpatterns = [
-    path('', include((router.urls, 'governance'), namespace='governance')),
+    # Web views for templates (these should come BEFORE the router)
+    path('membership/apply/', views.membership_application_create, name='membership_application_create'),
+    path('membership/', views.membership_dashboard, name='membership_dashboard'),
+    
+    # API routes (router URLs)
+    path('', include(router.urls)),
 ]
+
+# Set the app_name
+app_name = 'governance'

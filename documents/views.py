@@ -1,5 +1,7 @@
 from django.db.models import Q, Count
 from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, Http404
 from rest_framework import viewsets, permissions, status, filters
 from rest_framework.decorators import action
@@ -225,3 +227,107 @@ class DocumentTemplateViewSet(viewsets.ModelViewSet):
             'download_url': request.build_absolute_uri(template.template_file.url),
             'filename': template.template_file.name.split('/')[-1]
         })
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def document_list(request):
+    """Web view for listing documents"""
+    # Get all active documents with appropriate filtering
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        documents = Document.objects.filter(is_active=True)
+    elif request.user.is_authenticated:
+        documents = Document.objects.filter(is_active=True).exclude(access_level='confidential')
+    else:
+        documents = Document.objects.filter(is_active=True, access_level='public')
+    
+    # Filter by document type if specified
+    document_type = request.GET.get('type', '')
+    if document_type:
+        documents = documents.filter(document_type=document_type)
+    
+    # Filter by category if specified
+    category_id = request.GET.get('category', '')
+    if category_id:
+        documents = documents.filter(category_id=category_id)
+    
+    # Get document categories for filter dropdown
+    categories = DocumentCategory.objects.all()
+    
+    # Get document statistics
+    total_documents = Document.objects.filter(is_active=True).count()
+    confidential_count = Document.objects.filter(access_level='confidential', is_active=True).count()
+    expiring_soon = Document.objects.filter(
+        expiry_date__gte=timezone.now().date(),
+        expiry_date__lte=timezone.now().date() + timezone.timedelta(days=30),
+        is_active=True
+    ).count()
+    
+    context = {
+        'user': request.user,
+        'documents': documents.order_by('-created_at'),
+        'categories': categories,
+        'total_documents': total_documents,
+        'confidential_count': confidential_count,
+        'expiring_soon_count': expiring_soon,
+        'document_types': Document.objects.values_list('document_type', flat=True).distinct(),
+        'selected_type': document_type,
+        'selected_category': category_id,
+        'current_year': timezone.now().year,
+    }
+    return render(request, 'documents/document_list.html', context)
+
+
+@login_required
+def document_dashboard(request):
+    """Web view for document management dashboard"""
+    # Get statistics for dashboard
+    total_documents = Document.objects.filter(is_active=True).count()
+    total_categories = DocumentCategory.objects.count()
+    total_downloads = Document.objects.aggregate(total=Count('download_count'))['total'] or 0
+    total_views = Document.objects.aggregate(total=Count('view_count'))['total'] or 0
+    
+    # Get recent documents
+    recent_documents = Document.objects.filter(is_active=True).order_by('-created_at')[:10]
+    
+    # Get popular documents (by downloads)
+    popular_documents = Document.objects.filter(is_active=True).order_by('-download_count')[:5]
+    
+    # Get documents by type
+    documents_by_type = Document.objects.filter(is_active=True).values('document_type').annotate(
+        count=Count('id'),
+        total_downloads=Count('download_count'),
+        total_views=Count('view_count')
+    )
+    
+    # Get expiring documents
+    expiring_documents = Document.objects.filter(
+        expiry_date__gte=timezone.now().date(),
+        expiry_date__lte=timezone.now().date() + timezone.timedelta(days=30),
+        is_active=True
+    ).order_by('expiry_date')[:5]
+    
+    # Get access statistics
+    if request.user.is_staff or getattr(request.user, 'user_type', None) == 'executive':
+        recent_access_logs = DocumentAccessLog.objects.all().order_by('-accessed_at')[:20]
+    else:
+        recent_access_logs = DocumentAccessLog.objects.filter(user=request.user).order_by('-accessed_at')[:10]
+    
+    context = {
+        'user': request.user,
+        'total_documents': total_documents,
+        'total_categories': total_categories,
+        'total_downloads': total_downloads,
+        'total_views': total_views,
+        'recent_documents': recent_documents,
+        'popular_documents': popular_documents,
+        'documents_by_type': documents_by_type,
+        'expiring_documents': expiring_documents,
+        'recent_access_logs': recent_access_logs,
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
+    }
+    return render(request, 'documents/document_dashboard.html', context)

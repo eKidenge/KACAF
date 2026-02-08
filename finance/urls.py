@@ -14,6 +14,11 @@ router.register(r'budgets', views.BudgetViewSet, basename='budget')
 
 # URL patterns
 urlpatterns = [
+    # Web interface URLs (add these BEFORE the router)
+    path('transactions/', views.transaction_list, name='transaction_list'),
+    path('budget/', views.budget_dashboard, name='budget_dashboard'),
+    
+    # API routes
     path('', include((router.urls, 'finance'), namespace='finance')),
     path(
         'financial-report/',
@@ -21,3 +26,6 @@ urlpatterns = [
         name='financial-report'
     ),
 ]
+
+# Set the app_name (important for URL reversing)
+app_name = 'finance'

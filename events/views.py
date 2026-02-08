@@ -1,6 +1,8 @@
 from django.db.models import Q, Count, Avg
 from django.utils import timezone
-from rest_framework import viewsets, permissions, status
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from rest_framework import viewsets, permissions, status, filters
 import django_filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -24,9 +26,6 @@ class EventFilter(django_filters.FilterSet):
     class Meta:
         model = Event
         fields = ['event_type', 'status', 'is_public', 'is_featured']
-
-
-from rest_framework import filters  # ⚡ minimal fix to make SearchFilter and OrderingFilter work
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -250,3 +249,71 @@ class EventResourceViewSet(viewsets.ModelViewSet):
             'message': 'Download recorded',
             'download_url': request.build_absolute_uri(resource.file.url)
         })
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def event_list(request):
+    """Web view for listing events"""
+    # Get all events, but show only public ones for non-staff
+    if request.user.is_staff:
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(is_public=True)
+    
+    # Filter by upcoming/past if specified
+    filter_type = request.GET.get('filter', 'upcoming')
+    if filter_type == 'upcoming':
+        events = events.filter(start_datetime__gte=timezone.now())
+    elif filter_type == 'past':
+        events = events.filter(start_datetime__lt=timezone.now())
+    
+    # Get user's registrations
+    user_registrations = EventRegistration.objects.filter(participant=request.user)
+    registered_event_ids = user_registrations.values_list('event_id', flat=True)
+    
+    context = {
+        'user': request.user,
+        'events': events.order_by('start_datetime'),
+        'registered_event_ids': list(registered_event_ids),
+        'total_events': events.count(),
+        'upcoming_count': events.filter(start_datetime__gte=timezone.now()).count(),
+        'past_count': events.filter(start_datetime__lt=timezone.now()).count(),
+        'filter_type': filter_type,
+    }
+    return render(request, 'events/event_list.html', context)
+
+
+@login_required
+def event_calendar(request):
+    """Web view for event calendar"""
+    # Get all events for the calendar
+    if request.user.is_staff:
+        events = Event.objects.all()
+    else:
+        events = Event.objects.filter(is_public=True)
+    
+    # Format events for FullCalendar or similar
+    calendar_events = []
+    for event in events:
+        calendar_events.append({
+            'id': event.id,
+            'title': event.title,
+            'start': event.start_datetime.isoformat(),
+            'end': event.end_datetime.isoformat() if event.end_datetime else None,
+            'location': event.location,
+            'event_type': event.event_type,
+            'status': event.status,
+            'url': f"/api/events/events/{event.id}/",  # or create a web detail page
+        })
+    
+    context = {
+        'user': request.user,
+        'calendar_events': calendar_events,
+        'event_types': Event.objects.values_list('event_type', flat=True).distinct(),
+        'total_events': events.count(),
+    }
+    return render(request, 'events/event_calendar.html', context)

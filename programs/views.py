@@ -1,4 +1,7 @@
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -167,3 +170,86 @@ class TrainingViewSet(viewsets.ModelViewSet):
         upcoming = Training.objects.filter(date__gte=timezone.now().date()).order_by('date')
         serializer = self.get_serializer(upcoming, many=True)
         return Response(serializer.data)
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def program_list(request):
+    """Web view for listing all programs"""
+    # Get all programs, filter by status if specified
+    status_filter = request.GET.get('status', 'active')
+    
+    if status_filter == 'active':
+        programs = Program.objects.filter(status='active')
+    elif status_filter == 'completed':
+        programs = Program.objects.filter(status='completed')
+    else:
+        programs = Program.objects.all()
+    
+    # Calculate overall statistics
+    total_programs = Program.objects.count()
+    active_programs = Program.objects.filter(status='active').count()
+    total_beneficiaries_reached = Program.objects.aggregate(total=Sum('beneficiaries_reached'))['total'] or 0
+    
+    # Get program statistics by type
+    program_stats = Program.objects.values('program_type').annotate(
+        count=Count('id'),
+        total_budget=Sum('budget'),
+        total_reached=Sum('beneficiaries_reached')
+    )
+    
+    context = {
+        'user': request.user,
+        'programs': programs.order_by('-created_at'),
+        'total_programs': total_programs,
+        'active_programs': active_programs,
+        'total_beneficiaries_reached': total_beneficiaries_reached,
+        'program_stats': program_stats,
+        'status_filter': status_filter,
+        'current_year': timezone.now().year,
+    }
+    return render(request, 'programs/program_list.html', context)
+
+
+@login_required
+def program_dashboard(request):
+    """Web view for program dashboard with overview and statistics"""
+    # Get recent programs
+    recent_programs = Program.objects.all().order_by('-created_at')[:5]
+    
+    # Get active projects
+    active_projects = Project.objects.filter(status='active').order_by('-start_date')[:5]
+    
+    # Get upcoming trainings
+    upcoming_trainings = Training.objects.filter(
+        date__gte=timezone.now().date()
+    ).order_by('date')[:5]
+    
+    # Calculate key metrics
+    total_trees_planted = TreePlanting.objects.aggregate(total=Sum('quantity'))['total'] or 0
+    total_training_participants = Training.objects.aggregate(total=Count('participants'))['total'] or 0
+    total_area_coverage = Project.objects.aggregate(total=Sum('area_coverage'))['total'] or 0
+    
+    # Get program completion rates
+    completed_programs = Program.objects.filter(status='completed').count()
+    active_programs = Program.objects.filter(status='active').count()
+    completion_rate = (completed_programs / (completed_programs + active_programs) * 100) if (completed_programs + active_programs) > 0 else 0
+    
+    context = {
+        'user': request.user,
+        'recent_programs': recent_programs,
+        'active_projects': active_projects,
+        'upcoming_trainings': upcoming_trainings,
+        'total_trees_planted': total_trees_planted,
+        'total_training_participants': total_training_participants,
+        'total_area_coverage': total_area_coverage,
+        'completion_rate': round(completion_rate, 1),
+        'active_programs_count': active_programs,
+        'completed_programs_count': completed_programs,
+        'current_year': timezone.now().year,
+        'current_month': timezone.now().month,
+    }
+    return render(request, 'programs/program_dashboard.html', context)

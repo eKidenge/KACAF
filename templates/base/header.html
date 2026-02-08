@@ -1,6 +1,6 @@
 <header class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'home' %}">
+        <a class="navbar-brand" href="{% url 'accounts:home' %}">
             <i class="fas fa-tree"></i>
             <span class="fw-bold">KACAF</span>
             <small class="d-none d-md-inline">Kenya Agroforestry & Climate Action Foundation</small>
@@ -13,27 +13,27 @@
         <div class="collapse navbar-collapse" id="navbarMain">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'programs:program_list' %}">
+                    <a class="nav-link" href="{% url 'programs:program-list' %}">
                         <i class="fas fa-seedling"></i> Programs
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'events:event_list' %}">
+                    <a class="nav-link" href="{% url 'events:event-list' %}">
                         <i class="fas fa-calendar-alt"></i> Events
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'documents:document_list' %}">
+                    <a class="nav-link" href={% url "documents:document-list" %}>
                         <i class="fas fa-file-alt"></i> Resources
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'communications:announcement_list' %}">
+                    <a class="nav-link" href={% url 'communications:announcement-list' %}>
                         <i class="fas fa-bullhorn"></i> Announcements
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'contact' %}">
+                    <a class="nav-link" href="{% url 'communications:contact-message-list' %}">
                         <i class="fas fa-envelope"></i> Contact
                     </a>
                 </li>
@@ -51,22 +51,36 @@
                         {% endif %}
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="{% url 'accounts:dashboard' %}">
-                            <i class="fas fa-tachometer-alt"></i> Dashboard
-                        </a></li>
-                        <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
-                            <i class="fas fa-user"></i> My Profile
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        {% if user.is_staff %}
-                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">
-                            <i class="fas fa-cog"></i> Admin Panel
-                        </a></li>
-                        {% endif %}
-                        <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </a></li>
-                    </ul>
+    {% if user.user_type == 'executive' %}
+    <li><a class="dropdown-item" href="{% url 'accounts:executive_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a></li>
+    {% elif user.user_type == 'staff' %}
+    <li><a class="dropdown-item" href="{% url 'accounts:admin_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a></li>
+    {% else %}
+    <li><a class="dropdown-item" href="{% url 'accounts:member_dashboard' %}">
+        <i class="fas fa-tachometer-alt"></i> Dashboard
+    </a></li>
+    {% endif %}
+
+    <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+        <i class="fas fa-user"></i> My Profile
+    </a></li>
+    <li><hr class="dropdown-divider"></li>
+    
+    {% if user.is_staff %}
+    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+        <i class="fas fa-cog"></i> Admin Panel
+    </a></li>
+    {% endif %}
+
+    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a></li>
+</ul>
+
                 </li>
                 {% else %}
                 <li class="nav-item">

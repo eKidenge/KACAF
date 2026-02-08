@@ -1,4 +1,6 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -210,3 +212,36 @@ class DisciplinaryActionViewSet(viewsets.ModelViewSet):
         actions = DisciplinaryAction.objects.filter(member=request.user)
         serializer = self.get_serializer(actions, many=True)
         return Response(serializer.data)
+
+
+# ------------------------------------------------------------
+# Web Interface Views (for template rendering)
+# ------------------------------------------------------------
+
+@login_required
+def membership_application_create(request):
+    """Web form for creating a membership application"""
+    # You can add context data here if needed
+    context = {
+        'user': request.user,
+        'action': 'create',
+    }
+    # Use the existing template
+    return render(request, 'governance/membership/application_form.html', context)
+
+
+@login_required
+def membership_dashboard(request):
+    """Membership dashboard"""
+    # Get user's membership applications
+    user_applications = MembershipApplication.objects.filter(applicant=request.user)
+    
+    context = {
+        'user': request.user,
+        'applications': user_applications,
+        'total_applications': user_applications.count(),
+        'pending_applications': user_applications.filter(status='pending').count(),
+        'approved_applications': user_applications.filter(status='approved').count(),
+    }
+    # Use the existing template
+    return render(request, 'governance/membership/application_list.html', context)
