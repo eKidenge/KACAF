@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
+from accounts import views as accounts_views
 from rest_framework import permissions
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -59,7 +60,9 @@ urlpatterns = [
     path("", root_redirect, name="root"),
 
     # Accounts app handles home and dashboards
-    path("", include("accounts.urls")),
+    path("home/", accounts_views.public_dashboard, name="public_home"),  # <-- THIS fixes /home/
+    path("accounts/", include("accounts.urls", namespace="accounts")),
+
 
     # Admin
     path("admin/", admin.site.urls),

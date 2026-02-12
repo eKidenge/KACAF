@@ -48,10 +48,66 @@
         justify-content: center;
         margin: 0 auto 10px;
         font-weight: bold;
+        transition: all 0.3s ease;
     }
     .step.active .step-circle {
         background: #198754;
         color: white;
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+    }
+    .step.completed .step-circle {
+        background: #198754;
+        color: white;
+    }
+    .password-strength-meter {
+        height: 5px;
+        background: #e9ecef;
+        border-radius: 10px;
+        margin-top: 8px;
+        overflow: hidden;
+    }
+    .password-strength-bar {
+        height: 100%;
+        width: 0;
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    .strength-weak { background-color: #dc3545; width: 25%; }
+    .strength-fair { background-color: #ffc107; width: 50%; }
+    .strength-good { background-color: #17a2b8; width: 75%; }
+    .strength-strong { background-color: #198754; width: 100%; }
+    .field-icon {
+        float: right;
+        margin-right: 10px;
+        margin-top: -30px;
+        position: relative;
+        z-index: 2;
+        cursor: pointer;
+        color: #6c757d;
+    }
+    .field-icon:hover {
+        color: #198754;
+    }
+    .is-invalid {
+        border-color: #dc3545 !important;
+    }
+    .is-valid {
+        border-color: #198754 !important;
+    }
+    .membership-card {
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: 2px solid transparent;
+    }
+    .membership-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    .membership-card.selected {
+        border-color: #198754;
+        background-color: rgba(25, 135, 84, 0.05);
+    }
+    .membership-card input[type="radio"] {
+        display: none;
     }
 </style>
 {% endblock %}
@@ -60,7 +116,7 @@
 <div class="register-container">
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="register-card p-4 p-md-5">
                     <!-- Header -->
                     <div class="text-center mb-5">
@@ -72,365 +128,583 @@
                     
                     <!-- Registration Steps -->
                     <div class="step-indicator">
-                        <div class="step active">
+                        <div class="step active" id="step1">
                             <div class="step-circle">1</div>
-                            <div class="step-label small">Account</div>
+                            <div class="step-label small fw-bold">Account</div>
                         </div>
-                        <div class="step">
+                        <div class="step" id="step2">
                             <div class="step-circle">2</div>
-                            <div class="step-label small">Profile</div>
+                            <div class="step-label small fw-bold">Personal Info</div>
                         </div>
-                        <div class="step">
+                        <div class="step" id="step3">
                             <div class="step-circle">3</div>
-                            <div class="step-label small">Membership</div>
+                            <div class="step-label small fw-bold">Location</div>
+                        </div>
+                        <div class="step" id="step4">
+                            <div class="step-circle">4</div>
+                            <div class="step-label small fw-bold">Membership</div>
                         </div>
                     </div>
                     
                     <!-- Registration Form -->
-                    <form method="post" id="registrationForm" enctype="multipart/form-data">
+                    <form method="post" id="registrationForm" enctype="multipart/form-data" novalidate>
                         {% csrf_token %}
                         
-                        <!-- Account Information -->
-                        <fieldset class="mb-4">
-                            <legend class="h5 text-success border-bottom pb-2">
-                                <i class="fas fa-user-circle me-2"></i>Account Information
-                            </legend>
-                            
-                            <div class="row">
-                                <!-- Username -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.username.id_for_label }}" class="form-label">
-                                        <i class="fas fa-user me-1"></i> Username *
-                                    </label>
-                                    {{ form.username }}
-                                    {% if form.username.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.username.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    <div class="form-text">Choose a unique username</div>
-                                </div>
+                        <!-- Step 1: Account Information -->
+                        <div class="form-step step-1">
+                            <fieldset class="mb-4">
+                                <legend class="h5 text-success border-bottom pb-2">
+                                    <i class="fas fa-user-circle me-2"></i>Account Information
+                                </legend>
                                 
-                                <!-- Email -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.email.id_for_label }}" class="form-label">
-                                        <i class="fas fa-envelope me-1"></i> Email Address *
-                                    </label>
-                                    {{ form.email }}
-                                    {% if form.email.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.email.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <!-- Password -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.password1.id_for_label }}" class="form-label">
-                                        <i class="fas fa-lock me-1"></i> Password *
-                                    </label>
-                                    <div class="input-group">
-                                        {{ form.password1 }}
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword1">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    {% if form.password1.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.password1.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <small>Must contain at least 8 characters</small>
-                                    </div>
-                                </div>
-                                
-                                <!-- Confirm Password -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.password2.id_for_label }}" class="form-label">
-                                        <i class="fas fa-lock me-1"></i> Confirm Password *
-                                    </label>
-                                    <div class="input-group">
-                                        {{ form.password2 }}
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword2">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                    {% if form.password2.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.password2.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <!-- Personal Information -->
-                        <fieldset class="mb-4">
-                            <legend class="h5 text-success border-bottom pb-2">
-                                <i class="fas fa-id-card me-2"></i>Personal Information
-                            </legend>
-                            
-                            <div class="row">
-                                <!-- First Name -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-signature me-1"></i> First Name *
-                                    </label>
-                                    {{ form.first_name }}
-                                    {% if form.first_name.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.first_name.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Last Name -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">
-                                        <i class="fas fa-signature me-1"></i> Last Name *
-                                    </label>
-                                    {{ form.last_name }}
-                                    {% if form.last_name.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.last_name.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <!-- Phone -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.phone.id_for_label }}" class="form-label">
-                                        <i class="fas fa-phone me-1"></i> Phone Number *
-                                    </label>
-                                    {{ form.phone }}
-                                    {% if form.phone.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.phone.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- ID Number -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.id_number.id_for_label }}" class="form-label">
-                                        <i class="fas fa-id-badge me-1"></i> National ID *
-                                    </label>
-                                    {{ form.id_number }}
-                                    {% if form.id_number.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.id_number.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <!-- Date of Birth -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
-                                        <i class="fas fa-birthday-cake me-1"></i> Date of Birth *
-                                    </label>
-                                    {{ form.date_of_birth }}
-                                    {% if form.date_of_birth.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.date_of_birth.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Profile Picture -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
-                                        <i class="fas fa-camera me-1"></i> Profile Picture
-                                    </label>
-                                    {{ form.profile_picture }}
-                                    {% if form.profile_picture.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.profile_picture.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    <div class="form-text">
-                                        <small>Optional. Max 2MB. JPG, PNG allowed.</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <!-- Location Information -->
-                        <fieldset class="mb-4">
-                            <legend class="h5 text-success border-bottom pb-2">
-                                <i class="fas fa-map-marker-alt me-2"></i>Location Information
-                            </legend>
-                            
-                            <div class="row">
-                                <!-- County -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.county.id_for_label }}" class="form-label">
-                                        <i class="fas fa-globe-africa me-1"></i> County *
-                                    </label>
-                                    {{ form.county }}
-                                    {% if form.county.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.county.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Sub-County -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.sub_county.id_for_label }}" class="form-label">
-                                        <i class="fas fa-map me-1"></i> Sub-County
-                                    </label>
-                                    {{ form.sub_county }}
-                                    {% if form.sub_county.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.sub_county.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <!-- Ward -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.ward.id_for_label }}" class="form-label">
-                                        <i class="fas fa-map-pin me-1"></i> Ward
-                                    </label>
-                                    {{ form.ward }}
-                                    {% if form.ward.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.ward.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Village -->
-                                <div class="col-md-6 mb-3">
-                                    <label for="{{ form.village.id_for_label }}" class="form-label">
-                                        <i class="fas fa-home me-1"></i> Village/Area
-                                    </label>
-                                    {{ form.village }}
-                                    {% if form.village.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.village.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </fieldset>
-                        
-                        <!-- Membership Type -->
-                        <fieldset class="mb-4">
-                            <legend class="h5 text-success border-bottom pb-2">
-                                <i class="fas fa-users me-2"></i>Membership Type
-                            </legend>
-                            
-                            <div class="mb-3">
                                 <div class="row">
-                                    {% for choice in form.user_type %}
-                                    <div class="col-md-4 mb-2">
-                                        <div class="form-check card border">
-                                            <input class="form-check-input" type="radio" 
-                                                   name="{{ form.user_type.name }}" 
-                                                   id="{{ choice.id_for_label }}" 
-                                                   value="{{ choice.data.value }}"
-                                                   {% if choice.data.value == 'member' %}checked{% endif %}>
-                                            <label class="form-check-label w-100 p-3" for="{{ choice.id_for_label }}">
-                                                <div class="d-flex align-items-center">
-                                                    {% if choice.data.value == 'member' %}
-                                                    <i class="fas fa-user fa-2x text-success me-3"></i>
-                                                    {% elif choice.data.value == 'farmer' %}
-                                                    <i class="fas fa-tractor fa-2x text-success me-3"></i>
-                                                    {% elif choice.data.value == 'youth' %}
-                                                    <i class="fas fa-user-graduate fa-2x text-success me-3"></i>
-                                                    {% endif %}
-                                                    <div>
-                                                        <strong>{{ choice.choice_label }}</strong>
-                                                        <div class="small text-muted">
-                                                            {% if choice.data.value == 'member' %}
-                                                            General community member
-                                                            {% elif choice.data.value == 'farmer' %}
-                                                            Active farmer or agripreneur
-                                                            {% elif choice.data.value == 'youth' %}
-                                                            Youth (18-35 years)
-                                                            {% endif %}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </label>
+                                    <!-- Email -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-1"></i> Email Address <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.email }}
+                                        {% if form.email.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.email.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
                                         </div>
+                                        {% endif %}
+                                        <div class="form-text">We'll never share your email with anyone else.</div>
                                     </div>
-                                    {% endfor %}
                                 </div>
-                                {% if form.user_type.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.user_type.errors %}
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
+                                
+                                <div class="row">
+                                    <!-- Password -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-lock me-1"></i> Password <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="position-relative">
+                                            {{ form.password1 }}
+                                            <span class="field-icon" onclick="togglePassword('{{ form.password1.id_for_label }}', this)">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
+                                        {% if form.password1.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password1.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% else %}
+                                        <!-- Password Strength Meter -->
+                                        <div class="password-strength-meter mt-2">
+                                            <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Confirm Password -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-lock me-1"></i> Confirm Password <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="position-relative">
+                                            {{ form.password2 }}
+                                            <span class="field-icon" onclick="togglePassword('{{ form.password2.id_for_label }}', this)">
+                                                <i class="fas fa-eye"></i>
+                                            </span>
+                                        </div>
+                                        {% if form.password2.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password2.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="password-match-indicator small mt-1" id="passwordMatchIndicator"></div>
+                                    </div>
                                 </div>
-                                {% endif %}
-                            </div>
-                        </fieldset>
-                        
-                        <!-- Terms and Conditions -->
-                        <div class="mb-4">
-                            <div class="form-check">
-                                {{ form.terms_accepted }}
-                                <label class="form-check-label" for="{{ form.terms_accepted.id_for_label }}">
-                                    I agree to the <a href="{% url 'terms' %}" target="_blank">Terms and Conditions</a> 
-                                    and <a href="{% url 'privacy' %}" target="_blank">Privacy Policy</a> *
-                                </label>
-                                {% if form.terms_accepted.errors %}
-                                <div class="text-danger small mt-1">
-                                    {% for error in form.terms_accepted.errors %}
-                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                    {% endfor %}
-                                </div>
-                                {% endif %}
+                            </fieldset>
+                            
+                            <div class="d-flex justify-content-end">
+                                <button type="button" class="btn btn-success next-step">
+                                    Next: Personal Information <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
                             </div>
                         </div>
                         
-                        <!-- Submit Button -->
-                        <div class="d-grid gap-2">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-user-plus me-2"></i> Complete Registration
-                            </button>
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary">
-                                <i class="fas fa-sign-in-alt me-2"></i> Already have an account? Login
-                            </a>
+                        <!-- Step 2: Personal Information -->
+                        <div class="form-step step-2" style="display: none;">
+                            <fieldset class="mb-4">
+                                <legend class="h5 text-success border-bottom pb-2">
+                                    <i class="fas fa-id-card me-2"></i>Personal Information
+                                </legend>
+                                
+                                <div class="row">
+                                    <!-- First Name -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-signature me-1"></i> First Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.first_name }}
+                                        {% if form.first_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.first_name.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Last Name -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-signature me-1"></i> Last Name <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.last_name }}
+                                        {% if form.last_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.last_name.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Phone -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.phone.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-phone me-1"></i> Phone Number <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.phone }}
+                                        {% if form.phone.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.phone.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Format: 07XXXXXXXX or 01XXXXXXXX</div>
+                                    </div>
+                                    
+                                    <!-- ID Number -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.id_number.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-id-badge me-1"></i> National ID/Passport <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.id_number }}
+                                        {% if form.id_number.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.id_number.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Date of Birth -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-birthday-cake me-1"></i> Date of Birth <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.date_of_birth }}
+                                        {% if form.date_of_birth.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.date_of_birth.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Format: YYYY-MM-DD</div>
+                                    </div>
+                                    
+                                    <!-- Gender -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.gender.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-venus-mars me-1"></i> Gender <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.gender }}
+                                        {% if form.gender.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.gender.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Occupation -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.occupation.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-briefcase me-1"></i> Occupation
+                                        </label>
+                                        {{ form.occupation }}
+                                        {% if form.occupation.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.occupation.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Education Level -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.education_level.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-graduation-cap me-1"></i> Education Level
+                                        </label>
+                                        {{ form.education_level }}
+                                        {% if form.education_level.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.education_level.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Profile Picture -->
+                                    <div class="col-md-12 mb-3">
+                                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-camera me-1"></i> Profile Picture
+                                        </label>
+                                        {{ form.profile_picture }}
+                                        {% if form.profile_picture.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.profile_picture.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">
+                                            <small>Optional. Max 2MB. JPG, PNG allowed. Recommended size: 300x300px.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Previous
+                                </button>
+                                <button type="button" class="btn btn-success next-step">
+                                    Next: Location <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3: Location Information -->
+                        <div class="form-step step-3" style="display: none;">
+                            <fieldset class="mb-4">
+                                <legend class="h5 text-success border-bottom pb-2">
+                                    <i class="fas fa-map-marker-alt me-2"></i>Location Information
+                                </legend>
+                                
+                                <div class="row">
+                                    <!-- County -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.county.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-globe-africa me-1"></i> County <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.county }}
+                                        {% if form.county.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.county.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Sub-County -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.sub_county.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-map me-1"></i> Sub-County <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.sub_county }}
+                                        {% if form.sub_county.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.sub_county.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Ward -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.ward.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-map-pin me-1"></i> Ward <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.ward }}
+                                        {% if form.ward.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.ward.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Village -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.village.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-home me-1"></i> Village/Estate <span class="text-danger">*</span>
+                                        </label>
+                                        {{ form.village }}
+                                        {% if form.village.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.village.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <!-- Postal Address -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.postal_address.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-envelope me-1"></i> Postal Address
+                                        </label>
+                                        {{ form.postal_address }}
+                                        {% if form.postal_address.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.postal_address.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Postal Code -->
+                                    <div class="col-md-6 mb-3">
+                                        <label for="{{ form.postal_code.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-mail-bulk me-1"></i> Postal Code
+                                        </label>
+                                        {{ form.postal_code }}
+                                        {% if form.postal_code.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.postal_code.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </fieldset>
+                            
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Previous
+                                </button>
+                                <button type="button" class="btn btn-success next-step">
+                                    Next: Membership Type <i class="fas fa-arrow-right ms-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 4: Membership Type -->
+                        <div class="form-step step-4" style="display: none;">
+                            <fieldset class="mb-4">
+                                <legend class="h5 text-success border-bottom pb-2">
+                                    <i class="fas fa-users me-2"></i>Membership Type
+                                </legend>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Select Membership Category <span class="text-danger">*</span></label>
+                                    <div class="row g-3">
+                                        {% for value, label in form.user_type.field.choices %}
+                                        <div class="col-md-4">
+                                            <div class="membership-card card h-100 {% if value == 'member' %}selected{% endif %}" onclick="selectMembership(this, '{{ value }}')">
+                                                <input type="radio" name="{{ form.user_type.name }}" 
+                                                       id="id_user_type_{{ forloop.counter0 }}" 
+                                                       value="{{ value }}"
+                                                       {% if value == 'member' %}checked{% endif %}>
+                                                <div class="card-body text-center p-3">
+                                                    {% if value == 'member' %}
+                                                    <i class="fas fa-user-circle fa-3x text-success mb-3"></i>
+                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                    <p class="small text-muted mb-0">
+                                                        General community member
+                                                    </p>
+                                                    {% elif value == 'farmer' %}
+                                                    <i class="fas fa-tractor fa-3x text-success mb-3"></i>
+                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                    <p class="small text-muted mb-0">
+                                                        Active farmer or agripreneur
+                                                    </p>
+                                                    {% elif value == 'youth' %}
+                                                    <i class="fas fa-user-graduate fa-3x text-success mb-3"></i>
+                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                    <p class="small text-muted mb-0">
+                                                        Youth (18-35 years)
+                                                    </p>
+                                                    {% elif value == 'organization' %}
+                                                    <i class="fas fa-building fa-3x text-success mb-3"></i>
+                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                    <p class="small text-muted mb-0">
+                                                        NGO, CBO, or Company
+                                                    </p>
+                                                    {% elif value == 'student' %}
+                                                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
+                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                    <p class="small text-muted mb-0">
+                                                        Full-time student
+                                                    </p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="card-footer bg-transparent border-0 text-center">
+                                                    <span class="badge bg-success-subtle text-success">Select</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {% endfor %}
+                                    </div>
+                                    {% if form.user_type.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {% for error in form.user_type.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Organization Name (conditional) -->
+                                <div id="organizationField" style="display: none;">
+                                    <div class="mb-3">
+                                        <label for="{{ form.organization_name.id_for_label }}" class="form-label fw-bold">
+                                            <i class="fas fa-building me-1"></i> Organization Name
+                                        </label>
+                                        {{ form.organization_name }}
+                                        {% if form.organization_name.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.organization_name.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Referral Source -->
+                                <div class="mb-3">
+                                    <label for="{{ form.referral_source.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-info-circle me-1"></i> How did you hear about us?
+                                    </label>
+                                    {{ form.referral_source }}
+                                    {% if form.referral_source.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.referral_source.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Interests -->
+                                <div class="mb-3">
+                                    <label for="{{ form.interests.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-heart me-1"></i> Areas of Interest
+                                    </label>
+                                    {{ form.interests }}
+                                    {% if form.interests.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.interests.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Select all that apply</div>
+                                </div>
+                                
+                                <!-- Skills -->
+                                <div class="mb-3">
+                                    <label for="{{ form.skills.id_for_label }}" class="form-label fw-bold">
+                                        <i class="fas fa-tools me-1"></i> Skills
+                                    </label>
+                                    {{ form.skills }}
+                                    {% if form.skills.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.skills.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Newsletter Subscription -->
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        {{ form.newsletter_subscription }}
+                                        <label class="form-check-label" for="{{ form.newsletter_subscription.id_for_label }}">
+                                            <i class="fas fa-newspaper me-1"></i> Subscribe to our newsletter
+                                        </label>
+                                        {% if form.newsletter_subscription.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.newsletter_subscription.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                        <div class="form-text">Receive updates on tree planting events, training opportunities, and climate action news.</div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                            
+                            <!-- Terms and Conditions -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form.terms_accepted }}
+                                    <label class="form-check-label fw-bold" for="{{ form.terms_accepted.id_for_label }}">
+                                        I agree to the <a href="{% url 'accounts:terms' %}" target="_blank" class="text-success">Terms and Conditions</a> 
+                                        and <a href="{% url 'accounts:privacy' %}" target="_blank" class="text-success">Privacy Policy</a> <span class="text-danger">*</span>
+                                    </label>
+                                    {% if form.terms_accepted.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.terms_accepted.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- GDPR Consent -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form.data_consent }}
+                                    <label class="form-check-label" for="{{ form.data_consent.id_for_label }}">
+                                        <i class="fas fa-shield-alt me-1"></i> I consent to KACAF storing and processing my personal data
+                                    </label>
+                                    {% if form.data_consent.errors %}
+                                    <div class="text-danger small mt-1">
+                                        {% for error in form.data_consent.errors %}
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Submit Button -->
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-outline-secondary prev-step">
+                                    <i class="fas fa-arrow-left me-2"></i> Previous
+                                </button>
+                                <button type="submit" class="btn btn-success btn-lg px-5">
+                                    <i class="fas fa-user-plus me-2"></i> Complete Registration
+                                </button>
+                            </div>
                         </div>
                     </form>
                     
@@ -439,29 +713,45 @@
                         <h6 class="text-success mb-3">
                             <i class="fas fa-gift me-2"></i>Benefits of Joining KACAF
                         </h6>
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="text-center p-3 border rounded h-100">
+                        <div class="row g-3">
+                            <div class="col-md-3 col-6">
+                                <div class="text-center p-2">
                                     <i class="fas fa-tree fa-2x text-success mb-2"></i>
-                                    <h6>Tree Seedlings</h6>
-                                    <p class="small mb-0">Free tree seedlings for agroforestry</p>
+                                    <h6 class="small fw-bold mb-1">Free Seedlings</h6>
+                                    <p class="small text-muted mb-0">For agroforestry</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="text-center p-3 border rounded h-100">
+                            <div class="col-md-3 col-6">
+                                <div class="text-center p-2">
                                     <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
-                                    <h6>Training</h6>
-                                    <p class="small mb-0">Free training on climate-smart agriculture</p>
+                                    <h6 class="small fw-bold mb-1">Free Training</h6>
+                                    <p class="small text-muted mb-0">Climate-smart agri</p>
                                 </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <div class="text-center p-3 border rounded h-100">
+                            <div class="col-md-3 col-6">
+                                <div class="text-center p-2">
                                     <i class="fas fa-handshake fa-2x text-success mb-2"></i>
-                                    <h6>Networking</h6>
-                                    <p class="small mb-0">Connect with other farmers and experts</p>
+                                    <h6 class="small fw-bold mb-1">Networking</h6>
+                                    <p class="small text-muted mb-0">Connect & grow</p>
+                                </div>
+                            </div>
+                            <div class="col-md-3 col-6">
+                                <div class="text-center p-2">
+                                    <i class="fas fa-seedling fa-2x text-success mb-2"></i>
+                                    <h6 class="small fw-bold mb-1">Farm Visits</h6>
+                                    <p class="small text-muted mb-0">Expert advice</p>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Already have account -->
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Already have an account? 
+                            <a href="{% url 'accounts:login' %}" class="text-success fw-bold text-decoration-none">
+                                Login here <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -472,20 +762,11 @@
 
 {% block extra_js %}
 <script>
-    // Toggle password visibility
-    document.getElementById('togglePassword1').addEventListener('click', function() {
-        const passwordInput = document.getElementById('{{ form.password1.id_for_label }}');
-        const icon = this.querySelector('i');
-        togglePasswordVisibility(passwordInput, icon);
-    });
-    
-    document.getElementById('togglePassword2').addEventListener('click', function() {
-        const passwordInput = document.getElementById('{{ form.password2.id_for_label }}');
-        const icon = this.querySelector('i');
-        togglePasswordVisibility(passwordInput, icon);
-    });
-    
-    function togglePasswordVisibility(input, icon) {
+    // Password visibility toggle
+    function togglePassword(inputId, element) {
+        const input = document.getElementById(inputId);
+        const icon = element.querySelector('i');
+        
         if (input.type === 'password') {
             input.type = 'text';
             icon.classList.remove('fa-eye');
@@ -497,15 +778,205 @@
         }
     }
     
-    // Form validation
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        // Add any custom validation here
-        const terms = document.getElementById('{{ form.terms_accepted.id_for_label }}');
-        if (!terms.checked) {
-            e.preventDefault();
-            alert('You must agree to the Terms and Conditions to register.');
-            terms.focus();
+    // Password strength checker
+    document.addEventListener('DOMContentLoaded', function() {
+        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const matchIndicator = document.getElementById('passwordMatchIndicator');
+        
+        if (password1) {
+            password1.addEventListener('input', function() {
+                const strength = checkPasswordStrength(this.value);
+                updatePasswordStrength(strength);
+            });
+        }
+        
+        if (password2) {
+            password2.addEventListener('input', function() {
+                checkPasswordMatch();
+            });
+        }
+        
+        if (password1) {
+            password1.addEventListener('input', function() {
+                checkPasswordMatch();
+            });
+        }
+        
+        function checkPasswordStrength(password) {
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 25;
+            if (password.match(/[$@#&!]+/)) strength += 25;
+            
+            return Math.min(strength, 100);
+        }
+        
+        function updatePasswordStrength(strength) {
+            if (strengthBar) {
+                strengthBar.style.width = strength + '%';
+                strengthBar.className = 'password-strength-bar';
+                
+                if (strength < 25) {
+                    strengthBar.classList.add('strength-weak');
+                } else if (strength < 50) {
+                    strengthBar.classList.add('strength-fair');
+                } else if (strength < 75) {
+                    strengthBar.classList.add('strength-good');
+                } else {
+                    strengthBar.classList.add('strength-strong');
+                }
+            }
+        }
+        
+        function checkPasswordMatch() {
+            if (password1 && password2 && matchIndicator) {
+                if (password1.value && password2.value) {
+                    if (password1.value === password2.value) {
+                        matchIndicator.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Passwords match';
+                        matchIndicator.className = 'password-match-indicator small mt-1 text-success';
+                    } else {
+                        matchIndicator.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i> Passwords do not match';
+                        matchIndicator.className = 'password-match-indicator small mt-1 text-danger';
+                    }
+                } else {
+                    matchIndicator.innerHTML = '';
+                }
+            }
         }
     });
+    
+    // Multi-step form navigation
+    document.addEventListener('DOMContentLoaded', function() {
+        const steps = document.querySelectorAll('.form-step');
+        const stepIndicators = document.querySelectorAll('.step');
+        let currentStep = 1;
+        
+        function showStep(step) {
+            steps.forEach(s => s.style.display = 'none');
+            stepIndicators.forEach(s => s.classList.remove('active', 'completed'));
+            
+            const stepElement = document.querySelector(`.form-step.step-${step}`);
+            if (stepElement) stepElement.style.display = 'block';
+            
+            for (let i = 1; i < step; i++) {
+                const stepIndicator = document.getElementById(`step${i}`);
+                if (stepIndicator) stepIndicator.classList.add('completed');
+            }
+            
+            const currentStepIndicator = document.getElementById(`step${step}`);
+            if (currentStepIndicator) currentStepIndicator.classList.add('active');
+            
+            currentStep = step;
+        }
+        
+        // Next button click
+        document.querySelectorAll('.next-step').forEach(button => {
+            button.addEventListener('click', function() {
+                if (currentStep < 4) {
+                    showStep(currentStep + 1);
+                }
+            });
+        });
+        
+        // Previous button click
+        document.querySelectorAll('.prev-step').forEach(button => {
+            button.addEventListener('click', function() {
+                if (currentStep > 1) {
+                    showStep(currentStep - 1);
+                }
+            });
+        });
+    });
+    
+    // Membership card selection
+    function selectMembership(card, value) {
+        // Remove selected class from all cards
+        document.querySelectorAll('.membership-card').forEach(c => {
+            c.classList.remove('selected');
+        });
+        
+        // Add selected class to clicked card
+        card.classList.add('selected');
+        
+        // Check the radio button
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+        
+        // Show/hide organization field
+        const orgField = document.getElementById('organizationField');
+        if (orgField) {
+            orgField.style.display = value === 'organization' ? 'block' : 'none';
+        }
+    }
+    
+    // Form validation
+    document.getElementById('registrationForm').addEventListener('submit', function(e) {
+        const terms = document.getElementById('{{ form.terms_accepted.id_for_label }}');
+        const dataConsent = document.getElementById('{{ form.data_consent.id_for_label }}');
+        
+        if (terms && !terms.checked) {
+            e.preventDefault();
+            alert('You must agree to the Terms and Conditions and Privacy Policy to register.');
+            terms.focus();
+            return false;
+        }
+        
+        if (dataConsent && !dataConsent.checked) {
+            e.preventDefault();
+            alert('You must consent to data processing to register.');
+            dataConsent.focus();
+            return false;
+        }
+        
+        // Check if passwords match
+        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+        
+        if (password1 && password2 && password1.value !== password2.value) {
+            e.preventDefault();
+            alert('Passwords do not match!');
+            password2.focus();
+            return false;
+        }
+        
+        return true;
+    });
+    
+    // File input preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const profilePic = document.getElementById('{{ form.profile_picture.id_for_label }}');
+        
+        if (profilePic) {
+            profilePic.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.size > 2 * 1024 * 1024) {
+                        alert('File size must be less than 2MB');
+                        this.value = '';
+                    }
+                    
+                    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                    if (!validTypes.includes(file.type)) {
+                        alert('Please upload a valid image file (JPG, PNG)');
+                        this.value = '';
+                    }
+                }
+            });
+        }
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        document.querySelectorAll('.alert').forEach(alert => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => alert.remove(), 500);
+        });
+    }, 5000);
 </script>
 {% endblock %}
