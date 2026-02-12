@@ -22,6 +22,7 @@ urlpatterns = [
     path('announcement/create/', views.announcement_create, name='announcement_create'),
     path('contact/', views.contact, name='contact'),  # ✅ This is what your template needs
     path('newsletter/subscribe/', views.newsletter_subscribe, name='newsletter_subscribe'),
+    path('announcements/', views.announcement_list, name='announcement_list'),
 
     # API routes (router URLs)
     path('', include(router.urls)),

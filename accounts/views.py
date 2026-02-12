@@ -1,14 +1,15 @@
+# accounts/views.py
 from django.shortcuts import render, redirect
-from django.contrib.auth import get_user_model
+from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView, DetailView, ListView
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth.views import LoginView
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.decorators import login_required
-from django.views.generic import CreateView, DetailView, ListView
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.urls import reverse_lazy
-from django.contrib import messages
 import random
 import string
 
@@ -27,12 +28,40 @@ User = get_user_model()
 
 
 # ---------------------------
+# Custom Login View
+# ---------------------------
+class CustomLoginView(LoginView):
+    """Custom login view with redirect based on user type"""
+    template_name = 'accounts/auth/login.html'
+    
+    def get_success_url(self):
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return reverse_lazy('accounts:admin_dashboard')
+        elif user.user_type == 'executive':
+            return reverse_lazy('accounts:executive_dashboard')
+        else:
+            return reverse_lazy('accounts:member_dashboard')
+
+
+# ---------------------------
+# Logout View
+# ---------------------------
+def logout_view(request):
+    """Custom logout view"""
+    logout(request)
+    messages.success(request, "You have been successfully logged out.")
+    return redirect('accounts:public_dashboard')
+
+
+# ---------------------------
 # Public & role dashboards
 # ---------------------------
 def public_dashboard(request):
+    """Public facing homepage/dashboard"""
     context = {
         "total_trees_planted": 12345,
-        "total_members": 6789,
+        "total_members": User.objects.filter(user_type='member').count(),
         "total_area_coverage": 1500,
         "total_beneficiaries": 2345,
         "carbon_sequestered": 987,
@@ -51,22 +80,30 @@ def dashboard_redirect(request):
     - Staff/Admin -> admin dashboard
     - Executive -> executive dashboard
     - Member -> member dashboard
+    - Others -> member dashboard (fallback)
     """
     if request.user.is_staff or request.user.is_superuser:
         return redirect('accounts:admin_dashboard')
     elif request.user.user_type == 'executive':
         return redirect('accounts:executive_dashboard')
-    else:  # member or any other type
+    elif request.user.user_type == 'member':
+        return redirect('accounts:member_dashboard')
+    else:
+        # For other user types (youth, organization, donor, etc.)
+        # You can create specific dashboards for them later
         return redirect('accounts:member_dashboard')
 
 
 @login_required
 def admin_dashboard(request):
-    # Add context data for admin dashboard
+    """Admin/staff dashboard"""
     context = {
         "total_users": User.objects.count(),
         "verified_users": User.objects.filter(is_verified=True).count(),
         "regular_members": User.objects.filter(user_type='member').count(),
+        "executive_members": User.objects.filter(user_type='executive').count(),
+        "youth_members": User.objects.filter(user_type='youth').count(),
+        "organizations": User.objects.filter(user_type='organization').count(),
         "total_income": 0,
         "total_expenses": 0,
         "net_balance": 0,
@@ -114,28 +151,46 @@ def admin_dashboard(request):
 
 @login_required
 def executive_dashboard(request):
+    """Executive committee dashboard"""
+    # Check if user has executive committee profile
+    try:
+        executive_profile = request.user.executive_role
+    except ExecutiveCommittee.DoesNotExist:
+        executive_profile = None
+    
     context = {
         "executive_members": ExecutiveCommittee.objects.filter(is_active=True),
+        "current_member": executive_profile,
         "pending_decisions": [],
         "upcoming_meetings": [],
         "reports": [],
+        "total_members": User.objects.filter(user_type='member').count(),
+        "pending_applications": 0,
     }
     return render(request, "dashboard/executive_dashboard.html", context)
 
 
 @login_required
 def member_dashboard(request):
-    # Get member profile
+    """Regular member dashboard"""
+    # Get member profile - handle case where it doesn't exist
     try:
         profile = request.user.memberprofile
-    except MemberProfile.DoesNotExist:
-        profile = None
+    except (MemberProfile.DoesNotExist, AttributeError):
+        # Create a profile if it doesn't exist and user is a member
+        if request.user.user_type == 'member':
+            profile = MemberProfile.objects.create(user=request.user)
+        else:
+            profile = None
     
     context = {
         "profile": profile,
         "membership_status": "Active" if request.user.is_active else "Inactive",
-        "joined_date": request.user.date_joined,
-        "contributions": 0,
+        "joined_date": getattr(request.user, 'join_date', request.user.date_joined),
+        "contributions": profile.total_donations if profile else 0,
+        "trees_planted": profile.trees_planted if profile else 0,
+        "events_attended": profile.events_attended if profile else 0,
+        "training_completed": profile.training_completed if profile else 0,
         "programs_enrolled": [],
         "certificates": [],
     }
@@ -153,12 +208,22 @@ def profile(request):
     user_profile = None
     try:
         user_profile = request.user.memberprofile
-    except MemberProfile.DoesNotExist:
+    except (MemberProfile.DoesNotExist, AttributeError):
+        # Create a profile if it doesn't exist and user is a member
+        if request.user.user_type == 'member':
+            user_profile = MemberProfile.objects.create(user=request.user)
+    
+    # Get executive profile if user is executive
+    executive_profile = None
+    try:
+        executive_profile = request.user.executive_role
+    except (ExecutiveCommittee.DoesNotExist, AttributeError):
         pass
 
     context = {
         "user": request.user,
         "profile": user_profile,
+        "executive_profile": executive_profile,
     }
     return render(request, "accounts/profile.html", context)
 
@@ -170,7 +235,7 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """View for creating new users (staff only)"""
     model = User
     template_name = 'accounts/user_form.html'
-    fields = ['email', 'first_name', 'last_name', 'user_type', 'is_active']
+    fields = ['email', 'first_name', 'last_name', 'user_type', 'is_active', 'is_staff', 'is_superuser']
     success_url = reverse_lazy('accounts:admin_dashboard')
     
     def test_func(self):
@@ -180,9 +245,16 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
         temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
         user = form.save(commit=False)
         user.set_password(temp_password)
+        user.username = form.cleaned_data['email']
         user.save()
-        if user.user_type in ['member', 'executive']:
-            MemberProfile.objects.create(user=user)
+        
+        # Create MemberProfile ONLY for members, not for other user types
+        if user.user_type == 'member':
+            MemberProfile.objects.get_or_create(user=user)
+        
+        # Executive committee members should be added through the executive committee management
+        # not automatically created here
+            
         messages.success(self.request, f'User {user.email} created successfully. Temporary password: {temp_password}')
         return super().form_valid(form)
 
@@ -195,6 +267,24 @@ class UserDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def test_func(self):
         user_obj = self.get_object()
         return self.request.user.is_staff or self.request.user.id == user_obj.id
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user_obj = self.get_object()
+        
+        # Get member profile if exists
+        try:
+            context['member_profile'] = user_obj.memberprofile
+        except (MemberProfile.DoesNotExist, AttributeError):
+            context['member_profile'] = None
+            
+        # Get executive profile if exists
+        try:
+            context['executive_profile'] = user_obj.executive_role
+        except (ExecutiveCommittee.DoesNotExist, AttributeError):
+            context['executive_profile'] = None
+            
+        return context
 
 
 class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
@@ -207,7 +297,30 @@ class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
         return self.request.user.is_staff
     
     def get_queryset(self):
-        return User.objects.all().order_by('-date_joined')
+        queryset = User.objects.all().order_by('-date_joined')
+        
+        # Filter by user_type if provided
+        user_type = self.request.GET.get('user_type')
+        if user_type:
+            queryset = queryset.filter(user_type=user_type)
+            
+        # Search by email or name
+        search = self.request.GET.get('search')
+        if search:
+            queryset = queryset.filter(
+                models.Q(email__icontains=search) |
+                models.Q(first_name__icontains=search) |
+                models.Q(last_name__icontains=search)
+            )
+            
+        return queryset
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['user_type_choices'] = User.USER_TYPE_CHOICES
+        context['current_filter'] = self.request.GET.get('user_type', '')
+        context['search_query'] = self.request.GET.get('search', '')
+        return context
 
 
 # ---------------------------
@@ -226,14 +339,28 @@ class UserViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [p() for p in permission_classes]
 
-    @action(detail=False)
+    @action(detail=False, methods=['get'])
     def me(self, request):
         serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def members(self, request):
+        """Get all member users"""
+        members = User.objects.filter(user_type='member')
+        serializer = self.get_serializer(members, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def executives(self, request):
+        """Get all executive users"""
+        executives = User.objects.filter(user_type='executive')
+        serializer = self.get_serializer(executives, many=True)
         return Response(serializer.data)
 
 
 # ---------------------------
-# Registration view
+# Registration view - FIXED VERSION
 # ---------------------------
 def register_view(request):
     """
@@ -242,38 +369,24 @@ def register_view(request):
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            # Create the user
+            # Save the form - this creates both CustomUser and MemberProfile
             user = form.save()
             
-            # Create MemberProfile with all form data
-            MemberProfile.objects.create(
-                user=user,
-                phone=form.cleaned_data.get('phone'),
-                id_number=form.cleaned_data.get('id_number'),
-                date_of_birth=form.cleaned_data.get('date_of_birth'),
-                gender=form.cleaned_data.get('gender'),
-                occupation=form.cleaned_data.get('occupation'),
-                education_level=form.cleaned_data.get('education_level'),
-                profile_picture=form.cleaned_data.get('profile_picture'),
-                county=form.cleaned_data.get('county'),
-                sub_county=form.cleaned_data.get('sub_county'),
-                ward=form.cleaned_data.get('ward'),
-                village=form.cleaned_data.get('village'),
-                postal_address=form.cleaned_data.get('postal_address'),
-                postal_code=form.cleaned_data.get('postal_code'),
-                organization_name=form.cleaned_data.get('organization_name'),
-                referral_source=form.cleaned_data.get('referral_source'),
-                interests=form.cleaned_data.get('interests'),
-                skills=form.cleaned_data.get('skills'),
-                newsletter_subscription=form.cleaned_data.get('newsletter_subscription', False),
-                terms_accepted=form.cleaned_data.get('terms_accepted', False),
-                data_consent=form.cleaned_data.get('data_consent', False)
-            )
+            # Log the user in after registration
+            login(request, user)
             
-            messages.success(request, "Registration successful! Please login.")
-            return redirect('accounts:login')
+            messages.success(request, "Registration successful! Welcome to KACAF.")
+            
+            # Redirect to appropriate dashboard
+            if user.user_type == 'executive':
+                return redirect('accounts:executive_dashboard')
+            else:
+                return redirect('accounts:member_dashboard')
         else:
-            messages.error(request, "Please correct the errors below.")
+            # Print form errors for debugging
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = UserRegistrationForm()
     
@@ -292,6 +405,23 @@ class MemberProfileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+    
+    @action(detail=True, methods=['post'])
+    def increment_trees(self, request, pk=None):
+        """Increment trees planted count"""
+        profile = self.get_object()
+        count = request.data.get('count', 1)
+        profile.trees_planted += int(count)
+        profile.save()
+        return Response({'trees_planted': profile.trees_planted})
+    
+    @action(detail=True, methods=['post'])
+    def increment_events(self, request, pk=None):
+        """Increment events attended count"""
+        profile = self.get_object()
+        profile.events_attended += 1
+        profile.save()
+        return Response({'events_attended': profile.events_attended})
 
 
 class ExecutiveCommitteeViewSet(viewsets.ModelViewSet):
@@ -305,11 +435,16 @@ class ExecutiveCommitteeViewSet(viewsets.ModelViewSet):
             permission_classes = [permissions.IsAuthenticated]
         return [p() for p in permission_classes]
 
-    @action(detail=False)
+    @action(detail=False, methods=['get'])
     def current(self, request):
         qs = ExecutiveCommittee.objects.filter(is_active=True).order_by("order")
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def positions(self, request):
+        """Get all available positions"""
+        return Response(dict(ExecutiveCommittee.POSITIONS))
 
 
 class ChangePasswordView(generics.UpdateAPIView):
@@ -334,10 +469,12 @@ class ChangePasswordView(generics.UpdateAPIView):
     
 
 def about_view(request):
+    """About page"""
     return render(request, "base/about.html")
 
 
 def donate(request):
+    """Donation page"""
     return render(request, "accounts/donate.html")
 
 
@@ -345,6 +482,26 @@ def terms_view(request):
     """Render the Terms and Conditions page"""
     return render(request, 'accounts/terms.html')
 
+
 def privacy_view(request):
     """Render the Privacy Policy page"""
     return render(request, 'accounts/privacy.html')
+
+# accounts/views.py - Add this function
+
+@login_required
+def profile_edit(request):
+    """
+    View for editing user profile
+    """
+    if request.method == 'POST':
+        # Handle form submission
+        # You'll need to create a form for this
+        messages.success(request, "Profile updated successfully!")
+        return redirect('accounts:profile')
+    
+    # GET request - display edit form
+    context = {
+        "user": request.user,
+    }
+    return render(request, "accounts/user/profile_edit.html", context)

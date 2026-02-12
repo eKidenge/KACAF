@@ -18,6 +18,8 @@ urlpatterns = [
     path('programs/', views.program_list, name='program_list'),
     path('programs/create/', views.program_create, name='program_create'),  # ✅ Added create view
     path('dashboard/', views.program_dashboard, name='program_dashboard'),
+    path('my-trees/', views.my_trees, name='my_trees'),  # ✅ ADD THIS LINE
+    path('trees/add/', views.add_tree_planting, name='tree_planting_create'),  # NOT 'add_tree_planting'
     
     # API routes (router URLs)
     path('', include(router.urls)),

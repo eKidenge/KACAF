@@ -17,6 +17,13 @@ from .serializers import (
     NewsletterSubscriptionSerializer
 )
 
+# communications/views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from .models import Announcement, Newsletter, Feedback, ContactMessage
+from .forms import AnnouncementForm, NewsletterForm, FeedbackForm, ContactMessageForm
 
 class AnnouncementFilter(django_filters.FilterSet):
     announcement_type = django_filters.CharFilter(field_name='announcement_type')
@@ -475,3 +482,277 @@ def newsletter_subscribe(request):
     return redirect('/')  # redirect to home or wherever you want
 
 
+# JUST A PLACEHOLDER VIEW FOR ANNOUNCEMENT LIST (you can replace this with your actual implementation)
+@login_required
+def announcement_list(request):
+    """
+    Web view for listing all announcements
+    """
+    # Get all announcements, ordered by newest first
+    announcements = Announcement.objects.all().order_by('-created_at')
+    
+    # Filter by status if specified
+    status = request.GET.get('status')
+    if status:
+        announcements = announcements.filter(status=status)
+    
+    # Filter by priority if specified
+    priority = request.GET.get('priority')
+    if priority:
+        announcements = announcements.filter(priority=priority)
+    
+    # Filter by audience if specified
+    audience = request.GET.get('audience')
+    if audience:
+        announcements = announcements.filter(target_audience=audience)
+    
+    # Search by title or content
+    search = request.GET.get('search')
+    if search:
+        announcements = announcements.filter(
+            Q(title__icontains=search) | 
+            Q(content__icontains=search) |
+            Q(summary__icontains=search)
+        )
+    
+    context = {
+        'announcements': announcements,
+        'total_count': announcements.count(),
+        'published_count': announcements.filter(is_published=True).count(),
+        'draft_count': announcements.filter(is_published=False).count(),
+        'urgent_count': announcements.filter(priority='urgent', is_published=True).count(),
+        'current_year': timezone.now().year,
+        'status_filter': status,
+        'priority_filter': priority,
+        'audience_filter': audience,
+        'search_query': search,
+    }
+    return render(request, 'communications/announcement_list.html', context)
+
+
+@login_required
+def announcement_detail(request, pk):
+    """
+    Web view for viewing a single announcement
+    """
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    # Check permissions
+    if not announcement.is_published:
+        if not (request.user.is_staff or request.user.user_type == 'executive'):
+            messages.error(request, "This announcement is not published yet.")
+            return redirect('communications:announcement_list')
+    
+    # Check target audience
+    if announcement.target_audience not in ['all', 'members']:
+        if not (request.user.is_staff or 
+                request.user.user_type == announcement.target_audience or
+                request.user in announcement.specific_users.all()):
+            messages.error(request, "You don't have permission to view this announcement.")
+            return redirect('communications:announcement_list')
+    
+    # Increment view count
+    announcement.view_count += 1
+    announcement.save(update_fields=['view_count'])
+    
+    # Get attachments
+    attachments = announcement.attachments.all()
+    
+    context = {
+        'announcement': announcement,
+        'attachments': attachments,
+    }
+    return render(request, 'communications/announcement_detail.html', context)
+
+
+@login_required
+def announcement_create(request):
+    """
+    Web view for creating a new announcement
+    """
+    # Check permission
+    if not (request.user.is_staff or request.user.user_type == 'executive'):
+        messages.error(request, "You don't have permission to create announcements.")
+        return redirect('communications:announcement_list')
+    
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST, request.FILES)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.created_by = request.user
+            announcement.save()
+            
+            # Handle attachments
+            if 'attachments' in request.FILES:
+                files = request.FILES.getlist('attachments')
+                for file in files:
+                    AnnouncementAttachment.objects.create(
+                        announcement=announcement,
+                        file=file,
+                        filename=file.name,
+                        file_size=file.size
+                    )
+            
+            # Handle specific users
+            specific_users = request.POST.getlist('specific_users')
+            if specific_users:
+                announcement.specific_users.set(specific_users)
+            
+            messages.success(request, "Announcement created successfully!")
+            
+            if request.POST.get('_continue'):
+                return redirect('communications:announcement_edit', pk=announcement.pk)
+            elif request.POST.get('_addanother'):
+                return redirect('communications:announcement_create')
+            else:
+                return redirect('communications:announcement_detail', pk=announcement.pk)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AnnouncementForm()
+    
+    # Get users for specific targeting
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    users = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    context = {
+        'form': form,
+        'users': users,
+        'is_create': True,
+    }
+    return render(request, 'communications/announcement_form.html', context)
+
+
+@login_required
+def announcement_edit(request, pk):
+    """
+    Web view for editing an existing announcement
+    """
+    # Check permission
+    if not (request.user.is_staff or request.user.user_type == 'executive'):
+        messages.error(request, "You don't have permission to edit announcements.")
+        return redirect('communications:announcement_list')
+    
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST, request.FILES, instance=announcement)
+        if form.is_valid():
+            announcement = form.save()
+            
+            # Handle new attachments
+            if 'attachments' in request.FILES:
+                files = request.FILES.getlist('attachments')
+                for file in files:
+                    AnnouncementAttachment.objects.create(
+                        announcement=announcement,
+                        file=file,
+                        filename=file.name,
+                        file_size=file.size
+                    )
+            
+            # Handle specific users
+            specific_users = request.POST.getlist('specific_users')
+            if specific_users:
+                announcement.specific_users.set(specific_users)
+            else:
+                announcement.specific_users.clear()
+            
+            messages.success(request, "Announcement updated successfully!")
+            
+            if request.POST.get('_continue'):
+                return redirect('communications:announcement_edit', pk=announcement.pk)
+            else:
+                return redirect('communications:announcement_detail', pk=announcement.pk)
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = AnnouncementForm(instance=announcement)
+    
+    # Get users for specific targeting
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+    users = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    
+    # Get existing attachments
+    attachments = announcement.attachments.all()
+    
+    context = {
+        'form': form,
+        'announcement': announcement,
+        'users': users,
+        'attachments': attachments,
+        'is_create': False,
+    }
+    return render(request, 'communications/announcement_form.html', context)
+
+
+@login_required
+def announcement_delete(request, pk):
+    """
+    Web view for deleting an announcement
+    """
+    # Check permission
+    if not (request.user.is_staff or request.user.user_type == 'executive'):
+        messages.error(request, "You don't have permission to delete announcements.")
+        return redirect('communications:announcement_list')
+    
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    if request.method == 'POST':
+        announcement.delete()
+        messages.success(request, "Announcement deleted successfully!")
+        return redirect('communications:announcement_list')
+    
+    context = {
+        'announcement': announcement,
+    }
+    return render(request, 'communications/announcement_confirm_delete.html', context)
+
+
+@login_required
+def announcement_publish(request, pk):
+    """
+    Web view for publishing/unpublishing an announcement
+    """
+    # Check permission
+    if not (request.user.is_staff or request.user.user_type == 'executive'):
+        messages.error(request, "You don't have permission to publish announcements.")
+        return redirect('communications:announcement_list')
+    
+    announcement = get_object_or_404(Announcement, pk=pk)
+    
+    if request.method == 'POST':
+        announcement.is_published = not announcement.is_published
+        if announcement.is_published:
+            announcement.published_by = request.user
+            announcement.publish_date = timezone.now()
+        announcement.save()
+        
+        status = "published" if announcement.is_published else "unpublished"
+        messages.success(request, f"Announcement {status} successfully!")
+    
+    return redirect('communications:announcement_detail', pk=announcement.pk)
+
+
+@login_required
+def announcement_remove_attachment(request, pk, attachment_pk):
+    """
+    Web view for removing an attachment from an announcement
+    """
+    # Check permission
+    if not (request.user.is_staff or request.user.user_type == 'executive'):
+        messages.error(request, "You don't have permission to remove attachments.")
+        return redirect('communications:announcement_detail', pk=pk)
+    
+    attachment = get_object_or_404(AnnouncementAttachment, pk=attachment_pk, announcement_id=pk)
+    
+    if request.method == 'POST':
+        attachment.delete()
+        messages.success(request, "Attachment removed successfully!")
+    
+    return redirect('communications:announcement_edit', pk=pk)
+
+
+# ... (keep all your existing code below) ...

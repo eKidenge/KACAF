@@ -1,17 +1,18 @@
-from django.shortcuts import get_object_or_404
+# programs/views.py
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils import timezone
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from .models import Program, Project, TreePlanting, Training
 from .serializers import (
     ProgramSerializer, ProjectSerializer, 
     TreePlantingSerializer, TrainingSerializer,
     ProgramProgressSerializer
 )
+from .forms import ProgramForm
 
 
 class ProgramViewSet(viewsets.ModelViewSet):
@@ -254,11 +255,10 @@ def program_dashboard(request):
     }
     return render(request, 'programs/program_dashboard.html', context)
 
+
 @login_required
 def program_create(request):
     """Web view for creating a new program"""
-    from .forms import ProgramForm  # make sure you have a form
-
     if request.method == "POST":
         form = ProgramForm(request.POST)
         if form.is_valid():
@@ -269,3 +269,90 @@ def program_create(request):
     
     context = {'form': form}
     return render(request, 'programs/program_create.html', context)
+
+
+# ------------------------------------------------------------
+# Member Tree Planting Views
+# ------------------------------------------------------------
+
+@login_required
+def my_trees(request):
+    """
+    Web view for members to see their tree planting history
+    Displays all trees planted by the current user
+    """
+    # Get all tree plantings by the current user
+    trees = TreePlanting.objects.filter(farmer=request.user).order_by('-planting_date')
+    
+    # Calculate statistics
+    total_trees = trees.aggregate(total=Sum('quantity'))['total'] or 0
+    total_species = trees.values('species').distinct().count()
+    
+    # Get trees by species
+    trees_by_species = trees.values('species').annotate(
+        total=Sum('quantity'),
+        avg_survival=Sum('survival_rate') / Count('id') if Count('id') > 0 else 0
+    )
+    
+    # Get monthly planting data for charts
+    current_year = timezone.now().year
+    monthly_data = trees.filter(
+        planting_date__year=current_year
+    ).values('planting_date__month').annotate(
+        total=Sum('quantity')
+    ).order_by('planting_date__month')
+    
+    # Get projects the user has participated in
+    projects = Project.objects.filter(
+        tree_plantings__farmer=request.user
+    ).distinct()
+    
+    context = {
+        'user': request.user,
+        'trees': trees,
+        'total_trees': total_trees,
+        'total_species': total_species,
+        'trees_by_species': trees_by_species,
+        'monthly_data': monthly_data,
+        'projects': projects,
+        'current_year': current_year,
+    }
+    return render(request, 'programs/my_trees.html', context)
+
+
+@login_required
+def tree_detail(request, pk):
+    """
+    Web view for viewing details of a specific tree planting record
+    """
+    tree = get_object_or_404(TreePlanting, pk=pk, farmer=request.user)
+    
+    context = {
+        'user': request.user,
+        'tree': tree,
+    }
+    return render(request, 'programs/tree_detail.html', context)
+
+
+@login_required
+def add_tree_planting(request):
+    """
+    Web view for adding a new tree planting record
+    """
+    from .forms import TreePlantingForm
+    
+    if request.method == "POST":
+        form = TreePlantingForm(request.POST)
+        if form.is_valid():
+            tree_planting = form.save(commit=False)
+            tree_planting.farmer = request.user
+            tree_planting.save()
+            messages.success(request, "Tree planting record added successfully!")
+            return redirect('programs:my_trees')
+    else:
+        form = TreePlantingForm()
+    
+    context = {
+        'form': form,
+    }
+    return render(request, 'programs/add_tree_planting.html', context)

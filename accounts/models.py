@@ -46,11 +46,15 @@ class CustomUser(AbstractUser):
         ('other', 'Other'),
     )
     
+    # ---------------------------
     # Basic Info
+    # ---------------------------
     user_type = models.CharField(max_length=20, choices=USER_TYPE_CHOICES, default='member')
     membership_type = models.CharField(max_length=20, choices=MEMBERSHIP_TYPE, null=True, blank=True)
     
-    # Personal Information - MOVED FROM MemberProfile TO HERE
+    # ---------------------------
+    # Personal Information
+    # ---------------------------
     phone = models.CharField(max_length=15, null=True, blank=True)
     id_number = models.CharField(max_length=20, null=True, blank=True)
     date_of_birth = models.DateField(null=True, blank=True)
@@ -60,7 +64,9 @@ class CustomUser(AbstractUser):
     profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
     bio = models.TextField(null=True, blank=True)
     
+    # ---------------------------
     # Location Information
+    # ---------------------------
     county = models.CharField(max_length=100, default='West Pokot')
     sub_county = models.CharField(max_length=100, null=True, blank=True)
     ward = models.CharField(max_length=100, null=True, blank=True)
@@ -68,23 +74,31 @@ class CustomUser(AbstractUser):
     postal_address = models.CharField(max_length=100, null=True, blank=True)
     postal_code = models.CharField(max_length=20, null=True, blank=True)
     
+    # ---------------------------
     # Membership Information
+    # ---------------------------
     organization_name = models.CharField(max_length=200, null=True, blank=True)
     referral_source = models.CharField(max_length=50, choices=REFERRAL_SOURCE_CHOICES, null=True, blank=True)
     interests = models.TextField(null=True, blank=True)
     skills = models.TextField(null=True, blank=True)
     
+    # ---------------------------
     # Consent Fields
+    # ---------------------------
     newsletter_subscription = models.BooleanField(default=False)
     terms_accepted = models.BooleanField(default=False)
     data_consent = models.BooleanField(default=False)
     
+    # ---------------------------
     # Status Fields
+    # ---------------------------
     join_date = models.DateField(default=timezone.now)
     is_verified = models.BooleanField(default=False)
     verification_date = models.DateField(null=True, blank=True)
     
-    # Executive Committee Position (if applicable)
+    # ---------------------------
+    # Executive Committee Position
+    # ---------------------------
     position = models.CharField(max_length=100, null=True, blank=True)
     position_start_date = models.DateField(null=True, blank=True)
     
@@ -103,22 +117,30 @@ class MemberProfile(models.Model):
     """ONLY agricultural and KACAF-specific activity data"""
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='member_profile')
     
+    # ---------------------------
     # Agricultural Information
-    farm_size = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # in acres
+    # ---------------------------
+    farm_size = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     trees_planted = models.IntegerField(default=0)
     conservation_practices = models.TextField(null=True, blank=True)
     
+    # ---------------------------
     # Activity Tracking
+    # ---------------------------
     total_donations = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     events_attended = models.IntegerField(default=0)
     training_completed = models.IntegerField(default=0)
     
-    # Contact preferences (override CustomUser defaults)
+    # ---------------------------
+    # Contact preferences
+    # ---------------------------
     receive_newsletter = models.BooleanField(default=True)
     receive_sms = models.BooleanField(default=True)
     receive_email = models.BooleanField(default=True)
     
+    # ---------------------------
     # Timestamps
+    # ---------------------------
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -149,7 +171,6 @@ class ExecutiveCommittee(models.Model):
     term_end = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     
-    # Special permissions (according to constitution)
     can_suspend_members = models.BooleanField(default=False)
     can_manage_finances = models.BooleanField(default=False)
     can_represent_legally = models.BooleanField(default=False)

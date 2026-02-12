@@ -1,4 +1,6 @@
+# accounts/urls.py
 from django.urls import path, include
+from django.urls import path, include, reverse_lazy  # Add reverse_lazy here
 from rest_framework.routers import DefaultRouter
 from django.contrib.auth import views as auth_views
 from . import views
@@ -36,9 +38,11 @@ urlpatterns = [
     # About page
     path("about/", views.about_view, name="about"),
 
-    # User profile
+        # User profile
     path("profile/", views.profile, name="profile"),
-    
+    #path("profile/edit/", views.profile_edit, name="profile_edit"),  # ADD THIS LINE
+    path("user/profile_edit/", views.profile_edit, name="profile_edit"),  # ADD THIS LINE
+
     # User management (web interface)
     path("users/create/", views.UserCreateView.as_view(), name="user_create"),
     path("users/<int:pk>/", views.UserDetailView.as_view(), name="user_detail"),
@@ -47,12 +51,12 @@ urlpatterns = [
     # Authentication
     path(
         "login/",
-        auth_views.LoginView.as_view(template_name="accounts/auth/login.html"),
+        views.CustomLoginView.as_view(),  # Use custom login view
         name="login",
     ),
     path(
         "logout/",
-        auth_views.LogoutView.as_view(next_page="/"),
+        views.logout_view,  # Use custom logout view
         name="logout",
     ),
     path("register/", views.register_view, name="register"),
@@ -62,7 +66,10 @@ urlpatterns = [
     path(
         "password-reset/",
         auth_views.PasswordResetView.as_view(
-            template_name="accounts/auth/password_reset_form.html"
+            template_name="accounts/auth/password_reset_form.html",
+            email_template_name="accounts/auth/password_reset_email.html",
+            subject_template_name="accounts/auth/password_reset_subject.txt",
+            success_url=reverse_lazy('accounts:password_reset_done')
         ),
         name="password_reset",
     ),
@@ -76,7 +83,8 @@ urlpatterns = [
     path(
         "reset/<uidb64>/<token>/",
         auth_views.PasswordResetConfirmView.as_view(
-            template_name="accounts/auth/password_reset_confirm.html"
+            template_name="accounts/auth/password_reset_confirm.html",
+            success_url=reverse_lazy('accounts:password_reset_complete')
         ),
         name="password_reset_confirm",
     ),
