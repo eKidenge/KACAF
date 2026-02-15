@@ -11748,3 +11748,19 @@ Traceback (most recent call last):
     raise TemplateSyntaxError("Invalid filter: '%s'" % filter_name)
 django.template.exceptions.TemplateSyntaxError: Template: /home/cs/Desktop/PROJECTS/kacaf/templates/base/sidebar.html, Invalid filter: 'intcomma'
 ERROR 2026-02-15 14:52:29,071 log 378248 139782642464448 "GET /accounts/dashboard/admin/ HTTP/1.1" 500 277998
+ERROR 2026-02-15 15:08:38,899 log 385933 140207481419456 Internal Server Error: /api/communications/contact/
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/kacaf/communications/views.py", line 470, in contact
+    return render(request, "communications/contact.html")
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: communications/contact.html
+ERROR 2026-02-15 15:08:38,904 log 385933 140207481419456 "GET /api/communications/contact/ HTTP/1.1" 500 95555
