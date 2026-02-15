@@ -1,889 +1,1721 @@
-{% extends 'base/base.html' %}
 {% load static %}
 {% load humanize %}
 {% load math_filters %}
-{% load event_extras %}  <!-- Add this line -->
+{% load event_extras %}
 
-{% block title %}Events - KACAF{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - KACAF | Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FullCalendar -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <link href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css" rel="stylesheet">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --dark-green: #0d3625;
+            --light-green: #d1e7dd;
+            --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --accent-purple: #6f42c1;
+            --accent-orange: #fd7e14;
+            --accent-red: #dc3545;
+            --accent-teal: #20c997;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional with Enhanced Hover */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        /* Bold Hover Effect */
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Active Link Style with Bold Indicator */
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 800;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Navbar Toggler - Enhanced */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Hero Section */
+        .events-hero {
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.85)), 
+                        url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 100px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
 
-{% block extra_css %}
-<style>
-    .event-card {
-        transition: transform 0.3s;
-        height: 100%;
-    }
-    .event-card:hover {
-        transform: translateY(-5px);
-    }
-    .event-date-badge {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(25, 135, 84, 0.9);
-        color: white;
-        padding: 5px 10px;
-        border-radius: 5px;
-    }
-    .calendar-event {
-        cursor: pointer;
-    }
-    .fc-event-title {
-        font-size: 0.9em;
-    }
-    .event-category-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-    }
-    .event-image-container {
-        height: 200px;
-        overflow: hidden;
-    }
-    .event-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: transform 0.5s;
-    }
-    .event-card:hover .event-image {
-        transform: scale(1.05);
-    }
-</style>
-{% endblock %}
+        .events-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
 
-{% block content %}
-<div class="container-fluid">
-    <!-- Hero Section -->
-    <div class="bg-success text-white rounded-3 p-5 mb-5 position-relative overflow-hidden">
-        <div class="position-absolute top-0 end-0 opacity-25">
-            <i class="fas fa-calendar-alt fa-10x"></i>
-        </div>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold mb-3">
-                    <i class="fas fa-calendar-alt me-3"></i>
-                    KACAF Events & Activities
-                </h1>
-                <p class="lead mb-4">
-                    Join our community events, training sessions, tree planting activities, 
-                    and awareness campaigns to make a difference.
-                </p>
-                <div class="d-flex flex-wrap gap-3">
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-calendar-check me-2"></i>{{ upcoming_events_count }} Upcoming Events
-                    </span>
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-users me-2"></i>{{ total_participants|intcomma }} Total Participants
-                    </span>
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-tree me-2"></i>{{ events_trees_planted|intcomma }} Trees Planted
-                    </span>
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Event Cards */
+        .event-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.15);
+        }
+
+        .event-image-container {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .event-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.8s ease;
+        }
+
+        .event-card:hover .event-image {
+            transform: scale(1.1);
+        }
+
+        .event-date-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            text-align: center;
+            min-width: 70px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 2;
+            font-weight: 700;
+        }
+
+        .event-date-badge .day {
+            font-size: 1.5rem;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-date-badge .month {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .event-category-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            z-index: 2;
+        }
+
+        .event-category-badge .badge {
+            padding: 8px 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Progress Bar */
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-200);
+        }
+
+        .progress-bar {
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* Filter Section */
+        .filter-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .filter-control {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.6rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .filter-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            background: white;
+            border-radius: 50px;
+            padding: 0.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: inline-flex;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .view-toggle .btn-check:checked + .btn-outline-success {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border-color: transparent;
+        }
+
+        .view-toggle .btn-outline-success {
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            color: var(--gray-600);
+            font-weight: 600;
+        }
+
+        .view-toggle .btn-outline-success:hover {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--primary-green);
+        }
+
+        /* Calendar Styling */
+        #eventCalendar {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+        }
+
+        .fc-toolbar-title {
+            font-size: 1.5rem !important;
+            font-weight: 700 !important;
+            color: var(--dark-green);
+        }
+
+        .fc-button {
+            background: var(--primary-green) !important;
+            border: none !important;
+            border-radius: 10px !important;
+            padding: 0.5rem 1rem !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-button:hover {
+            background: var(--secondary-green) !important;
+            transform: translateY(-2px) !important;
+        }
+
+        .fc-event {
+            border-radius: 8px !important;
+            padding: 4px !important;
+            font-size: 0.85rem !important;
+            border: none !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .fc-event:hover {
+            transform: scale(1.02) !important;
+            filter: brightness(1.1) !important;
+        }
+
+        /* List View */
+        .list-event-item {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .list-event-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+            border-color: var(--primary-green);
+        }
+
+        .list-date-badge {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-weight: 700;
+        }
+
+        .list-date-badge .day {
+            font-size: 2rem;
+            line-height: 1;
+        }
+
+        .list-date-badge .month {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        /* Event Type Cards */
+        .event-type-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            height: 100%;
+        }
+
+        .event-type-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 15px 30px rgba(25, 135, 84, 0.1);
+        }
+
+        .event-type-card.active {
+            border-color: var(--primary-green);
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.05), rgba(32, 201, 151, 0.05));
+        }
+
+        .type-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.8rem;
+            color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .event-type-card:hover .type-icon {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: rotateY(360deg);
+        }
+
+        /* Featured Events */
+        .featured-event-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-radius: 20px;
+            padding: 1.5rem;
+            border: 2px solid var(--accent-gold);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .featured-event-card::before {
+            content: '★';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            color: var(--accent-gold);
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+
+        /* Stats Cards */
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            height: 100%;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(25, 135, 84, 0.1);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 1.8rem;
+            color: var(--primary-green);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--dark-green);
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+            margin-top: 3rem;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: white;
+            color: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .list-date-badge {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .list-date-badge .day {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width with Logo -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                HOME
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <div class="col-lg-4 text-center">
-                <div class="bg-white rounded-3 p-4 shadow">
-                    <div class="display-6 text-success mb-2">{{ next_event_days }}</div>
-                    <p class="text-muted mb-0">Days until next event</p>
-                    {% if next_event %}
-                    <small class="text-muted">{{ next_event.title }}</small>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="events-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        KACAF Events<br>& Community Activities
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Join us in making a difference through tree planting, training sessions, 
+                        workshops, and community gatherings across West Pokot County.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3" data-aos="fade-up" data-aos-delay="200">
+                        <span class="badge bg-light text-dark fs-6 py-2">
+                            <i class="fas fa-calendar-check me-2"></i>{{ upcoming_events_count|default:"0" }} Upcoming Events
+                        </span>
+                        <span class="badge bg-light text-dark fs-6 py-2">
+                            <i class="fas fa-users me-2"></i>{{ total_participants|default:"0"|intcomma }} Total Participants
+                        </span>
+                        <span class="badge bg-light text-dark fs-6 py-2">
+                            <i class="fas fa-tree me-2"></i>{{ events_trees_planted|default:"0"|intcomma }} Trees Planted
+                        </span>
+                    </div>
+                </div>
+                <div class="col-lg-4 text-center" data-aos="fade-up" data-aos-delay="300">
+                    <div class="bg-white rounded-4 p-4 shadow-lg">
+                        <div class="display-4 text-success fw-bold mb-2">{{ next_event_days|default:"0" }}</div>
+                        <p class="text-muted mb-2">Days until next event</p>
+                        {% if next_event %}
+                        <small class="text-success">{{ next_event.title }}</small>
+                        {% endif %}
+                        <hr class="my-3">
+                        <div class="d-flex justify-content-around">
+                            <div>
+                                <div class="h5 mb-0">{{ events_this_month|default:"0" }}</div>
+                                <small class="text-muted">This Month</small>
+                            </div>
+                            <div>
+                                <div class="h5 mb-0">{{ events_this_week|default:"0" }}</div>
+                                <small class="text-muted">This Week</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Container -->
+    <div class="container py-5">
+        <!-- Filter Section -->
+        <div class="filter-card" data-aos="fade-up">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="fas fa-search me-2"></i>Search Events
+                    </label>
+                    <input type="text" class="form-control filter-control" id="searchEvents" 
+                           placeholder="Search by title or description...">
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="fas fa-tag me-2"></i>Event Type
+                    </label>
+                    <select class="form-select filter-control" id="eventTypeFilter">
+                        <option value="">All Event Types</option>
+                        {% for type in event_types %}
+                        <option value="{{ type.0 }}">{{ type.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="fas fa-map-marker-alt me-2"></i>Location
+                    </label>
+                    <select class="form-select filter-control" id="locationFilter">
+                        <option value="">All Locations</option>
+                        {% for location in locations %}
+                        <option value="{{ location }}">{{ location }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="filter-label">
+                        <i class="fas fa-clock me-2"></i>Time Period
+                    </label>
+                    <select class="form-select filter-control" id="timeFilter">
+                        <option value="">All Times</option>
+                        <option value="upcoming">Upcoming Events</option>
+                        <option value="today">Today</option>
+                        <option value="tomorrow">Tomorrow</option>
+                        <option value="this-week">This Week</option>
+                        <option value="this-month">This Month</option>
+                        <option value="past">Past Events</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="featuredEventsFilter">
+                            <label class="form-check-label" for="featuredEventsFilter">
+                                <i class="fas fa-star text-warning me-1"></i>Featured Only
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="myEventsFilter">
+                            <label class="form-check-label" for="myEventsFilter">
+                                <i class="fas fa-user-check text-success me-1"></i>My Events Only
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="freeEventsFilter">
+                            <label class="form-check-label" for="freeEventsFilter">
+                                <i class="fas fa-tag text-success me-1"></i>Free Events Only
+                            </label>
+                        </div>
+                        <button class="btn btn-sm btn-outline-success ms-auto" id="resetFiltersBtn">
+                            <i class="fas fa-redo me-2"></i>Reset Filters
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="row g-4 mb-5" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-check"></i>
+                    </div>
+                    <div class="stat-value">{{ total_events|default:"0" }}</div>
+                    <div class="stat-label">Total Events</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="stat-value">{{ total_registrations|default:"0"|intcomma }}</div>
+                    <div class="stat-label">Registrations</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <div class="stat-value">{{ total_trees_at_events|default:"0"|intcomma }}</div>
+                    <div class="stat-label">Trees Planted</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="stat-value">{{ average_attendance_rate|default:"85" }}%</div>
+                    <div class="stat-label">Attendance Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Toggle -->
+        <div class="d-flex justify-content-between align-items-center mb-4" data-aos="fade-up" data-aos-delay="200">
+            <div class="view-toggle" role="group">
+                <input type="radio" class="btn-check" name="viewOptions" id="calendarView" autocomplete="off" checked>
+                <label class="btn btn-outline-success" for="calendarView">
+                    <i class="fas fa-calendar-alt me-2"></i>Calendar
+                </label>
+                
+                <input type="radio" class="btn-check" name="viewOptions" id="listView" autocomplete="off">
+                <label class="btn btn-outline-success" for="listView">
+                    <i class="fas fa-list me-2"></i>List
+                </label>
+                
+                <input type="radio" class="btn-check" name="viewOptions" id="gridView" autocomplete="off">
+                <label class="btn btn-outline-success" for="gridView">
+                    <i class="fas fa-th-large me-2"></i>Grid
+                </label>
+            </div>
+            
+            {% if perms.events.add_event %}
+            <a href="{% url 'events:event_create' %}" class="btn btn-success">
+                <i class="fas fa-plus me-2"></i>Create Event
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- Calendar View -->
+        <div id="calendarViewContent" class="view-content" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>Events Calendar
+                    </h5>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-light" id="prevMonth">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-sm btn-light" id="todayBtn">
+                            Today
+                        </button>
+                        <button class="btn btn-sm btn-light" id="nextMonth">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="eventCalendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- List View -->
+        <div id="listViewContent" class="view-content" style="display: none;" data-aos="fade-up" data-aos-delay="300">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Event List
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    {% if events %}
+                        {% for event in events %}
+                        <div class="list-event-item event-item" 
+                             data-type="{{ event.event_type }}"
+                             data-location="{{ event.location }}"
+                             data-featured="{{ event.is_featured|yesno:'true,false' }}"
+                             data-free="{{ event.registration_fee|yesno:'false,true' }}">
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                    <div class="list-date-badge">
+                                        <span class="day">{{ event.start_datetime|date:"d" }}</span>
+                                        <span class="month">{{ event.start_datetime|date:"M" }}</span>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-1">{{ event.title }}</h5>
+                                            <div class="d-flex flex-wrap gap-3 mb-2">
+                                                <small class="text-muted">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    {{ event.start_datetime|date:"h:i A" }} - {{ event.end_datetime|date:"h:i A" }}
+                                                </small>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                                    {{ event.location }}
+                                                </small>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                <span class="badge bg-{% if event.event_type == 'tree_planting' %}success{% elif event.event_type == 'training' %}info{% else %}secondary{% endif %}">
+                                                    {{ event.get_event_type_display }}
+                                                </span>
+                                                {% if event.is_featured %}
+                                                <span class="badge bg-warning">
+                                                    <i class="fas fa-star me-1"></i> Featured
+                                                </span>
+                                                {% endif %}
+                                                {% if event.registration_fee == 0 %}
+                                                <span class="badge bg-success">
+                                                    <i class="fas fa-tag me-1"></i> Free
+                                                </span>
+                                                {% endif %}
+                                                <span class="badge bg-light text-dark">
+                                                    <i class="fas fa-users me-1"></i>
+                                                    {{ event.total_registrations }}/{{ event.max_participants }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            {% if user in event.participants.all %}
+                                            <span class="badge bg-success d-block mb-2">
+                                                <i class="fas fa-check me-1"></i> Registered
+                                            </span>
+                                            {% endif %}
+                                            <a href="{% url 'events:event_detail' event.id %}" 
+                                               class="btn btn-success btn-sm">
+                                                View Details <i class="fas fa-arrow-right ms-1"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+                        <h5 class="text-muted">No Events Found</h5>
+                        <p class="text-muted">There are no events matching your criteria.</p>
+                    </div>
                     {% endif %}
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Event Navigation -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="row g-3">
-                        <div class="col-md-3">
-                            <div class="input-group">
-                                <span class="input-group-text bg-success text-white">
-                                    <i class="fas fa-search"></i>
-                                </span>
-                                <input type="text" class="form-control" id="searchEvents" placeholder="Search events...">
+        <!-- Grid View -->
+        <div id="gridViewContent" class="view-content" style="display: none;">
+            <div class="row g-4" id="eventsGrid">
+                {% for event in events %}
+                <div class="col-lg-4 col-md-6 event-item" 
+                     data-type="{{ event.event_type }}"
+                     data-location="{{ event.location }}"
+                     data-featured="{{ event.is_featured|yesno:'true,false' }}"
+                     data-free="{{ event.registration_fee|yesno:'false,true' }}">
+                    <div class="event-card h-100">
+                        <!-- Event Image -->
+                        <div class="event-image-container position-relative">
+                            {% if event.banner_image %}
+                            <img src="{{ event.banner_image.url }}" 
+                                 class="event-image" 
+                                 alt="{{ event.title }}">
+                            {% else %}
+                            <div class="event-image bg-light d-flex align-items-center justify-content-center">
+                                <i class="fas fa-calendar-alt fa-5x text-muted"></i>
                             </div>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="eventTypeFilter">
-                                <option value="">All Event Types</option>
-                                {% for type in event_types %}
-                                <option value="{{ type.0 }}">{{ type.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="locationFilter">
-                                <option value="">All Locations</option>
-                                {% for location in locations %}
-                                <option value="{{ location }}">{{ location }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" id="timeFilter">
-                                <option value="">All Times</option>
-                                <option value="upcoming">Upcoming</option>
-                                <option value="past">Past Events</option>
-                                <option value="this-week">This Week</option>
-                                <option value="this-month">This Month</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="col">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="featuredEventsFilter" value="featured">
-                                <label class="form-check-label" for="featuredEventsFilter">
-                                    Featured Only
-                                </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="myEventsFilter" value="my-events">
-                                <label class="form-check-label" for="myEventsFilter">
-                                    My Events Only
-                                </label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="checkbox" id="freeEventsFilter" value="free-events">
-                                <label class="form-check-label" for="freeEventsFilter">
-                                    Free Events Only
-                                </label>
-                            </div>
-                            <button class="btn btn-sm btn-outline-success float-end" id="resetFiltersBtn">
-                                <i class="fas fa-redo"></i> Reset
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ total_events }}</div>
-                    <p class="text-muted mb-0">Total Events</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ total_registrations }}</div>
-                    <p class="text-muted mb-0">Total Registrations</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-tree"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ total_trees_at_events }}</div>
-                    <p class="text-muted mb-0">Trees at Events</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="h5 mb-0">{{ average_attendance_rate }}%</div>
-                    <p class="text-muted mb-0">Avg Attendance Rate</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- View Toggle -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body">
-                    <div class="btn-group w-100" role="group">
-                        <input type="radio" class="btn-check" name="viewOptions" id="calendarView" autocomplete="off" checked>
-                        <label class="btn btn-outline-success" for="calendarView">
-                            <i class="fas fa-calendar-alt me-2"></i>Calendar View
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="viewOptions" id="listView" autocomplete="off">
-                        <label class="btn btn-outline-success" for="listView">
-                            <i class="fas fa-list me-2"></i>List View
-                        </label>
-                        
-                        <input type="radio" class="btn-check" name="viewOptions" id="gridView" autocomplete="off">
-                        <label class="btn btn-outline-success" for="gridView">
-                            <i class="fas fa-th-large me-2"></i>Grid View
-                        </label>
-                        
-                        {% if perms.events.add_event %}
-                        <a href="{% url 'events:event_create' %}" class="btn btn-success">
-                            <i class="fas fa-plus me-2"></i>Create Event
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Calendar View -->
-    <div id="calendarViewContent" class="view-content">
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">
-                    <i class="fas fa-calendar-alt me-2"></i>Event Calendar
-                </h6>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-light" id="prevMonth">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="btn btn-sm btn-light" id="todayBtn">
-                        Today
-                    </button>
-                    <button class="btn btn-sm btn-light" id="nextMonth">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="card-body">
-                <div id="eventCalendar"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- List View -->
-    <div id="listViewContent" class="view-content" style="display: none;">
-        <div class="card mb-4">
-            <div class="card-header bg-success text-white">
-                <h6 class="mb-0">
-                    <i class="fas fa-list me-2"></i>Event List
-                </h6>
-            </div>
-            <div class="card-body p-0">
-                {% if events %}
-                <div class="list-group list-group-flush">
-                    {% for event in events %}
-                    <div class="list-group-item list-group-item-action event-item" 
-                         data-type="{{ event.event_type }}"
-                         data-location="{{ event.location }}"
-                         data-featured="{{ event.is_featured|yesno:'true,false' }}"
-                         data-free="{{ event.registration_fee|yesno:'false,true' }}">
-                        <div class="row align-items-center">
-                            <div class="col-auto">
-                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
-                                     style="width: 60px; height: 60px;">
-                                    <div class="text-center text-white">
-                                        <div class="h5 mb-0">{{ event.start_datetime|date:"d" }}</div>
-                                        <small>{{ event.start_datetime|date:"M" }}</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="d-flex w-100 justify-content-between">
-                                    <h6 class="mb-1">{{ event.title }}</h6>
-                                    <small class="text-muted">
-                                        {{ event.start_datetime|date:"h:i A" }}
-                                    </small>
-                                </div>
-                                <p class="mb-1 small">
-                                    <i class="fas fa-map-marker-alt me-1"></i>
-                                    {{ event.location }}
-                                </p>
-                                <div class="d-flex gap-2">
-                                    <span class="badge bg-{% if event.event_type == 'tree_planting' %}success{% elif event.event_type == 'training' %}info{% else %}secondary{% endif %}">
-                                        {{ event.get_event_type_display }}
-                                    </span>
-                                    {% if event.is_featured %}
-                                    <span class="badge bg-warning">
-                                        <i class="fas fa-star me-1"></i> Featured
-                                    </span>
-                                    {% endif %}
-                                    {% if event.registration_fee == 0 %}
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-tag me-1"></i> Free
-                                    </span>
-                                    {% endif %}
-                                    <span class="badge bg-light text-dark">
-                                        <i class="fas fa-users me-1"></i>
-                                        {{ event.total_registrations }}/{{ event.max_participants }}
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col-auto">
-                                {% if user in event.participants.all %}
-                                <span class="badge bg-success">
-                                    <i class="fas fa-check me-1"></i> Registered
-                                </span>
-                                {% endif %}
-                                <a href="{% url 'events:event_detail' event.id %}" 
-                                   class="btn btn-sm btn-outline-success mt-2">
-                                    <i class="fas fa-eye me-1"></i> View
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-5">
-                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No events found.</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Grid View -->
-    <div id="gridViewContent" class="view-content" style="display: none;">
-        <div class="row" id="eventsGrid">
-            {% for event in events %}
-            <div class="col-lg-4 col-md-6 mb-4 event-item" 
-                 data-type="{{ event.event_type }}"
-                 data-location="{{ event.location }}"
-                 data-featured="{{ event.is_featured|yesno:'true,false' }}"
-                 data-free="{{ event.registration_fee|yesno:'false,true' }}">
-                <div class="card event-card h-100">
-                    <!-- Event Image -->
-                    <div class="event-image-container position-relative">
-                        {% if event.banner_image %}
-                        <img src="{{ event.banner_image.url }}" 
-                             class="event-image" 
-                             alt="{{ event.title }}">
-                        {% else %}
-                        <div class="event-image bg-light d-flex align-items-center justify-content-center">
-                            <i class="fas fa-calendar-alt fa-5x text-muted"></i>
-                        </div>
-                        {% endif %}
-                        
-                        <!-- Date Badge -->
-                        <div class="event-date-badge">
-                            <div class="text-center">
-                                <div class="h5 mb-0">{{ event.start_datetime|date:"d" }}</div>
-                                <small>{{ event.start_datetime|date:"M" }}</small>
-                            </div>
-                        </div>
-                        
-                        <!-- Category Badge -->
-                        <div class="event-category-badge">
-                            <span class="badge bg-{% if event.event_type == 'tree_planting' %}success{% elif event.event_type == 'training' %}info{% else %}secondary{% endif %}">
-                                {{ event.get_event_type_display }}
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Card Body -->
-                    <div class="card-body">
-                        <h5 class="card-title">{{ event.title|truncatechars:50 }}</h5>
-                        
-                        <!-- Event Details -->
-                        <div class="mb-3">
-                            <p class="card-text small text-muted">
-                                {{ event.description|truncatechars:100 }}
-                            </p>
+                            {% endif %}
                             
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-clock me-1"></i>
-                                        {{ event.start_datetime|time:"h:i A" }}
-                                    </small>
-                                </div>
-                                <div class="col-6">
-                                    <small class="text-muted">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        {{ event.location|truncatechars:20 }}
-                                    </small>
-                                </div>
+                            <!-- Date Badge -->
+                            <div class="event-date-badge">
+                                <div class="day">{{ event.start_datetime|date:"d" }}</div>
+                                <div class="month">{{ event.start_datetime|date:"M" }}</div>
+                            </div>
+                            
+                            <!-- Category Badge -->
+                            <div class="event-category-badge">
+                                <span class="badge bg-{% if event.event_type == 'tree_planting' %}success{% elif event.event_type == 'training' %}info{% else %}secondary{% endif %}">
+                                    {{ event.get_event_type_display }}
+                                </span>
                             </div>
                         </div>
                         
-                        <!-- Registration Info -->
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <h5 class="card-title mb-2">{{ event.title|truncatechars:50 }}</h5>
+                            
+                            <!-- Event Details -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center text-muted small mb-2">
+                                    <i class="fas fa-clock me-2"></i>
+                                    {{ event.start_datetime|date:"h:i A" }} - {{ event.end_datetime|date:"h:i A" }}
+                                </div>
+                                <div class="d-flex align-items-center text-muted small mb-2">
+                                    <i class="fas fa-map-marker-alt me-2"></i>
+                                    {{ event.location|truncatechars:30 }}
+                                </div>
+                                <p class="card-text small text-muted">
+                                    {{ event.description|truncatechars:100 }}
+                                </p>
+                            </div>
+                            
+                            <!-- Registration Info -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
                                     <small class="text-muted">
                                         <i class="fas fa-users me-1"></i>
-                                        {{ event.total_registrations }}/{{ event.max_participants }}
+                                        {{ event.total_registrations }}/{{ event.max_participants }} Registered
                                     </small>
-                                </div>
-                                {% if event.registration_fee > 0 %}
-                                <div>
+                                    {% if event.registration_fee > 0 %}
                                     <small class="text-success fw-bold">
                                         KES {{ event.registration_fee|floatformat:0 }}
                                     </small>
-                                </div>
-                                {% else %}
-                                <div>
+                                    {% else %}
                                     <span class="badge bg-success">Free</span>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="progress mt-1" style="height: 5px;">
-                                {% with reg_percent=event.total_registrations|divisibleby:event.max_participants|multiply:100 %}
-                                <div class="progress-bar {% if reg_percent >= 90 %}bg-danger{% elif reg_percent >= 70 %}bg-warning{% else %}bg-success{% endif %}" 
-                                     style="width: {{ reg_percent }}%;">
+                                
+                                {% with reg_percent=event.total_registrations|multiply:100|divide:event.max_participants %}
+                                <div class="progress">
+                                    <div class="progress-bar {% if reg_percent >= 90 %}bg-danger{% elif reg_percent >= 70 %}bg-warning{% else %}bg-success{% endif %}" 
+                                         style="width: {{ reg_percent }}%;"
+                                         role="progressbar"
+                                         aria-valuenow="{{ reg_percent }}"
+                                         aria-valuemin="0"
+                                         aria-valuemax="100">
+                                    </div>
                                 </div>
                                 {% endwith %}
                             </div>
+                            
+                            <!-- Event Features -->
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                {% if event.transport_arranged %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-bus me-1"></i> Transport
+                                </span>
+                                {% endif %}
+                                {% if event.meals_provided %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-utensils me-1"></i> Meals
+                                </span>
+                                {% endif %}
+                                {% if event.accommodation_provided %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-bed me-1"></i> Accommodation
+                                </span>
+                                {% endif %}
+                                {% if event.materials_provided %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-file-pdf me-1"></i> Materials
+                                </span>
+                                {% endif %}
+                                {% if event.certificate_provided %}
+                                <span class="badge bg-info">
+                                    <i class="fas fa-certificate me-1"></i> Certificate
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                         
-                        <!-- Event Features -->
-                        <div class="d-flex flex-wrap gap-1 mb-3">
-                            {% if event.transport_arranged %}
-                            <span class="badge bg-info">
-                                <i class="fas fa-bus me-1"></i> Transport
-                            </span>
-                            {% endif %}
-                            {% if event.meals_provided %}
-                            <span class="badge bg-info">
-                                <i class="fas fa-utensils me-1"></i> Meals
-                            </span>
-                            {% endif %}
-                            {% if event.accommodation_provided %}
-                            <span class="badge bg-info">
-                                <i class="fas fa-bed me-1"></i> Accommodation
-                            </span>
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-transparent border-top-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if user in event.participants.all %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check me-1"></i> Registered
+                                    </span>
+                                    {% elif event.requires_registration %}
+                                    <a href="{% url 'events:event_register' event.id %}" 
+                                       class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-user-plus me-1"></i> Register
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                <a href="{% url 'events:event_detail' event.id %}" 
+                                   class="btn btn-sm btn-success">
+                                    View Details <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Events Found</h5>
+                            <p class="text-muted">There are no events matching your criteria.</p>
+                            {% if perms.events.add_event %}
+                            <a href="{% url 'events:event_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i> Create First Event
+                            </a>
                             {% endif %}
                         </div>
                     </div>
-                    
-                    <!-- Card Footer -->
-                    <div class="card-footer bg-transparent">
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Featured Events -->
+        {% if featured_events %}
+        <section class="mt-5" data-aos="fade-up">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-star text-warning me-2"></i>Featured Events
+            </h3>
+            <div class="row g-4">
+                {% for event in featured_events|slice:":3" %}
+                <div class="col-md-4">
+                    <div class="featured-event-card h-100">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="bg-warning rounded-3 p-3 me-3">
+                                <i class="fas fa-star text-white fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1">{{ event.title|truncatechars:40 }}</h5>
+                                <small class="text-muted d-block mb-2">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    {{ event.start_datetime|date:"M d, Y - h:i A" }}
+                                </small>
+                            </div>
+                        </div>
+                        <p class="small text-muted mb-3">{{ event.description|truncatechars:100 }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <div>
-                                {% if user in event.participants.all %}
                                 <span class="badge bg-success">
-                                    <i class="fas fa-check me-1"></i> Registered
+                                    <i class="fas fa-users me-1"></i>
+                                    {{ event.total_registrations }} registered
                                 </span>
-                                {% elif event.requires_registration %}
-                                <a href="{% url 'events:event_register' event.id %}" 
-                                   class="btn btn-sm btn-outline-success">
-                                    <i class="fas fa-user-plus me-1"></i> Register
-                                </a>
-                                {% endif %}
                             </div>
-                            <a href="{% url 'events:event_detail' event.id %}" 
-                               class="btn btn-sm btn-success">
-                                Details <i class="fas fa-arrow-right ms-1"></i>
+                            <a href="{% url 'events:event_detail' event.id %}" class="btn btn-warning btn-sm">
+                                Learn More <i class="fas fa-arrow-right ms-1"></i>
                             </a>
                         </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
-            {% empty %}
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
-                        <h5 class="text-muted">No Events Found</h5>
-                        <p class="text-muted">There are no events matching your criteria.</p>
-                        {% if perms.events.add_event %}
-                        <a href="{% url 'events:event_create' %}" class="btn btn-success">
-                            <i class="fas fa-plus me-1"></i> Create First Event
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
+        </section>
+        {% endif %}
 
-    <!-- Upcoming Featured Events -->
-    {% if featured_events %}
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h6 class="mb-0">
-                <i class="fas fa-star me-2"></i>Featured Events
-            </h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                {% for event in featured_events|slice:":3" %}
-                <div class="col-md-4 mb-3">
-                    <div class="card border-success h-100">
+        <!-- Event Statistics -->
+        <section class="mt-5" data-aos="fade-up">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-chart-bar text-success me-2"></i>Event Statistics
+            </h3>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-pie me-2"></i>Events by Type
+                            </h6>
+                        </div>
                         <div class="card-body">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center" 
-                                     style="width: 50px; height: 50px;">
-                                    <i class="fas fa-star text-white"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h5 class="card-title mb-1">{{ event.title|truncatechars:40 }}</h5>
-                                    <div class="d-flex align-items-center mb-2">
-                                        <small class="text-muted me-3">
-                                            <i class="fas fa-calendar-alt me-1"></i>
-                                            {{ event.start_datetime|date:"M d, Y" }}
-                                        </small>
-                                        <small class="text-muted">
-                                            <i class="fas fa-clock me-1"></i>
-                                            {{ event.start_datetime|time:"h:i A" }}
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                            <p class="card-text small text-muted">{{ event.description|truncatechars:100 }}</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <small class="text-muted">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        {{ event.location|truncatechars:20 }}
-                                    </small>
-                                </div>
-                                <a href="{% url 'events:event_detail' event.id %}" 
-                                   class="btn btn-sm btn-outline-success">
-                                    Register Now
-                                </a>
-                            </div>
+                            <canvas id="eventTypeChart" height="250"></canvas>
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm h-100">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">
+                                <i class="fas fa-chart-line me-2"></i>Monthly Events
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="monthlyEventsChart" height="250"></canvas>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    {% endif %}
+        </section>
 
-    <!-- Event Statistics -->
-    <div class="row mb-4">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-chart-pie me-2"></i>Events by Type
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="eventTypeChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-success text-white">
-                    <h6 class="mb-0">
-                        <i class="fas fa-chart-line me-2"></i>Monthly Events
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="monthlyEventsChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Event Categories -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h6 class="mb-0">
-                <i class="fas fa-layer-group me-2"></i>Event Categories
-            </h6>
-        </div>
-        <div class="card-body">
+        <!-- Event Categories -->
+        <section class="mt-5" data-aos="fade-up">
+            <h3 class="section-title mb-4">
+                <i class="fas fa-layer-group text-success me-2"></i>Event Categories
+            </h3>
             <div class="row g-3">
                 {% for type in event_types %}
-                <div class="col-md-3 col-6 mb-3">
-                    <div class="card text-center event-type-card" data-type="{{ type.0 }}">
-                        <div class="card-body">
+                <div class="col-md-3 col-6">
+                    <div class="event-type-card" data-type="{{ type.0 }}">
+                        <div class="type-icon">
                             {% if type.0 == 'tree_planting' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-tree"></i>
-                            </div>
-                            <h6 class="mb-0">Tree Planting</h6>
+                            <i class="fas fa-tree"></i>
                             {% elif type.0 == 'training' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <h6 class="mb-0">Training</h6>
+                            <i class="fas fa-graduation-cap"></i>
                             {% elif type.0 == 'workshop' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <h6 class="mb-0">Workshop</h6>
+                            <i class="fas fa-chalkboard-teacher"></i>
                             {% elif type.0 == 'field_visit' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-map-marked-alt"></i>
-                            </div>
-                            <h6 class="mb-0">Field Visit</h6>
+                            <i class="fas fa-map-marked-alt"></i>
                             {% elif type.0 == 'fundraising' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-hand-holding-usd"></i>
-                            </div>
-                            <h6 class="mb-0">Fundraising</h6>
+                            <i class="fas fa-hand-holding-usd"></i>
+                            {% elif type.0 == 'awareness' %}
+                            <i class="fas fa-bullhorn"></i>
+                            {% elif type.0 == 'community' %}
+                            <i class="fas fa-users"></i>
                             {% else %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-calendar-alt"></i>
-                            </div>
-                            <h6 class="mb-0">{{ type.1 }}</h6>
+                            <i class="fas fa-calendar-alt"></i>
                             {% endif %}
-                            <small class="text-muted">
-                                {{ events_by_type|get_item:type.0 }} events
-                            </small>
                         </div>
+                        <h6 class="mb-1">{{ type.1 }}</h6>
+                        <small class="text-muted">
+                            {{ events_by_type|get_item:type.0 }} events
+                        </small>
                     </div>
                 </div>
                 {% endfor %}
             </div>
-        </div>
+        </section>
+
+        <!-- Call to Action -->
+        <section class="mt-5 text-center p-5 bg-success text-white rounded-4" data-aos="fade-up">
+            <i class="fas fa-calendar-check fa-4x mb-3 opacity-75"></i>
+            <h2 class="display-5 fw-bold mb-3">Host an Event with KACAF</h2>
+            <p class="lead mb-4">
+                Have an idea for a community event, training, or tree planting activity?<br>
+                Partner with us to make it happen.
+            </p>
+            <div class="d-flex justify-content-center gap-3">
+                <a href="{% url 'communications:contact' %}" class="btn btn-light btn-lg px-5">
+                    <i class="fas fa-handshake me-2"></i>Partner With Us
+                </a>
+                <a href="{% url 'events:event_create' %}" class="btn btn-outline-light btn-lg px-5">
+                    <i class="fas fa-plus me-2"></i>Create Event
+                </a>
+            </div>
+        </section>
     </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- FullCalendar -->
-<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                        </div>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="#">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="#">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254796761841" class="text-white">+254 796 761 841</a></p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
+                    <p><i class="fas fa-clock me-2"></i> Mon-Fri: 8:00 AM - 5:00 PM</p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="small">Subscribe to get updates on our events and programs.</p>
+                    <form class="mt-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email" style="border-radius: 30px 0 0 30px;">
+                            <button class="btn btn-success" type="submit" style="border-radius: 0 30px 30px 0;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="bg-white opacity-25">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">Privacy Policy</a>
+                    <a href="#" class="text-white">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-<script>
-    // View Toggle
-    document.querySelectorAll('input[name="viewOptions"]').forEach(radio => {
-        radio.addEventListener('change', function() {
-            // Hide all views
-            document.querySelectorAll('.view-content').forEach(view => {
-                view.style.display = 'none';
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- jQuery (for tooltips) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // View Toggle
+        document.querySelectorAll('input[name="viewOptions"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.querySelectorAll('.view-content').forEach(view => {
+                    view.style.display = 'none';
+                });
+                const viewId = this.id + 'Content';
+                document.getElementById(viewId).style.display = 'block';
+                
+                // Refresh calendar when switching to calendar view
+                if (this.id === 'calendarView' && calendar) {
+                    calendar.render();
+                }
+            });
+        });
+
+        // Event filtering
+        function filterEvents() {
+            const searchTerm = document.getElementById('searchEvents').value.toLowerCase();
+            const typeFilter = document.getElementById('eventTypeFilter').value;
+            const locationFilter = document.getElementById('locationFilter').value;
+            const timeFilter = document.getElementById('timeFilter').value;
+            const featuredFilter = document.getElementById('featuredEventsFilter').checked;
+            const myEventsFilter = document.getElementById('myEventsFilter').checked;
+            const freeEventsFilter = document.getElementById('freeEventsFilter').checked;
+            
+            const eventItems = document.querySelectorAll('.event-item');
+            
+            eventItems.forEach(item => {
+                const title = item.querySelector('.card-title')?.textContent.toLowerCase() || 
+                              item.querySelector('h5')?.textContent.toLowerCase() || '';
+                const type = item.dataset.type;
+                const location = item.dataset.location;
+                const featured = item.dataset.featured === 'true';
+                const free = item.dataset.free === 'true';
+                
+                let show = true;
+                
+                // Search filter
+                if (searchTerm && !title.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                // Type filter
+                if (typeFilter && type !== typeFilter) {
+                    show = false;
+                }
+                
+                // Location filter
+                if (locationFilter && location !== locationFilter) {
+                    show = false;
+                }
+                
+                // Featured filter
+                if (featuredFilter && !featured) {
+                    show = false;
+                }
+                
+                // Free events filter
+                if (freeEventsFilter && !free) {
+                    show = false;
+                }
+                
+                // My events filter (simplified - in production, check actual registration)
+                if (myEventsFilter) {
+                    const registeredBadge = item.querySelector('.badge.bg-success');
+                    if (!registeredBadge || !registeredBadge.textContent.includes('Registered')) {
+                        show = false;
+                    }
+                }
+                
+                item.style.display = show ? 'block' : 'none';
+            });
+        }
+
+        // Event listeners for filters
+        document.getElementById('searchEvents').addEventListener('keyup', filterEvents);
+        document.getElementById('eventTypeFilter').addEventListener('change', filterEvents);
+        document.getElementById('locationFilter').addEventListener('change', filterEvents);
+        document.getElementById('timeFilter').addEventListener('change', filterEvents);
+        document.getElementById('featuredEventsFilter').addEventListener('change', filterEvents);
+        document.getElementById('myEventsFilter').addEventListener('change', filterEvents);
+        document.getElementById('freeEventsFilter').addEventListener('change', filterEvents);
+
+        // Reset filters
+        document.getElementById('resetFiltersBtn').addEventListener('click', function() {
+            document.getElementById('searchEvents').value = '';
+            document.getElementById('eventTypeFilter').value = '';
+            document.getElementById('locationFilter').value = '';
+            document.getElementById('timeFilter').value = '';
+            document.getElementById('featuredEventsFilter').checked = false;
+            document.getElementById('myEventsFilter').checked = false;
+            document.getElementById('freeEventsFilter').checked = false;
+            
+            document.querySelectorAll('.event-item').forEach(item => {
+                item.style.display = 'block';
+            });
+        });
+
+        // Event type card click
+        document.querySelectorAll('.event-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const type = this.dataset.type;
+                document.getElementById('eventTypeFilter').value = type;
+                
+                // Remove active class from all cards
+                document.querySelectorAll('.event-type-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                
+                // Add active class to clicked card
+                this.classList.add('active');
+                
+                filterEvents();
+            });
+        });
+
+        // Initialize FullCalendar
+        let calendar;
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('eventCalendar');
+            if (calendarEl) {
+                calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: 'dayGridMonth',
+                    headerToolbar: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'dayGridMonth,timeGridWeek,listMonth'
+                    },
+                    events: [
+                        {% for event in events %}
+                        {
+                            title: '{{ event.title|escapejs }}',
+                            start: '{{ event.start_datetime|date:"c" }}',
+                            end: '{{ event.end_datetime|date:"c" }}',
+                            url: '{% url "events:event_detail" event.id %}',
+                            color: '{% if event.event_type == "tree_planting" %}#198754{% elif event.event_type == "training" %}#0dcaf0{% elif event.event_type == "workshop" %}#ffc107{% else %}#6c757d{% endif %}',
+                            textColor: 'white',
+                            extendedProps: {
+                                type: '{{ event.event_type }}',
+                                location: '{{ event.location|escapejs }}'
+                            }
+                        },
+                        {% endfor %}
+                    ],
+                    eventClick: function(info) {
+                        info.jsEvent.preventDefault();
+                        if (info.event.url) {
+                            window.location.href = info.event.url;
+                        }
+                    },
+                    eventDidMount: function(info) {
+                        // Add tooltip
+                        if (typeof $ !== 'undefined') {
+                            $(info.el).tooltip({
+                                title: `${info.event.title}<br>${info.event.extendedProps.location}<br>${info.event.extendedProps.type}`,
+                                placement: 'top',
+                                trigger: 'hover',
+                                container: 'body',
+                                html: true
+                            });
+                        }
+                    },
+                    loading: function(isLoading) {
+                        if (!isLoading) {
+                            // Calendar loaded
+                        }
+                    }
+                });
+                calendar.render();
+            }
+            
+            // Calendar navigation
+            document.getElementById('prevMonth')?.addEventListener('click', function() {
+                calendar.prev();
             });
             
-            // Show selected view
-            const viewId = this.id + 'Content';
-            document.getElementById(viewId).style.display = 'block';
+            document.getElementById('todayBtn')?.addEventListener('click', function() {
+                calendar.today();
+            });
+            
+            document.getElementById('nextMonth')?.addEventListener('click', function() {
+                calendar.next();
+            });
         });
-    });
-    
-    // Event filtering
-    function filterEvents() {
-        const searchTerm = document.getElementById('searchEvents').value.toLowerCase();
-        const typeFilter = document.getElementById('eventTypeFilter').value;
-        const locationFilter = document.getElementById('locationFilter').value;
-        const timeFilter = document.getElementById('timeFilter').value;
-        const featuredFilter = document.getElementById('featuredEventsFilter').checked;
-        const myEventsFilter = document.getElementById('myEventsFilter').checked;
-        const freeEventsFilter = document.getElementById('freeEventsFilter').checked;
-        
-        const eventItems = document.querySelectorAll('.event-item');
-        
-        eventItems.forEach(item => {
-            const title = item.querySelector('.card-title')?.textContent.toLowerCase() || 
-                          item.querySelector('h6').textContent.toLowerCase();
-            const type = item.dataset.type;
-            const location = item.dataset.location;
-            const featured = item.dataset.featured === 'true';
-            const free = item.dataset.free === 'true';
-            
-            let show = true;
-            
-            // Search filter
-            if (searchTerm && !title.includes(searchTerm)) {
-                show = false;
-            }
-            
-            // Type filter
-            if (typeFilter && type !== typeFilter) {
-                show = false;
-            }
-            
-            // Location filter
-            if (locationFilter && location !== locationFilter) {
-                show = false;
-            }
-            
-            // Time filter (simplified)
-            // Note: In a real implementation, you would filter by date
-            if (timeFilter === 'upcoming') {
-                // Logic to check if event is upcoming
-            }
-            
-            // Featured filter
-            if (featuredFilter && !featured) {
-                show = false;
-            }
-            
-            // My events filter
-            if (myEventsFilter) {
-                // Logic to check if user is registered for this event
-            }
-            
-            // Free events filter
-            if (freeEventsFilter && !free) {
-                show = false;
-            }
-            
-            item.style.display = show ? 'block' : 'none';
-        });
-    }
-    
-    // Event listeners for filters
-    document.getElementById('searchEvents').addEventListener('keyup', filterEvents);
-    document.getElementById('eventTypeFilter').addEventListener('change', filterEvents);
-    document.getElementById('locationFilter').addEventListener('change', filterEvents);
-    document.getElementById('timeFilter').addEventListener('change', filterEvents);
-    document.getElementById('featuredEventsFilter').addEventListener('change', filterEvents);
-    document.getElementById('myEventsFilter').addEventListener('change', filterEvents);
-    document.getElementById('freeEventsFilter').addEventListener('change', filterEvents);
-    
-    // Reset filters
-    document.getElementById('resetFiltersBtn').addEventListener('click', function() {
-        document.getElementById('searchEvents').value = '';
-        document.getElementById('eventTypeFilter').value = '';
-        document.getElementById('locationFilter').value = '';
-        document.getElementById('timeFilter').value = '';
-        document.getElementById('featuredEventsFilter').checked = false;
-        document.getElementById('myEventsFilter').checked = false;
-        document.getElementById('freeEventsFilter').checked = false;
-        
-        const eventItems = document.querySelectorAll('.event-item');
-        eventItems.forEach(item => {
-            item.style.display = 'block';
-        });
-    });
-    
-    // Event type card click
-    document.querySelectorAll('.event-type-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const type = this.dataset.type;
-            document.getElementById('eventTypeFilter').value = type;
-            filterEvents();
-        });
-    });
-    
-    // Initialize FullCalendar
-    let calendar;
-    document.addEventListener('DOMContentLoaded', function() {
-        const calendarEl = document.getElementById('eventCalendar');
-        calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listMonth'
-            },
-            events: [
-                {% for event in events %}
-                {
-                    title: '{{ event.title }}',
-                    start: '{{ event.start_datetime|date:"c" }}',
-                    end: '{{ event.end_datetime|date:"c" }}',
-                    url: '{% url "events:event_detail" event.id %}',
-                    color: '{% if event.event_type == "tree_planting" %}#198754{% elif event.event_type == "training" %}#0dcaf0{% elif event.event_type == "workshop" %}#ffc107{% else %}#6c757d{% endif %}',
-                    textColor: 'white',
-                    extendedProps: {
-                        type: '{{ event.event_type }}',
-                        location: '{{ event.location }}'
-                    }
+
+        // Event Type Chart
+        const typeCtx = document.getElementById('eventTypeChart')?.getContext('2d');
+        if (typeCtx) {
+            const typeChart = new Chart(typeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ event_type_labels|safe|default:"['Tree Planting', 'Training', 'Workshop', 'Other']" }},
+                    datasets: [{
+                        data: {{ event_type_data|safe|default:"[10, 8, 5, 7]" }},
+                        backgroundColor: [
+                            '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
+                            '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
+                        ],
+                        borderWidth: 0
+                    }]
                 },
-                {% endfor %}
-            ],
-            eventClick: function(info) {
-                info.jsEvent.preventDefault();
-                if (info.event.url) {
-                    window.location.href = info.event.url;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 8
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Events by Type'
+                        }
+                    },
+                    cutout: '60%'
                 }
-            },
-            eventDidMount: function(info) {
-                // Add custom tooltip
-                $(info.el).tooltip({
-                    title: `${info.event.extendedProps.location}<br>${info.event.extendedProps.type}`,
-                    placement: 'top',
-                    trigger: 'hover',
-                    container: 'body',
-                    html: true
-                });
-            }
-        });
-        calendar.render();
-        
-        // Calendar navigation
-        document.getElementById('prevMonth').addEventListener('click', function() {
-            calendar.prev();
-        });
-        
-        document.getElementById('todayBtn').addEventListener('click', function() {
-            calendar.today();
-        });
-        
-        document.getElementById('nextMonth').addEventListener('click', function() {
-            calendar.next();
-        });
-    });
-    
-    // Event Type Chart
-    const typeCtx = document.getElementById('eventTypeChart').getContext('2d');
-    const typeChart = new Chart(typeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: {{ event_type_labels|safe }},
-            datasets: [{
-                data: {{ event_type_data|safe }},
-                backgroundColor: [
-                    '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
-                    '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'right',
-                },
-                title: {
-                    display: true,
-                    text: 'Events by Type'
-                }
-            }
+            });
         }
-    });
-    
-    // Monthly Events Chart
-    const monthlyCtx = document.getElementById('monthlyEventsChart').getContext('2d');
-    const monthlyChart = new Chart(monthlyCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ monthly_labels|safe }},
-            datasets: [{
-                label: 'Events',
-                data: {{ monthly_data|safe }},
-                backgroundColor: '#198754',
-                borderColor: '#198754',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+
+        // Monthly Events Chart
+        const monthlyCtx = document.getElementById('monthlyEventsChart')?.getContext('2d');
+        if (monthlyCtx) {
+            const monthlyChart = new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ monthly_labels|safe|default:"['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']" }},
+                    datasets: [{
+                        label: 'Number of Events',
+                        data: {{ monthly_data|safe|default:"[5, 7, 8, 6, 9, 10]" }},
+                        backgroundColor: '#198754',
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1,
+                                callback: function(value) {
+                                    return value;
+                                }
+                            },
+                            grid: {
+                                drawBorder: false
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Events per Month'
+                        }
                     }
                 }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Events per Month'
-                }
-            }
+            });
         }
-    });
-</script>
-{% endblock %}
+
+        // Active navigation highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || 
+                    (currentPath.includes('events') && href.includes('events'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
