@@ -1,0 +1,1721 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{% if is_create %}Create New Announcement{% else %}Edit Announcement: {{ announcement.title }}{% endif %} - KACAF Communications{% endblock %}
+
+{% block extra_css %}
+<!-- Quill Rich Text Editor -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
+<!-- Tagify for user tagging -->
+<link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet">
+
+<!-- Select2 for enhanced dropdowns -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Flatpickr for date picking -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<style>
+    :root {
+        --primary-green: #198754;
+        --secondary-green: #20c997;
+        --dark-green: #0d3625;
+        --light-green: #d1e7dd;
+        --accent-gold: #ffc107;
+        --accent-blue: #0d6efd;
+        --accent-purple: #6f42c1;
+        --accent-orange: #fd7e14;
+        --accent-red: #dc3545;
+        --accent-teal: #20c997;
+        --gray-100: #f8f9fa;
+        --gray-200: #e9ecef;
+        --gray-300: #dee2e6;
+        --gray-600: #6c757d;
+        --gray-800: #343a40;
+        --gray-900: #212529;
+    }
+
+    /* Hero Section */
+    .form-hero {
+        background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.85)), 
+                    url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80');
+        background-size: cover;
+        background-position: center;
+        padding: 60px 0 80px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: -40px;
+    }
+
+    .form-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+        background-size: 50px 50px;
+        animation: moveBackground 20s linear infinite;
+    }
+
+    @keyframes moveBackground {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(50px) translateY(50px); }
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 1rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        animation: fadeInUp 1s ease;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        animation: fadeInUp 1s ease 0.2s both;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Form Container */
+    .form-container {
+        background: white;
+        border-radius: 40px 40px 0 0;
+        padding: 3rem 2rem;
+        box-shadow: 0 -20px 40px rgba(0,0,0,0.05);
+        position: relative;
+        z-index: 10;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 30px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.03);
+        border: 1px solid rgba(25, 135, 84, 0.1);
+        margin-bottom: 2rem;
+    }
+
+    .form-card-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--gray-200);
+    }
+
+    .form-card-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: var(--primary-green);
+    }
+
+    .form-card-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin: 0;
+        color: var(--dark-green);
+    }
+
+    .form-card-subtitle {
+        color: var(--gray-600);
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    /* Form Elements */
+    .form-label {
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label .required {
+        color: var(--accent-red);
+        margin-left: 0.25rem;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--gray-200);
+        border-radius: 15px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+    .form-control:hover, .form-select:hover {
+        border-color: var(--primary-green);
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+    }
+
+    .form-control.is-invalid, .form-select.is-invalid {
+        border-color: var(--accent-red);
+        background-image: none;
+    }
+
+    .invalid-feedback {
+        font-size: 0.85rem;
+        color: var(--accent-red);
+        margin-top: 0.25rem;
+    }
+
+    /* Rich Text Editor */
+    .quill-editor {
+        border: 2px solid var(--gray-200);
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .quill-editor:hover {
+        border-color: var(--primary-green);
+    }
+
+    .ql-toolbar {
+        border: none !important;
+        border-bottom: 2px solid var(--gray-200) !important;
+        background: var(--gray-100);
+    }
+
+    .ql-container {
+        border: none !important;
+        min-height: 300px;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 0.95rem;
+    }
+
+    .ql-editor {
+        min-height: 300px;
+    }
+
+    /* Tagify Customization */
+    .tagify {
+        border: 2px solid var(--gray-200);
+        border-radius: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .tagify:hover {
+        border-color: var(--primary-green);
+    }
+
+    .tagify--focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+    }
+
+    .tagify__tag {
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+        border-radius: 20px;
+        color: var(--primary-green);
+    }
+
+    .tagify__tag__removeBtn {
+        color: var(--primary-green);
+    }
+
+    /* Select2 Customization */
+    .select2-container--default .select2-selection--multiple {
+        border: 2px solid var(--gray-200);
+        border-radius: 15px;
+        min-height: 50px;
+        padding: 0.25rem;
+    }
+
+    .select2-container--default.select2-container--focus .select2-selection--multiple {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+        border: none;
+        border-radius: 20px;
+        padding: 0.25rem 0.75rem;
+        color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: var(--primary-green);
+        margin-right: 0.5rem;
+    }
+
+    /* Priority Badges */
+    .priority-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+    .priority-badge:hover {
+        transform: translateY(-2px);
+    }
+
+    .priority-badge input[type="radio"] {
+        display: none;
+    }
+
+    .priority-badge input[type="radio"]:checked + & {
+        border-color: var(--gray-800);
+    }
+
+    .priority-low {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+    }
+
+    .priority-normal {
+        background: linear-gradient(135deg, #cce5ff, #b8daff);
+        color: #004085;
+    }
+
+    .priority-high {
+        background: linear-gradient(135deg, #fff3cd, #ffeeba);
+        color: #856404;
+    }
+
+    .priority-urgent {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+        }
+    }
+
+    /* Audience Cards */
+    .audience-card {
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .audience-card input[type="radio"] {
+        position: absolute;
+        opacity: 0;
+    }
+
+    .audience-card .card-content {
+        padding: 1.5rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+
+    .audience-card input[type="radio"]:checked + .card-content {
+        border-color: var(--primary-green);
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.05), rgba(32, 201, 151, 0.05));
+        box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+    }
+
+    .audience-card:hover .card-content {
+        border-color: var(--primary-green);
+        transform: translateY(-3px);
+    }
+
+    .audience-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 1.8rem;
+        color: var(--primary-green);
+        transition: all 0.3s ease;
+    }
+
+    .audience-card:hover .audience-icon {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        transform: rotateY(360deg);
+    }
+
+    /* Attachment Area */
+    .attachment-area {
+        border: 2px dashed var(--gray-300);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .attachment-area:hover {
+        border-color: var(--primary-green);
+        background: rgba(25, 135, 84, 0.02);
+    }
+
+    .attachment-area.dragover {
+        border-color: var(--primary-green);
+        background: rgba(25, 135, 84, 0.05);
+        transform: scale(1.02);
+    }
+
+    .attachment-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .attachment-item {
+        position: relative;
+        width: 120px;
+        background: white;
+        border-radius: 15px;
+        padding: 0.75rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        border: 1px solid var(--gray-200);
+        transition: all 0.3s ease;
+    }
+
+    .attachment-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+    }
+
+    .attachment-icon {
+        width: 100%;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2.5rem;
+        color: var(--primary-green);
+        background: rgba(25, 135, 84, 0.05);
+        border-radius: 10px;
+        margin-bottom: 0.5rem;
+    }
+
+    .attachment-name {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .attachment-size {
+        font-size: 0.7rem;
+        color: var(--gray-600);
+    }
+
+    .attachment-remove {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        width: 25px;
+        height: 25px;
+        background: var(--accent-red);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem;
+        cursor: pointer;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .attachment-item:hover .attachment-remove {
+        opacity: 1;
+    }
+
+    /* Schedule Preview */
+    .schedule-preview {
+        background: linear-gradient(135deg, var(--gray-100), white);
+        border-radius: 20px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    .schedule-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .schedule-item:last-child {
+        border-bottom: none;
+    }
+
+    .schedule-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-green);
+    }
+
+    .schedule-label {
+        font-weight: 600;
+        color: var(--gray-800);
+        min-width: 120px;
+    }
+
+    .schedule-value {
+        color: var(--primary-green);
+        font-weight: 600;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        font-weight: 700;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .btn-primary-action {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        box-shadow: 0 10px 20px rgba(25, 135, 84, 0.2);
+    }
+
+    .btn-primary-action:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 30px rgba(25, 135, 84, 0.3);
+    }
+
+    .btn-secondary-action {
+        background: white;
+        color: var(--primary-green);
+        border: 2px solid var(--primary-green);
+    }
+
+    .btn-secondary-action:hover {
+        background: var(--primary-green);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    .btn-danger-action {
+        background: white;
+        color: var(--accent-red);
+        border: 2px solid var(--accent-red);
+    }
+
+    .btn-danger-action:hover {
+        background: var(--accent-red);
+        color: white;
+        transform: translateY(-3px);
+    }
+
+    /* Progress Bar */
+    .form-progress {
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+        background: white;
+        padding: 1rem;
+        border-radius: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+        border: 1px solid rgba(25, 135, 84, 0.1);
+    }
+
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background: var(--gray-200);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .step-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gray-600);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .progress-step.completed .step-number {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+    }
+
+    .progress-step.active .step-number {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        box-shadow: 0 0 0 5px rgba(25, 135, 84, 0.2);
+    }
+
+    .progress-bar-line {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--gray-200);
+        z-index: 0;
+    }
+
+    .progress-bar-fill {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+        transition: width 0.3s ease;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+        .hero-title {
+            font-size: 3rem;
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .form-container {
+            padding: 2rem 1rem;
+        }
+        
+        .form-card {
+            padding: 1.5rem;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+        }
+        
+        .btn-action {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2rem;
+        }
+        
+        .progress-steps {
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .progress-bar-line,
+        .progress-bar-fill {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="form-hero">
+    <div class="container">
+        <h1 class="hero-title" data-aos="fade-up">
+            {% if is_create %}
+            Create New Announcement
+            {% else %}
+            Edit Announcement
+            {% endif %}
+        </h1>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+            {% if is_create %}
+            Craft a compelling announcement to share with the KACAF community
+            {% else %}
+            Update and refine your announcement before publishing
+            {% endif %}
+        </p>
+    </div>
+</section>
+
+<!-- Form Container -->
+<section class="form-container">
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="form-progress" data-aos="fade-up">
+            <div class="progress-steps">
+                <div class="progress-bar-line"></div>
+                <div class="progress-bar-fill" style="width: 0%;"></div>
+                
+                <div class="progress-step completed" id="step1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="progress-step" id="step2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Content</div>
+                </div>
+                <div class="progress-step" id="step3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Audience</div>
+                </div>
+                <div class="progress-step" id="step4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Schedule</div>
+                </div>
+                <div class="progress-step" id="step5">
+                    <div class="step-number">5</div>
+                    <div class="step-label">Attachments</div>
+                </div>
+                <div class="progress-step" id="step6">
+                    <div class="step-number">6</div>
+                    <div class="step-label">Review</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form -->
+        <form method="post" enctype="multipart/form-data" id="announcementForm" data-aos="fade-up">
+            {% csrf_token %}
+            
+            <!-- Step 1: Basic Information -->
+            <div class="form-card step" id="step1-card">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Basic Information</h3>
+                        <p class="form-card-subtitle">Tell us the essentials about this announcement</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Title -->
+                    <div class="col-12">
+                        <label class="form-label">
+                            Announcement Title <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="title" 
+                               id="title"
+                               value="{{ form.title.value|default:'' }}"
+                               placeholder="e.g., Upcoming Tree Planting Initiative"
+                               required
+                               maxlength="200">
+                        <div class="invalid-feedback">Please enter a title for your announcement</div>
+                        <small class="text-muted float-end" id="titleCount">0/200 characters</small>
+                    </div>
+                    
+                    <!-- Announcement Type -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Announcement Type <span class="required">*</span>
+                        </label>
+                        <select class="form-select" name="announcement_type" id="announcement_type" required>
+                            <option value="">Select type</option>
+                            <option value="general" {% if form.announcement_type.value == 'general' %}selected{% endif %}>General Announcement</option>
+                            <option value="event" {% if form.announcement_type.value == 'event' %}selected{% endif %}>Event Announcement</option>
+                            <option value="program" {% if form.announcement_type.value == 'program' %}selected{% endif %}>Program Update</option>
+                            <option value="policy" {% if form.announcement_type.value == 'policy' %}selected{% endif %}>Policy Change</option>
+                            <option value="alert" {% if form.announcement_type.value == 'alert' %}selected{% endif %}>Alert / Emergency</option>
+                            <option value="achievement" {% if form.announcement_type.value == 'achievement' %}selected{% endif %}>Achievement / Milestone</option>
+                            <option value="opportunity" {% if form.announcement_type.value == 'opportunity' %}selected{% endif %}>Opportunity</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Priority Level -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Priority Level <span class="required">*</span>
+                        </label>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <label class="priority-badge priority-low">
+                                <input type="radio" name="priority" value="low" {% if form.priority.value == 'low' %}checked{% endif %}>
+                                <i class="fas fa-arrow-down"></i> Low
+                            </label>
+                            <label class="priority-badge priority-normal">
+                                <input type="radio" name="priority" value="normal" {% if form.priority.value == 'normal' or not form.priority.value %}checked{% endif %}>
+                                <i class="fas fa-minus"></i> Normal
+                            </label>
+                            <label class="priority-badge priority-high">
+                                <input type="radio" name="priority" value="high" {% if form.priority.value == 'high' %}checked{% endif %}>
+                                <i class="fas fa-arrow-up"></i> High
+                            </label>
+                            <label class="priority-badge priority-urgent">
+                                <input type="radio" name="priority" value="urgent" {% if form.priority.value == 'urgent' %}checked{% endif %}>
+                                <i class="fas fa-exclamation-triangle"></i> Urgent
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary -->
+                    <div class="col-12">
+                        <label class="form-label">Short Summary</label>
+                        <textarea class="form-control" 
+                                  name="summary" 
+                                  id="summary"
+                                  rows="3"
+                                  placeholder="Brief overview of the announcement (will appear in previews)">{{ form.summary.value|default:'' }}</textarea>
+                        <small class="text-muted float-end" id="summaryCount">0/300 characters</small>
+                    </div>
+                </div>
+                
+                <div class="text-end mt-4">
+                    <button type="button" class="btn-action btn-primary-action next-step">
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Content -->
+            <div class="form-card step" id="step2-card" style="display: none;">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-pen-fancy"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Announcement Content</h3>
+                        <p class="form-card-subtitle">Write the full content of your announcement</p>
+                    </div>
+                </div>
+                
+                <!-- Hidden input for Quill content -->
+                <input type="hidden" name="content" id="content" value="{{ form.content.value|default:'' }}">
+                
+                <!-- Quill Editor -->
+                <div class="quill-editor">
+                    <div id="quillEditor" style="height: 400px;">
+                        {{ form.content.value|safe|default:'' }}
+                    </div>
+                </div>
+                
+                <!-- Call to Action -->
+                <div class="row g-4 mt-4">
+                    <div class="col-md-6">
+                        <label class="form-label">Call to Action Text (Optional)</label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="cta_text" 
+                               id="cta_text"
+                               value="{{ form.cta_text.value|default:'' }}"
+                               placeholder="e.g., Register Now, Learn More">
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Call to Action URL (Optional)</label>
+                        <input type="url" 
+                               class="form-control" 
+                               name="cta_url" 
+                               id="cta_url"
+                               value="{{ form.cta_url.value|default:'' }}"
+                               placeholder="https://example.com">
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn-action btn-secondary-action prev-step">
+                        <i class="fas fa-arrow-left me-2"></i> Previous
+                    </button>
+                    <button type="button" class="btn-action btn-primary-action next-step">
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 3: Target Audience -->
+            <div class="form-card step" id="step3-card" style="display: none;">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Target Audience</h3>
+                        <p class="form-card-subtitle">Select who should see this announcement</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Audience Cards -->
+                    <div class="col-md-3">
+                        <label class="audience-card">
+                            <input type="radio" name="target_audience" value="all" {% if form.target_audience.value == 'all' or not form.target_audience.value %}checked{% endif %}>
+                            <div class="card-content">
+                                <div class="audience-icon">
+                                    <i class="fas fa-globe"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Everyone</h5>
+                                <small class="text-muted">Public - visible to all visitors</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="audience-card">
+                            <input type="radio" name="target_audience" value="members" {% if form.target_audience.value == 'members' %}checked{% endif %}>
+                            <div class="card-content">
+                                <div class="audience-icon">
+                                    <i class="fas fa-user-friends"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Members Only</h5>
+                                <small class="text-muted">All registered members</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="audience-card">
+                            <input type="radio" name="target_audience" value="executive" {% if form.target_audience.value == 'executive' %}checked{% endif %}>
+                            <div class="card-content">
+                                <div class="audience-icon">
+                                    <i class="fas fa-crown"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Executive</h5>
+                                <small class="text-muted">Executive committee only</small>
+                            </div>
+                        </label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <label class="audience-card">
+                            <input type="radio" name="target_audience" value="specific" id="specific_audience" {% if form.target_audience.value == 'specific' %}checked{% endif %}>
+                            <div class="card-content">
+                                <div class="audience-icon">
+                                    <i class="fas fa-user-tag"></i>
+                                </div>
+                                <h5 class="fw-bold mb-2">Specific Users</h5>
+                                <small class="text-muted">Select individuals</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                
+                <!-- Specific Users Selection (shown only when specific is selected) -->
+                <div id="specificUsersSection" class="mt-4" style="{% if form.target_audience.value != 'specific' %}display: none;{% endif %}">
+                    <label class="form-label">
+                        Select Users <span class="required">*</span>
+                    </label>
+                    <select class="select2-users" name="specific_users" multiple="multiple" style="width: 100%;">
+                        {% for user in users %}
+                        <option value="{{ user.id }}" 
+                                {% if user.id in form.specific_users.value %}selected{% endif %}>
+                            {{ user.get_full_name|default:user.username }} ({{ user.email }}) - {{ user.get_user_type_display|default:'Member' }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <small class="text-muted">Search and select specific users to target</small>
+                </div>
+                
+                <!-- Program/Event Association -->
+                <div class="row g-4 mt-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Associated Program (Optional)</label>
+                        <select class="form-select" name="program">
+                            <option value="">None</option>
+                            {% for program in programs %}
+                            <option value="{{ program.id }}" {% if form.program.value == program.id %}selected{% endif %}>{{ program.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="form-label">Associated Event (Optional)</label>
+                        <select class="form-select" name="event">
+                            <option value="">None</option>
+                            {% for event in events %}
+                            <option value="{{ event.id }}" {% if form.event.value == event.id %}selected{% endif %}>{{ event.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn-action btn-secondary-action prev-step">
+                        <i class="fas fa-arrow-left me-2"></i> Previous
+                    </button>
+                    <button type="button" class="btn-action btn-primary-action next-step">
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 4: Schedule -->
+            <div class="form-card step" id="step4-card" style="display: none;">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Schedule & Publishing</h3>
+                        <p class="form-card-subtitle">Set when and how this announcement should be published</p>
+                    </div>
+                </div>
+                
+                <div class="row g-4">
+                    <!-- Publish Date -->
+                    <div class="col-md-6">
+                        <label class="form-label">
+                            Publish Date <span class="required">*</span>
+                        </label>
+                        <input type="text" 
+                               class="form-control datepicker" 
+                               name="publish_date" 
+                               id="publish_date"
+                               value="{{ form.publish_date.value|date:'Y-m-d H:i'|default:'' }}"
+                               placeholder="YYYY-MM-DD HH:MM"
+                               required>
+                        <small class="text-muted">When should this announcement go live?</small>
+                    </div>
+                    
+                    <!-- Expiry Date -->
+                    <div class="col-md-6">
+                        <label class="form-label">Expiry Date (Optional)</label>
+                        <input type="text" 
+                               class="form-control datepicker" 
+                               name="expiry_date" 
+                               id="expiry_date"
+                               value="{{ form.expiry_date.value|date:'Y-m-d H:i'|default:'' }}"
+                               placeholder="YYYY-MM-DD HH:MM">
+                        <small class="text-muted">Leave empty for no expiry</small>
+                    </div>
+                    
+                    <!-- Show on Homepage -->
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="show_on_homepage" id="show_on_homepage" {% if form.show_on_homepage.value %}checked{% endif %}>
+                            <label class="form-check-label" for="show_on_homepage">
+                                Show on Homepage <span class="text-muted">(Featured on the main page)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Sticky/Pinned -->
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="is_sticky" id="is_sticky" {% if form.is_sticky.value %}checked{% endif %}>
+                            <label class="form-check-label" for="is_sticky">
+                                Pin to Top <span class="text-muted">(Stays at the top of announcement lists)</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Send Email Notification -->
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="send_email" id="send_email" {% if form.send_email.value %}checked{% endif %}>
+                            <label class="form-check-label" for="send_email">
+                                Send Email Notification <span class="text-muted">(Notify target audience via email)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Schedule Preview -->
+                <div class="schedule-preview mt-4">
+                    <h6 class="fw-bold mb-3">Schedule Preview</h6>
+                    <div class="schedule-item">
+                        <div class="schedule-icon">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <span class="schedule-label">Publish Date:</span>
+                        <span class="schedule-value" id="previewPublishDate">Not set</span>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-icon">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <span class="schedule-label">Expiry Date:</span>
+                        <span class="schedule-value" id="previewExpiryDate">No expiry</span>
+                    </div>
+                    <div class="schedule-item">
+                        <div class="schedule-icon">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <span class="schedule-label">Email Notification:</span>
+                        <span class="schedule-value" id="previewEmail">No</span>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn-action btn-secondary-action prev-step">
+                        <i class="fas fa-arrow-left me-2"></i> Previous
+                    </button>
+                    <button type="button" class="btn-action btn-primary-action next-step">
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Attachments -->
+            <div class="form-card step" id="step5-card" style="display: none;">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-paperclip"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Attachments</h3>
+                        <p class="form-card-subtitle">Upload supporting documents or images</p>
+                    </div>
+                </div>
+                
+                <!-- File Upload Area -->
+                <div class="attachment-area" id="attachmentArea">
+                    <input type="file" 
+                           name="attachments" 
+                           id="attachments" 
+                           multiple 
+                           style="display: none;"
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif,.xlsx,.pptx,.txt">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-success mb-3"></i>
+                    <h5 class="fw-bold">Drag & Drop Files Here</h5>
+                    <p class="text-muted mb-2">or <span class="text-success fw-bold">browse</span> to upload</p>
+                    <small class="text-muted">Supported formats: PDF, Word, Excel, PowerPoint, Images (max 10MB each)</small>
+                </div>
+                
+                <!-- Attachment Preview -->
+                <div class="attachment-preview" id="attachmentPreview">
+                    {% if attachments %}
+                        {% for attachment in attachments %}
+                        <div class="attachment-item" data-id="{{ attachment.id }}">
+                            <div class="attachment-icon">
+                                {% if attachment.is_image %}
+                                <img src="{{ attachment.file.url }}" alt="{{ attachment.filename }}" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                                {% else %}
+                                <i class="fas fa-file-{{ attachment.icon }}"></i>
+                                {% endif %}
+                            </div>
+                            <div class="attachment-name">{{ attachment.filename|truncatechars:15 }}</div>
+                            <div class="attachment-size">{{ attachment.file_size|filesizeformat }}</div>
+                            <div class="attachment-remove" onclick="removeAttachment({{ attachment.id }})">
+                                <i class="fas fa-times"></i>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn-action btn-secondary-action prev-step">
+                        <i class="fas fa-arrow-left me-2"></i> Previous
+                    </button>
+                    <button type="button" class="btn-action btn-primary-action next-step">
+                        Next Step <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 6: Review & Submit -->
+            <div class="form-card step" id="step6-card" style="display: none;">
+                <div class="form-card-header">
+                    <div class="form-card-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <h3 class="form-card-title">Review & Submit</h3>
+                        <p class="form-card-subtitle">Review your announcement before publishing</p>
+                    </div>
+                </div>
+                
+                <!-- Preview Cards -->
+                <div class="row g-4">
+                    <!-- Announcement Preview -->
+                    <div class="col-lg-8">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                                <span>Announcement Preview</span>
+                                <span class="badge bg-light text-dark priority-badge-preview" id="previewPriority">Normal</span>
+                            </div>
+                            <div class="card-body">
+                                <h4 class="card-title" id="previewTitle">No title set</h4>
+                                <p class="text-muted" id="previewSummary">No summary provided</p>
+                                <hr>
+                                <div class="preview-content" id="previewContent">
+                                    No content provided
+                                </div>
+                                
+                                <div id="previewCTA" style="display: none;">
+                                    <hr>
+                                    <a href="#" class="btn btn-success" id="previewCTAButton">Learn More</a>
+                                </div>
+                            </div>
+                            <div class="card-footer text-muted">
+                                <div class="d-flex justify-content-between">
+                                    <span><i class="fas fa-users me-2"></i><span id="previewAudience">Everyone</span></span>
+                                    <span><i class="fas fa-calendar me-2"></i><span id="previewDate">Not scheduled</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Card -->
+                    <div class="col-lg-4">
+                        <div class="card border-success">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-clipboard-list me-2"></i>Summary
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> <strong>Type:</strong> <span id="summaryType">Not set</span></li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> <strong>Priority:</strong> <span id="summaryPriority">Normal</span></li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> <strong>Audience:</strong> <span id="summaryAudience">Everyone</span></li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> <strong>Attachments:</strong> <span id="summaryAttachments">0</span></li>
+                                    <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> <strong>Email Notification:</strong> <span id="summaryEmail">No</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <!-- Publishing Options -->
+                        <div class="card border-success mt-4">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-cog me-2"></i>Publishing Options
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="is_published" id="is_published" {% if form.is_published.value %}checked{% endif %}>
+                                    <label class="form-check-label" for="is_published">
+                                        Publish immediately
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" name="save_as_draft" id="save_as_draft" checked>
+                                    <label class="form-check-label" for="save_as_draft">
+                                        Save as draft (if not publishing)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn-action btn-secondary-action prev-step">
+                        <i class="fas fa-arrow-left me-2"></i> Previous
+                    </button>
+                    <div class="d-flex gap-2">
+                        <button type="submit" name="_continue" value="1" class="btn-action btn-secondary-action">
+                            <i class="fas fa-save me-2"></i> Save & Continue
+                        </button>
+                        <button type="submit" name="_addanother" value="1" class="btn-action btn-secondary-action">
+                            <i class="fas fa-plus-circle me-2"></i> Save & Add Another
+                        </button>
+                        <button type="submit" class="btn-action btn-primary-action">
+                            <i class="fas fa-paper-plane me-2"></i> {% if is_create %}Create Announcement{% else %}Update Announcement{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<!-- Quill Rich Text Editor -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+
+<!-- Tagify -->
+<script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+
+<!-- Select2 -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<!-- Flatpickr -->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script>
+    // Initialize AOS
+    if (typeof AOS !== 'undefined') {
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+    }
+
+    // Character counters
+    document.getElementById('title')?.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('titleCount').textContent = `${count}/200 characters`;
+    });
+
+    document.getElementById('summary')?.addEventListener('input', function() {
+        const count = this.value.length;
+        document.getElementById('summaryCount').textContent = `${count}/300 characters`;
+    });
+
+    // Initialize Quill Editor
+    const quill = new Quill('#quillEditor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['link', 'image', 'video'],
+                ['clean']
+            ],
+        },
+        placeholder: 'Write your announcement content here...'
+    });
+
+    // Update hidden content field when Quill changes
+    quill.on('text-change', function() {
+        document.getElementById('content').value = quill.root.innerHTML;
+    });
+
+    // Step navigation
+    const steps = document.querySelectorAll('.step');
+    const stepIndicators = document.querySelectorAll('.progress-step');
+    const progressFill = document.querySelector('.progress-bar-fill');
+    let currentStep = 0;
+
+    function showStep(stepIndex) {
+        steps.forEach((step, index) => {
+            step.style.display = index === stepIndex ? 'block' : 'none';
+        });
+        
+        stepIndicators.forEach((indicator, index) => {
+            if (index < stepIndex) {
+                indicator.classList.add('completed');
+                indicator.classList.remove('active');
+            } else if (index === stepIndex) {
+                indicator.classList.add('active');
+                indicator.classList.remove('completed');
+            } else {
+                indicator.classList.remove('completed', 'active');
+            }
+        });
+        
+        const progress = ((stepIndex + 1) / steps.length) * 100;
+        progressFill.style.width = progress + '%';
+        
+        // Scroll to top of form
+        document.querySelector('.form-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    document.querySelectorAll('.next-step').forEach(button => {
+        button.addEventListener('click', function() {
+            if (currentStep < steps.length - 1) {
+                // Validate current step
+                if (validateStep(currentStep)) {
+                    currentStep++;
+                    showStep(currentStep);
+                    updatePreview();
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('.prev-step').forEach(button => {
+        button.addEventListener('click', function() {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+    });
+
+    // Validate steps
+    function validateStep(step) {
+        switch(step) {
+            case 0:
+                const title = document.getElementById('title');
+                const type = document.getElementById('announcement_type');
+                if (!title.value || !type.value) {
+                    alert('Please fill in all required fields');
+                    return false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    // Initialize Select2
+    $('.select2-users').select2({
+        placeholder: 'Search for users...',
+        allowClear: true,
+        width: '100%',
+        templateResult: formatUser,
+        templateSelection: formatUserSelection
+    });
+
+    function formatUser(user) {
+        if (!user.id) return user.text;
+        return $('<span><i class="fas fa-user me-2"></i>' + user.text + '</span>');
+    }
+
+    function formatUserSelection(user) {
+        return user.text.split('(')[0];
+    }
+
+    // Show/hide specific users section
+    document.querySelectorAll('input[name="target_audience"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const specificSection = document.getElementById('specificUsersSection');
+            if (this.value === 'specific') {
+                specificSection.style.display = 'block';
+            } else {
+                specificSection.style.display = 'none';
+            }
+            updatePreview();
+        });
+    });
+
+    // Initialize datepickers
+    flatpickr('.datepicker', {
+        enableTime: true,
+        dateFormat: 'Y-m-d H:i',
+        minDate: 'today',
+        onChange: function(selectedDates, dateStr, instance) {
+            updateSchedulePreview();
+        }
+    });
+
+    // Update schedule preview
+    function updateSchedulePreview() {
+        const publishDate = document.getElementById('publish_date').value;
+        const expiryDate = document.getElementById('expiry_date').value;
+        const sendEmail = document.getElementById('send_email').checked;
+        
+        document.getElementById('previewPublishDate').textContent = publishDate || 'Not set';
+        document.getElementById('previewExpiryDate').textContent = expiryDate || 'No expiry';
+        document.getElementById('previewEmail').textContent = sendEmail ? 'Yes' : 'No';
+    }
+
+    // File upload handling
+    const attachmentArea = document.getElementById('attachmentArea');
+    const attachmentInput = document.getElementById('attachments');
+    const attachmentPreview = document.getElementById('attachmentPreview');
+
+    attachmentArea.addEventListener('click', function() {
+        attachmentInput.click();
+    });
+
+    attachmentArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        this.classList.add('dragover');
+    });
+
+    attachmentArea.addEventListener('dragleave', function() {
+        this.classList.remove('dragover');
+    });
+
+    attachmentArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        this.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        handleFiles(files);
+    });
+
+    attachmentInput.addEventListener('change', function() {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        Array.from(files).forEach(file => {
+            // Check file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`File ${file.name} is too large. Maximum size is 10MB.`);
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = createAttachmentPreview(file, e.target.result);
+                attachmentPreview.appendChild(preview);
+            };
+            
+            if (file.type.startsWith('image/')) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    function createAttachmentPreview(file, dataUrl) {
+        const div = document.createElement('div');
+        div.className = 'attachment-item';
+        
+        const icon = document.createElement('div');
+        icon.className = 'attachment-icon';
+        
+        if (file.type.startsWith('image/')) {
+            icon.innerHTML = `<img src="${dataUrl}" alt="${file.name}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+        } else {
+            const fileType = file.name.split('.').pop().toLowerCase();
+            icon.innerHTML = `<i class="fas fa-file-${getFileIcon(fileType)}"></i>`;
+        }
+        
+        const name = document.createElement('div');
+        name.className = 'attachment-name';
+        name.textContent = file.name.substring(0, 15) + (file.name.length > 15 ? '...' : '');
+        
+        const size = document.createElement('div');
+        size.className = 'attachment-size';
+        size.textContent = formatFileSize(file.size);
+        
+        const remove = document.createElement('div');
+        remove.className = 'attachment-remove';
+        remove.innerHTML = '<i class="fas fa-times"></i>';
+        remove.onclick = function() { div.remove(); };
+        
+        div.appendChild(icon);
+        div.appendChild(name);
+        div.appendChild(size);
+        div.appendChild(remove);
+        
+        return div;
+    }
+
+    function getFileIcon(extension) {
+        const icons = {
+            pdf: 'pdf',
+            doc: 'word',
+            docx: 'word',
+            xls: 'excel',
+            xlsx: 'excel',
+            ppt: 'powerpoint',
+            pptx: 'powerpoint',
+            txt: 'alt',
+            jpg: 'image',
+            jpeg: 'image',
+            png: 'image',
+            gif: 'image'
+        };
+        return icons[extension] || 'alt';
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+        else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+
+    // Update preview function
+    function updatePreview() {
+        // Update title
+        document.getElementById('previewTitle').textContent = document.getElementById('title').value || 'No title set';
+        
+        // Update summary
+        document.getElementById('previewSummary').textContent = document.getElementById('summary').value || 'No summary provided';
+        
+        // Update content
+        document.getElementById('previewContent').innerHTML = quill.root.innerHTML || 'No content provided';
+        
+        // Update priority
+        const priority = document.querySelector('input[name="priority"]:checked');
+        if (priority) {
+            const priorityLabel = priority.parentElement.textContent.trim();
+            document.getElementById('previewPriority').textContent = priorityLabel;
+            document.getElementById('summaryPriority').textContent = priorityLabel;
+        }
+        
+        // Update audience
+        const audience = document.querySelector('input[name="target_audience"]:checked');
+        if (audience) {
+            let audienceText = '';
+            switch(audience.value) {
+                case 'all': audienceText = 'Everyone'; break;
+                case 'members': audienceText = 'Members Only'; break;
+                case 'executive': audienceText = 'Executive'; break;
+                case 'specific': audienceText = 'Specific Users'; break;
+            }
+            document.getElementById('previewAudience').textContent = audienceText;
+            document.getElementById('summaryAudience').textContent = audienceText;
+        }
+        
+        // Update type
+        const type = document.getElementById('announcement_type');
+        if (type.value) {
+            document.getElementById('summaryType').textContent = type.options[type.selectedIndex].text;
+        }
+        
+        // Update attachments count
+        const attachments = document.querySelectorAll('.attachment-item').length;
+        document.getElementById('summaryAttachments').textContent = attachments;
+        
+        // Update email notification
+        document.getElementById('summaryEmail').textContent = document.getElementById('send_email').checked ? 'Yes' : 'No';
+        
+        // Update CTA
+        const ctaText = document.getElementById('cta_text').value;
+        const ctaUrl = document.getElementById('cta_url').value;
+        if (ctaText && ctaUrl) {
+            document.getElementById('previewCTA').style.display = 'block';
+            document.getElementById('previewCTAButton').textContent = ctaText;
+            document.getElementById('previewCTAButton').href = ctaUrl;
+        } else {
+            document.getElementById('previewCTA').style.display = 'none';
+        }
+        
+        // Update date
+        document.getElementById('previewDate').textContent = document.getElementById('publish_date').value || 'Not scheduled';
+    }
+
+    // Remove attachment
+    function removeAttachment(attachmentId) {
+        if (confirm('Are you sure you want to remove this attachment?')) {
+            // Create a form and submit it
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `{% if announcement %}{% url 'communications:announcement_remove_attachment' announcement.id 0 %}{% endif %}`.replace('0', attachmentId);
+            
+            const csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = 'csrfmiddlewaretoken';
+            csrf.value = '{{ csrf_token }}';
+            form.appendChild(csrf);
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Update schedule on input change
+    document.getElementById('publish_date')?.addEventListener('change', updateSchedulePreview);
+    document.getElementById('expiry_date')?.addEventListener('change', updateSchedulePreview);
+    document.getElementById('send_email')?.addEventListener('change', updateSchedulePreview);
+
+    // Initial schedule preview
+    updateSchedulePreview();
+
+    // Form submission validation
+    document.getElementById('announcementForm')?.addEventListener('submit', function(e) {
+        const title = document.getElementById('title');
+        const type = document.getElementById('announcement_type');
+        const content = quill.root.innerHTML.trim();
+        
+        if (!title.value) {
+            e.preventDefault();
+            title.classList.add('is-invalid');
+            alert('Please enter a title');
+            showStep(0);
+            return false;
+        }
+        
+        if (!type.value) {
+            e.preventDefault();
+            type.classList.add('is-invalid');
+            alert('Please select an announcement type');
+            showStep(0);
+            return false;
+        }
+        
+        if (!content || content === '<p><br></p>') {
+            e.preventDefault();
+            alert('Please enter announcement content');
+            showStep(1);
+            return false;
+        }
+        
+        // Check if specific users are selected when audience is 'specific'
+        const audience = document.querySelector('input[name="target_audience"]:checked');
+        if (audience && audience.value === 'specific') {
+            const selectedUsers = $('.select2-users').val();
+            if (!selectedUsers || selectedUsers.length === 0) {
+                e.preventDefault();
+                alert('Please select specific users for this announcement');
+                showStep(2);
+                return false;
+            }
+        }
+    });
+
+    // Initialize step 1
+    showStep(0);
+</script>
+{% endblock %}

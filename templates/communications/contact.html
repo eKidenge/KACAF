@@ -1,0 +1,1870 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact KACAF - Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --dark-green: #0d3625;
+            --light-green: #d1e7dd;
+            --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --accent-purple: #6f42c1;
+            --accent-orange: #fd7e14;
+            --accent-red: #dc3545;
+            --accent-teal: #20c997;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional with Enhanced Hover */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        /* Bold Hover Effect */
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Active Link Style with Bold Indicator */
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 800;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Navbar Toggler - Enhanced */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.85)), 
+                        url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 120px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section Styling */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            margin-bottom: 3rem;
+        }
+
+        /* Contact Info Cards */
+        .contact-info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            height: 100%;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .contact-info-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+        }
+
+        .contact-info-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.15);
+        }
+
+        .contact-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .contact-info-card:hover .contact-icon {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: rotateY(360deg);
+        }
+
+        .contact-info-card h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-green);
+        }
+
+        .contact-info-card p {
+            color: var(--gray-600);
+            line-height: 1.8;
+        }
+
+        .contact-info-card a {
+            color: var(--primary-green);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .contact-info-card a:hover {
+            color: var(--secondary-green);
+            letter-spacing: 0.5px;
+        }
+
+        /* Key Contact Person Card */
+        .contact-person-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-person-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green), var(--accent-teal));
+        }
+
+        .person-image {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 15px 35px rgba(25, 135, 84, 0.2);
+            margin-bottom: 1.5rem;
+        }
+
+        .person-name {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .person-title {
+            font-size: 1.2rem;
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .person-organization {
+            font-size: 1rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px dashed rgba(25, 135, 84, 0.2);
+        }
+
+        .person-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--gray-800);
+        }
+
+        .person-contact-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+            color: var(--primary-green);
+        }
+
+        .person-contact-item i {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 1.2rem;
+        }
+
+        .person-social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+        }
+
+        .person-social-link {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .person-social-link:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* Contact Form */
+        .contact-form-wrapper {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--dark-green);
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .form-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            border-radius: 2px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        .form-control.is-invalid, .form-select.is-invalid {
+            border-color: var(--accent-red);
+            background-image: none;
+        }
+
+        .invalid-feedback {
+            font-size: 0.85rem;
+            color: var(--accent-red);
+            margin-top: 0.25rem;
+        }
+
+        .form-check-input:checked {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+
+        .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.3);
+        }
+
+        .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        /* Map Container */
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 3px solid white;
+            height: 350px;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Office Hours Card */
+        .office-hours-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            margin-top: 2rem;
+        }
+
+        .office-hours-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark-green);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .office-hours-title i {
+            color: var(--primary-green);
+        }
+
+        .office-hours-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .office-hours-item:last-child {
+            border-bottom: none;
+        }
+
+        .office-hours-day {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .office-hours-time {
+            color: var(--primary-green);
+            font-weight: 500;
+        }
+
+        .office-hours-note {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(25, 135, 84, 0.05);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            text-align: center;
+        }
+
+        /* Social Links */
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            background: white;
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .accordion-item {
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            border-radius: 15px !important;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+
+        .accordion-button {
+            font-weight: 700;
+            color: var(--gray-800);
+            background: white;
+            padding: 1.25rem;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.05), rgba(32, 201, 151, 0.05));
+            color: var(--primary-green);
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(25, 135, 84, 0.3);
+        }
+
+        .accordion-button::after {
+            background-size: 1rem;
+        }
+
+        .accordion-body {
+            padding: 1.5rem;
+            background: white;
+            color: var(--gray-600);
+            line-height: 1.8;
+        }
+
+        /* Alert Messages */
+        .alert-custom {
+            border-radius: 15px;
+            padding: 1rem 1.5rem;
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .alert-success-custom {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border-left: 4px solid #155724;
+        }
+
+        .alert-error-custom {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border-left: 4px solid #721c24;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: white;
+            color: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        /* Emergency Banner */
+        .emergency-banner {
+            background: linear-gradient(135deg, #fff3cd, #ffe69b);
+            border: 2px dashed var(--accent-red);
+            border-radius: 20px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .emergency-banner::before {
+            content: '⚠️';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .brand-text h1 {
+                font-size: 1.6rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.8rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .container-fluid {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .navbar-nav {
+                padding: 1rem 0;
+                background: rgba(10, 92, 59, 0.95);
+                border-radius: 15px;
+                margin-top: 15px;
+                backdrop-filter: blur(10px);
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 5px 15px;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+                border-radius: 10px;
+            }
+            
+            .navbar-nav .nav-link:hover {
+                transform: translateY(-2px);
+            }
+            
+            .navbar-nav .nav-link.active::before {
+                bottom: 5px;
+                width: 60px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.4rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.7rem;
+            }
+            
+            .brand-logo-container {
+                width: 55px;
+                height: 55px;
+                margin-right: 12px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .contact-form-wrapper {
+                padding: 2rem;
+            }
+            
+            .contact-person-card {
+                padding: 2rem;
+            }
+            
+            .person-name {
+                font-size: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .brand-text h1 {
+                font-size: 1.2rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.65rem;
+            }
+            
+            .brand-logo-container {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .person-image {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .person-name {
+                font-size: 1.5rem;
+            }
+            
+            .faq-section {
+                padding: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.6rem;
+                line-height: 1.2;
+            }
+            
+            .navbar-nav .nav-link {
+                font-size: 0.9rem;
+                padding: 0.8rem 1rem;
+            }
+            
+            .brand-logo-container {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                margin-right: 10px;
+            }
+            
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .contact-info-card {
+                padding: 1.5rem;
+            }
+            
+            .contact-form-wrapper {
+                padding: 1.5rem;
+            }
+            
+            .person-contact-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width with Logo -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                HOME
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Let's Connect<br>for a Greener Future
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        Whether you're a farmer, partner, donor, or volunteer, we're here to listen, 
+                        collaborate, and grow together. Reach out today.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Information Cards -->
+    <section class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <h4>Visit Our Office</h4>
+                    <p class="mb-0">
+                        West Pokot County<br>
+                        Kapenguria, Kenya<br>
+                        P.O. Box 123-30600
+                    </p>
+                    <a href="https://maps.google.com/?q=Kapenguria+Kenya" target="_blank" class="mt-3 d-inline-block">
+                        <i class="fas fa-directions me-2"></i>Get Directions
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <h4>Call Our Team</h4>
+                    <p class="mb-0">
+                        <strong>Main Line:</strong><br>
+                        <a href="tel:+254796761841">+254 796 761 841</a><br>
+                        <strong>Support:</strong><br>
+                        <a href="tel:+254700000000">+254 700 000 000</a>
+                    </p>
+                    <a href="tel:+254796761841" class="mt-3 d-inline-block">
+                        <i class="fas fa-phone me-2"></i>Call Now
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="contact-info-card">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <h4>Email Us</h4>
+                    <p class="mb-0">
+                        <strong>General Inquiries:</strong><br>
+                        <a href="mailto:info@kacaf.org">info@kacaf.org</a><br>
+                        <strong>Partnerships:</strong><br>
+                        <a href="mailto:partners@kacaf.org">partners@kacaf.org</a>
+                    </p>
+                    <a href="mailto:info@kacaf.org" class="mt-3 d-inline-block">
+                        <i class="fas fa-paper-plane me-2"></i>Send Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Contact Person - Davis Masibo -->
+    <section class="container py-4">
+        <div class="contact-person-card" data-aos="fade-up">
+            <div class="row align-items-center">
+                <div class="col-lg-4 text-center">
+    <div class="person-card">
+        <img src="{% static 'images/admin.png' %}" 
+             alt="Davis Masibo" 
+             class="person-image">
+        <div class="person-social-links mt-3">
+            <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank" class="person-social-link">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="mailto:davis.masibo@kacaf.org" class="person-social-link">
+                <i class="fas fa-envelope"></i>
+            </a>
+            <a href="tel:+254796761841" class="person-social-link">
+                <i class="fas fa-phone-alt"></i>
+            </a>
+            <a href="#" class="person-social-link">
+                <i class="fab fa-twitter"></i>
+            </a>
+        </div>
+    </div>
+</div>
+                <div class="col-lg-8">
+                    <h2 class="person-name">Davis Masibo</h2>
+                    <p class="person-title">Lead Environmental Scientist</p>
+                    <p class="person-organization">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        MSc. Environmental Science, Egerton University
+                    </p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <a href="tel:+254796761841" class="person-contact-item">
+                                <i class="fas fa-phone-alt"></i>
+                                <span>+254 796 761 841</span>
+                            </a>
+                        </div>
+                        <div class="col-md-6">
+                            <a href="mailto:davis.masibo@kacaf.org" class="person-contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>davis.masibo@kacaf.org</span>
+                            </a>
+                        </div>
+                        <div class="col-12">
+                            <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank" class="person-contact-item">
+                                <i class="fab fa-linkedin-in"></i>
+                                <span>linkedin.com/in/davis-masibo</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 p-3 bg-light rounded-3">
+                        <p class="mb-0">
+                            <i class="fas fa-quote-left text-success me-2"></i>
+                            As our Lead Environmental Scientist, Davis brings over 8 years of experience in 
+                            sustainable land management, biodiversity conservation, and climate resilience. 
+                            He is your primary contact for technical inquiries, research collaborations, 
+                            and partnership opportunities. His work at Egerton University focuses on innovative 
+                            solutions for Kenya's environmental challenges.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form and Map -->
+    <section class="container py-5">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                <div class="contact-form-wrapper">
+                    <h3 class="form-title">Send Us a Message</h3>
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert-custom alert-{% if message.tags == 'success' %}success-custom{% else %}error-custom{% endif %} alert-dismissible fade show mb-4" role="alert">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" action="{% url 'communications:contact' %}" id="contactForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">
+                                    Full Name <span class="text-danger">*</span>
+                                </label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="name" 
+                                       name="name" 
+                                       required 
+                                       placeholder="John Doe"
+                                       minlength="2"
+                                       maxlength="100">
+                                <div class="invalid-feedback">Please enter your full name</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">
+                                    Email Address <span class="text-danger">*</span>
+                                </label>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="email" 
+                                       name="email" 
+                                       required 
+                                       placeholder="john@example.com">
+                                <div class="invalid-feedback">Please enter a valid email address</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="phone" 
+                                       name="phone" 
+                                       placeholder="+254 XXX XXX XXX">
+                                <div class="invalid-feedback">Please enter a valid phone number</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="organization" class="form-label">Organization/Institution</label>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="organization" 
+                                       name="organization" 
+                                       placeholder="e.g., Egerton University">
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="category" class="form-label">
+                                Inquiry Category <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="category" name="category" required>
+                                <option value="">Select a category</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="membership">Membership Application</option>
+                                <option value="donation">Donation & Support</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                                <option value="media">Media & Press</option>
+                                <option value="volunteer">Volunteer Program</option>
+                                <option value="research">Research Collaboration</option>
+                                <option value="training">Training & Workshops</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="other">Other</option>
+                            </select>
+                            <div class="invalid-feedback">Please select a category</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">
+                                Subject <span class="text-danger">*</span>
+                            </label>
+                            <input type="text" 
+                                   class="form-control" 
+                                   id="subject" 
+                                   name="subject" 
+                                   required 
+                                   placeholder="Brief summary of your inquiry"
+                                   minlength="5"
+                                   maxlength="200">
+                            <div class="invalid-feedback">Please enter a subject (min. 5 characters)</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="message" class="form-label">
+                                Message <span class="text-danger">*</span>
+                            </label>
+                            <textarea class="form-control" 
+                                      id="message" 
+                                      name="message" 
+                                      rows="5" 
+                                      required 
+                                      placeholder="Please provide details about your inquiry..."
+                                      minlength="20"
+                                      maxlength="2000"></textarea>
+                            <div class="invalid-feedback">Please enter a message (min. 20 characters)</div>
+                            <small class="text-muted" id="messageCount">0/2000 characters</small>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="allow_contact" name="allow_contact" checked>
+                            <label class="form-check-label" for="allow_contact">
+                                I agree to be contacted regarding my inquiry
+                            </label>
+                        </div>
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="privacy_policy" name="privacy_policy" required>
+                            <label class="form-check-label" for="privacy_policy">
+                                I have read and agree to the <a href="#" class="text-success">Privacy Policy</a> and 
+                                <a href="#" class="text-success">Terms of Service</a> <span class="text-danger">*</span>
+                            </label>
+                            <div class="invalid-feedback">You must agree to the privacy policy</div>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <i class="fas fa-paper-plane me-2"></i>Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Map and Office Hours -->
+            <div class="col-lg-6" data-aos="fade-left">
+                <!-- Map -->
+                <div class="map-container mb-4">
+                    <iframe 
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255194.14056655004!2d34.923679849999996!3d1.788277!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x178074e493adc3a5%3A0x7a8e5a9e9f9d8c4f!2sWest%20Pokot%2C%20Kenya!5e0!3m2!1sen!2s!4v1620000000000!5m2!1sen!2s" 
+                        allowfullscreen="" 
+                        loading="lazy"
+                        title="KACAF Location Map">
+                    </iframe>
+                </div>
+                
+                <!-- Office Hours Card -->
+                <div class="office-hours-card">
+                    <h5 class="office-hours-title">
+                        <i class="fas fa-clock"></i>
+                        Office Hours
+                    </h5>
+                    
+                    <div class="office-hours-item">
+                        <span class="office-hours-day">Monday - Friday</span>
+                        <span class="office-hours-time">8:00 AM - 5:00 PM</span>
+                    </div>
+                    <div class="office-hours-item">
+                        <span class="office-hours-day">Saturday</span>
+                        <span class="office-hours-time">9:00 AM - 1:00 PM</span>
+                    </div>
+                    <div class="office-hours-item">
+                        <span class="office-hours-day">Sunday</span>
+                        <span class="office-hours-time">Closed</span>
+                    </div>
+                    <div class="office-hours-item">
+                        <span class="office-hours-day">Public Holidays</span>
+                        <span class="office-hours-time">Closed</span>
+                    </div>
+                    
+                    <div class="office-hours-note">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Emergency contacts available 24/7 for partners and members
+                    </div>
+                </div>
+                
+                <!-- Quick Response Promise -->
+                <div class="office-hours-card mt-4">
+                    <h5 class="office-hours-title">
+                        <i class="fas fa-bolt"></i>
+                        Our Response Promise
+                    </h5>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-clock text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block">24-Hour Response</strong>
+                            <small class="text-muted">We respond to all inquiries within 24 hours</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-headset text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block">Dedicated Support</strong>
+                            <small class="text-muted">Each inquiry is assigned to a specific team member</small>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 rounded-circle p-3 me-3">
+                            <i class="fas fa-check-circle text-success fa-2x"></i>
+                        </div>
+                        <div>
+                            <strong class="d-block">Follow-up Guarantee</strong>
+                            <small class="text-muted">We follow up until your issue is resolved</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Social Media -->
+                <div class="office-hours-card mt-4">
+                    <h5 class="office-hours-title">
+                        <i class="fas fa-share-alt"></i>
+                        Connect With Us
+                    </h5>
+                    
+                    <div class="social-links">
+                        <a href="https://facebook.com/kacaf" target="_blank" class="social-link">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/kacaf" target="_blank" class="social-link">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com/kacaf" target="_blank" class="social-link">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://linkedin.com/company/kacaf" target="_blank" class="social-link">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <a href="https://youtube.com/kacaf" target="_blank" class="social-link">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://wa.me/254796761841" target="_blank" class="social-link">
+                            <i class="fab fa-whatsapp"></i>
+                        </a>
+                    </div>
+                    
+                    <p class="text-muted small mt-3 mb-0">
+                        <i class="fas fa-hashtag me-2"></i>
+                        Follow us for updates, success stories, and environmental tips
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="container py-5">
+        <div class="faq-section">
+            <h3 class="text-center mb-4" style="font-size: 2rem; font-weight: 800; color: var(--dark-green);">
+                Frequently Asked Questions
+            </h3>
+            <p class="text-center text-muted mb-5">
+                Find quick answers to common questions about contacting and engaging with KACAF
+            </p>
+            
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="accordion" id="faqAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                                    How quickly can I expect a response?
+                                </button>
+                            </h2>
+                            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    We pride ourselves on our 24-hour response policy. All inquiries submitted through this form 
+                                    are acknowledged immediately, and a detailed response from the relevant department follows 
+                                    within 24 hours during business days. For urgent matters, we recommend calling our main line 
+                                    at <a href="tel:+254796761841" class="text-success">+254 796 761 841</a>.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                                    Can I speak directly with Davis Masibo?
+                                </button>
+                            </h2>
+                            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! Davis Masibo, our Lead Environmental Scientist, is available for technical consultations, 
+                                    research collaborations, and partnership discussions. You can reach him directly at 
+                                    <a href="tel:+254796761841" class="text-success">+254 796 761 841</a> or 
+                                    <a href="mailto:davis.masibo@kacaf.org" class="text-success">davis.masibo@kacaf.org</a>. 
+                                    For general inquiries, our team will ensure your message reaches the right person.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                                    How do I become a KACAF member?
+                                </button>
+                            </h2>
+                            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Becoming a member is easy and free! You can:
+                                    <ul class="mt-2 mb-0">
+                                        <li>Fill out the membership category in the contact form above</li>
+                                        <li>Visit our <a href="{% url 'accounts:register' %}" class="text-success">Join KACAF</a> page</li>
+                                        <li>Call our membership desk at <a href="tel:+254796761841" class="text-success">+254 796 761 841</a></li>
+                                        <li>Visit our Kapenguria office during business hours</li>
+                                    </ul>
+                                    Membership includes access to training, networking events, and our quarterly newsletter.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                                    What partnership opportunities are available?
+                                </button>
+                            </h2>
+                            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    KACAF welcomes partnerships with:
+                                    <ul class="mt-2">
+                                        <li><strong>Research institutions:</strong> Collaborate on environmental studies and innovations</li>
+                                        <li><strong>Corporations:</strong> CSR initiatives and sustainability programs</li>
+                                        <li><strong>NGOs:</strong> Joint projects and community outreach</li>
+                                        <li><strong>Government agencies:</strong> Policy development and implementation</li>
+                                        <li><strong>International organizations:</strong> Funding and technical support</li>
+                                    </ul>
+                                    Contact Davis Masibo directly for partnership discussions.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                                    How can I support KACAF financially?
+                                </button>
+                            </h2>
+                            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    You can support our work through:
+                                    <ul class="mt-2">
+                                        <li><strong>One-time donations:</strong> Via M-Pesa Paybill or bank transfer</li>
+                                        <li><strong>Monthly giving:</strong> Become a regular supporter</li>
+                                        <li><strong>Sponsor a tree:</strong> Fund tree planting initiatives</li>
+                                        <li><strong>Sponsor a farmer:</strong> Support training and resources</li>
+                                        <li><strong>Legacy giving:</strong> Include KACAF in your will</li>
+                                    </ul>
+                                    Select "Donation & Support" in the contact form for more information.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq6">
+                                    Do you offer internships or volunteer positions?
+                                </button>
+                            </h2>
+                            <div id="faq6" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                                <div class="accordion-body">
+                                    Yes! We offer:
+                                    <ul class="mt-2">
+                                        <li><strong>Internships:</strong> For university students in environmental science, community development, and related fields</li>
+                                        <li><strong>Volunteer programs:</strong> Short and long-term opportunities in tree planting, training, and community outreach</li>
+                                        <li><strong>Research attachments:</strong> For graduate students conducting field research</li>
+                                    </ul>
+                                    Please select "Volunteer Program" in the contact form and include your CV and area of interest.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <p class="text-muted">
+                            Still have questions? <a href="#contactForm" class="text-success fw-bold">Send us a message</a> 
+                            or call <a href="tel:+254796761841" class="text-success fw-bold">+254 796 761 841</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Emergency Contact Banner -->
+    <section class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="emergency-banner text-center">
+                    <h5 class="fw-bold mb-3">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                        Emergency Environmental Concerns
+                    </h5>
+                    <p class="mb-3">
+                        For urgent environmental issues, illegal logging reports, or conservation emergencies:
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="tel:+254796761841" class="btn btn-success">
+                            <i class="fas fa-phone-alt me-2"></i>+254 796 761 841
+                        </a>
+                        <a href="tel:+254700000000" class="btn btn-outline-success">
+                            <i class="fas fa-phone-alt me-2"></i>+254 700 000 000
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                        </div>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="#">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="#">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Contact Info</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254796761841" class="text-white">+254 796 761 841</a></p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
+                    <p><i class="fas fa-clock me-2"></i> Mon-Fri: 8:00 AM - 5:00 PM</p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="small">Subscribe to get updates on our programs and impact.</p>
+                    <form class="mt-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email" style="border-radius: 30px 0 0 30px;">
+                            <button class="btn btn-success" type="submit" style="border-radius: 0 30px 30px 0;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="bg-white opacity-25">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">Privacy Policy</a>
+                    <a href="#" class="text-white">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert-custom').forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+        
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('contactForm');
+            const messageField = document.getElementById('message');
+            const messageCount = document.getElementById('messageCount');
+            
+            if (form) {
+                // Real-time message character count
+                if (messageField && messageCount) {
+                    messageField.addEventListener('input', function() {
+                        const count = this.value.length;
+                        messageCount.textContent = `${count}/2000 characters`;
+                        
+                        if (count < 20) {
+                            messageCount.style.color = '#dc3545';
+                        } else if (count > 1800) {
+                            messageCount.style.color = '#ffc107';
+                        } else {
+                            messageCount.style.color = '#6c757d';
+                        }
+                    });
+                }
+                
+                // Form submission validation
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    
+                    // Validate email
+                    const email = document.getElementById('email');
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailRegex.test(email.value)) {
+                        email.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        email.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate phone if provided
+                    const phone = document.getElementById('phone');
+                    if (phone.value && !phone.value.match(/^[0-9+\-\s]+$/)) {
+                        phone.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        phone.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate name
+                    const name = document.getElementById('name');
+                    if (name.value.length < 2) {
+                        name.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        name.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate message length
+                    if (messageField.value.length < 20) {
+                        messageField.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        messageField.classList.remove('is-invalid');
+                    }
+                    
+                    // Validate privacy policy
+                    const privacy = document.getElementById('privacy_policy');
+                    if (!privacy.checked) {
+                        privacy.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        privacy.classList.remove('is-invalid');
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                        
+                        // Scroll to first error
+                        const firstError = document.querySelector('.is-invalid');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    } else {
+                        // Show loading state
+                        const submitBtn = document.getElementById('submitBtn');
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+                    }
+                });
+            }
+        });
+        
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Phone number formatting
+        const phoneInput = document.getElementById('phone');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,6})/);
+                e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+            });
+        }
+        
+        // Track form abandonment
+        let formStarted = false;
+        const formInputs = document.querySelectorAll('#contactForm input, #contactForm textarea, #contactForm select');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                if (!formStarted) {
+                    formStarted = true;
+                    console.log('User started filling contact form');
+                    // You could send analytics event here
+                }
+            });
+        });
+        
+        // Add active class to current page in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || 
+                    (currentPath.includes('contact') && href.includes('contact'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

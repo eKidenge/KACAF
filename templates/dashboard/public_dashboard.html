@@ -493,17 +493,17 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}">
                                 RESOURCES
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}">
                                 ANNOUNCEMENTS
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">
                                 ABOUT US
                             </a>
                         </li>
@@ -537,7 +537,7 @@
                             <a href="{% url 'accounts:register' %}" class="btn btn-success btn-lg">
                                 <i class="fas fa-user-plus me-2"></i> Join KACAF
                             </a>
-                            <a href="#about" class="btn btn-outline-light btn-lg">
+                            <a href="{% url 'about' %}" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-info-circle me-2"></i> Learn More
                             </a>
                             <a href="{% url 'programs:program_list' %}" class="btn btn-outline-light btn-lg">

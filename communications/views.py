@@ -527,7 +527,7 @@ def announcement_list(request):
         'audience_filter': audience,
         'search_query': search,
     }
-    return render(request, 'communications/announcement_list.html', context)
+    return render(request, 'communications/announcement/announcement_list.html', context)
 
 
 @login_required

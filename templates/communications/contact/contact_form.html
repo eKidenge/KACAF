@@ -1,0 +1,1310 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact KACAF - Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --dark-green: #0d3625;
+            --light-green: #d1e7dd;
+            --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --accent-purple: #6f42c1;
+            --accent-orange: #fd7e14;
+            --accent-red: #dc3545;
+            --accent-teal: #20c997;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        /* Bold Hover Effect */
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Active Link Style with Bold Indicator */
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 800;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Navbar Toggler - Enhanced */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Hero Section */
+        .contact-hero {
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.85)), 
+                        url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b29?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 100px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Section Styling */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            border-radius: 2px;
+        }
+
+        .section-title.text-center::after {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            margin-bottom: 3rem;
+        }
+
+        /* Contact Info Cards */
+        .contact-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+        }
+
+        .contact-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.15);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover .card-icon {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: rotateY(360deg);
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--dark-green);
+        }
+
+        .card-text {
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .card-link {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .card-link:hover {
+            color: var(--secondary-green);
+            letter-spacing: 0.5px;
+        }
+
+        /* Contact Form */
+        .contact-form-wrapper {
+            background: white;
+            border-radius: 20px;
+            padding: 3rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .form-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            color: var(--dark-green);
+        }
+
+        .form-control, .form-select {
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--gray-800);
+            margin-bottom: 0.5rem;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.3);
+        }
+
+        /* Map Container */
+        .map-container {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            border: 3px solid white;
+        }
+
+        #contactMap {
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Key Contact Person Card */
+        .contact-person-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .contact-person-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+        }
+
+        .person-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+
+        .person-name {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--dark-green);
+        }
+
+        .person-title {
+            font-size: 1.1rem;
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .person-organization {
+            font-size: 1rem;
+            color: var(--gray-600);
+            margin-bottom: 1.5rem;
+            font-style: italic;
+        }
+
+        .person-contact {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 0.5rem 0;
+            color: var(--gray-800);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .person-contact:hover {
+            color: var(--primary-green);
+            transform: translateX(5px);
+        }
+
+        .person-contact i {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-green);
+            font-size: 1.3rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: white;
+            color: var(--primary-green);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .cta-button:hover {
+            background: transparent;
+            color: white;
+            border-color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .footer-social a:hover {
+            background: white;
+            color: var(--primary-green);
+            transform: translateY(-3px);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .brand-text h1 {
+                font-size: 1.6rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.8rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+            
+            .hero-title {
+                font-size: 3rem;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .container-fluid {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .navbar-nav {
+                padding: 1rem 0;
+                background: rgba(10, 92, 59, 0.95);
+                border-radius: 15px;
+                margin-top: 15px;
+                backdrop-filter: blur(10px);
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 5px 15px;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+                border-radius: 10px;
+            }
+            
+            .navbar-nav .nav-link:hover {
+                transform: translateY(-2px);
+            }
+            
+            .navbar-nav .nav-link.active::before {
+                bottom: 5px;
+                width: 60px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.4rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.7rem;
+            }
+            
+            .brand-logo-container {
+                width: 55px;
+                height: 55px;
+                margin-right: 12px;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .contact-form-wrapper {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .brand-text h1 {
+                font-size: 1.2rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.65rem;
+            }
+            
+            .brand-logo-container {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .person-name {
+                font-size: 1.5rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.6rem;
+                line-height: 1.2;
+            }
+            
+            .navbar-nav .nav-link {
+                font-size: 0.9rem;
+                padding: 0.8rem 1rem;
+            }
+            
+            .brand-logo-container {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                margin-right: 10px;
+            }
+            
+            .hero-title {
+                font-size: 1.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .contact-form-wrapper {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width with Logo -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                HOME
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="contact-hero">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h1 class="hero-title" data-aos="fade-up">
+                        Get in Touch<br>with KACAF
+                    </h1>
+                    <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                        We're here to answer your questions, explore partnerships, and welcome you to our community. 
+                        Reach out today and let's grow a greener future together.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Information Cards -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                    <div class="contact-card">
+                        <div class="card-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <h3 class="card-title">Visit Us</h3>
+                        <p class="card-text">
+                            KACAF Headquarters<br>
+                            West Pokot County<br>
+                            Kapenguria, Kenya<br>
+                            P.O. Box 123-30600
+                        </p>
+                        <a href="https://maps.google.com/?q=Kapenguria+Kenya" target="_blank" class="card-link">
+                            <i class="fas fa-directions me-2"></i>Get Directions
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                    <div class="contact-card">
+                        <div class="card-icon">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <h3 class="card-title">Call Us</h3>
+                        <p class="card-text">
+                            <strong>Main Office:</strong><br>
+                            <a href="tel:+254796761841" class="text-decoration-none text-dark">+254 796 761 841</a><br>
+                            <strong>Emergency:</strong><br>
+                            <a href="tel:+254700000000" class="text-decoration-none text-dark">+254 700 000 000</a>
+                        </p>
+                        <a href="tel:+254796761841" class="card-link">
+                            <i class="fas fa-phone me-2"></i>Call Now
+                        </a>
+                    </div>
+                </div>
+                <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                    <div class="contact-card">
+                        <div class="card-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <h3 class="card-title">Email Us</h3>
+                        <p class="card-text">
+                            <strong>General Inquiries:</strong><br>
+                            <a href="mailto:info@kacaf.org" class="text-decoration-none text-dark">info@kacaf.org</a><br>
+                            <strong>Partnerships:</strong><br>
+                            <a href="mailto:partners@kacaf.org" class="text-decoration-none text-dark">partners@kacaf.org</a>
+                        </p>
+                        <a href="mailto:info@kacaf.org" class="card-link">
+                            <i class="fas fa-paper-plane me-2"></i>Send Email
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Contact Person - Davis Masibo -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="contact-person-card" data-aos="fade-up">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center">
+                                <!-- Professional placeholder image - replace with actual photo -->
+                                <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=687&q=80" 
+                                     alt="Davis Masibo" 
+                                     class="person-image">
+                                <div class="social-links justify-content-center">
+                                    <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank" class="social-link">
+                                        <i class="fab fa-linkedin-in"></i>
+                                    </a>
+                                    <a href="mailto:davis.masibo@kacaf.org" class="social-link">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    <a href="tel:+254796761841" class="social-link">
+                                        <i class="fas fa-phone-alt"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h2 class="person-name">Davis Masibo</h2>
+                                <div class="person-title">Environmental Scientist</div>
+                                <div class="person-organization">MSc. Environmental Science, Egerton University</div>
+                                
+                                <div class="mt-4">
+                                    <p class="mb-3">
+                                        <i class="fas fa-quote-left text-success me-2"></i>
+                                        As our Lead Environmental Scientist, Davis brings expert knowledge in sustainable land management, 
+                                        biodiversity conservation, and climate resilience. He is your primary contact for all technical 
+                                        inquiries and partnership opportunities.
+                                    </p>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-sm-6">
+                                            <a href="tel:+254796761841" class="person-contact">
+                                                <i class="fas fa-phone-alt"></i>
+                                                <span>+254 796 761 841</span>
+                                            </a>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <a href="mailto:davis.masibo@kacaf.org" class="person-contact">
+                                                <i class="fas fa-envelope"></i>
+                                                <span>davis.masibo@kacaf.org</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank" class="btn btn-outline-success">
+                                            <i class="fab fa-linkedin-in me-2"></i>Connect on LinkedIn
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form & Map -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                    <div class="contact-form-wrapper">
+                        <h3 class="form-title">Send Us a Message</h3>
+                        <form method="post" action="{% url 'communications:contact_submit' %}">
+                            {% csrf_token %}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Your Name *</label>
+                                    <input type="text" class="form-control" name="name" required placeholder="John Doe">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Your Email *</label>
+                                    <input type="email" class="form-control" name="email" required placeholder="john@example.com">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" name="phone" placeholder="+254 XXX XXX XXX">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Subject *</label>
+                                    <select class="form-select" name="subject" required>
+                                        <option value="">Select a subject</option>
+                                        <option value="membership">Membership Inquiry</option>
+                                        <option value="partnership">Partnership Opportunity</option>
+                                        <option value="program">Program Information</option>
+                                        <option value="donation">Donation Support</option>
+                                        <option value="volunteer">Volunteer with Us</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">Your Message *</label>
+                                    <textarea class="form-control" name="message" rows="5" required placeholder="How can we help you?"></textarea>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="privacyPolicy" required>
+                                        <label class="form-check-label small" for="privacyPolicy">
+                                            I agree to the <a href="#" class="text-success">Privacy Policy</a> and consent to KACAF processing my data.
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="submit-btn">
+                                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-6" data-aos="fade-left">
+                    <div class="map-container">
+                        <div id="contactMap"></div>
+                    </div>
+                    
+                    <!-- Office Hours Card -->
+                    <div class="contact-card mt-4">
+                        <div class="row align-items-center">
+                            <div class="col-auto">
+                                <div class="card-icon" style="width: 60px; height: 60px; font-size: 1.5rem; margin: 0;">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <h5 class="mb-2">Office Hours</h5>
+                                <div class="d-flex justify-content-between">
+                                    <span>Monday - Friday:</span>
+                                    <span class="fw-bold">8:00 AM - 5:00 PM</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Saturday:</span>
+                                    <span class="fw-bold">9:00 AM - 1:00 PM</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Sunday:</span>
+                                    <span class="fw-bold">Closed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-5 bg-light">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="section-title text-center" data-aos="fade-up">Frequently Asked Questions</h2>
+                <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+                    Quick answers to common inquiries
+                </p>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="200">
+                    <div class="contact-card">
+                        <h5 class="fw-bold mb-3">How can I become a member?</h5>
+                        <p class="text-muted">You can join KACAF by filling out our membership application form online or visiting our office in Kapenguria. Membership is open to all individuals and organizations committed to environmental conservation.</p>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="300">
+                    <div class="contact-card">
+                        <h5 class="fw-bold mb-3">Do you accept volunteers?</h5>
+                        <p class="text-muted">Yes! We welcome volunteers who are passionate about agroforestry and climate action. Please contact Davis Masibo directly for current volunteer opportunities.</p>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="400">
+                    <div class="contact-card">
+                        <h5 class="fw-bold mb-3">How can I support your work?</h5>
+                        <p class="text-muted">You can support KACAF through donations, sponsoring tree planting events, or partnering with us on specific projects. Every contribution helps us grow our impact.</p>
+                    </div>
+                </div>
+                <div class="col-md-6" data-aos="fade-up" data-aos-delay="500">
+                    <div class="contact-card">
+                        <h5 class="fw-bold mb-3">Do you offer training programs?</h5>
+                        <p class="text-muted">Yes, we regularly conduct training on sustainable agriculture, tree nursery management, and climate-smart practices. Check our Events page for upcoming workshops.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container text-center">
+            <h2 class="cta-title" data-aos="fade-up">Ready to Make a Difference?</h2>
+            <p class="lead mb-4" data-aos="fade-up" data-aos-delay="100">
+                Join us in building a greener, more sustainable future for Kenya.
+            </p>
+            <div class="d-flex justify-content-center gap-3 flex-wrap" data-aos="fade-up" data-aos-delay="200">
+                <a href="{% url 'accounts:register' %}" class="cta-button">
+                    <i class="fas fa-user-plus me-2"></i> Join KACAF
+                </a>
+                <a href="tel:+254796761841" class="cta-button" style="background: transparent; color: white; border-color: white;">
+                    <i class="fas fa-phone-alt me-2"></i> Call Us Now
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                        </div>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.linkedin.com/in/davis-masibo/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="#">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="#">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254796761841" class="text-white">+254 796 761 841</a></p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
+                    <p><i class="fas fa-clock me-2"></i> Mon-Fri: 8:00 AM - 5:00 PM</p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="small">Subscribe to get updates on our programs and impact.</p>
+                    <form class="mt-3">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email" style="border-radius: 30px 0 0 30px;">
+                            <button class="btn btn-success" type="submit" style="border-radius: 0 30px 30px 0;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <hr class="bg-white opacity-25">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">Privacy Policy</a>
+                    <a href="#" class="text-white">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Leaflet Maps -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
+        // Initialize Map
+        let contactMap;
+        document.addEventListener('DOMContentLoaded', function() {
+            contactMap = L.map('contactMap').setView([1.9167, 35.1667], 9); // West Pokot coordinates
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(contactMap);
+            
+            // Add marker for KACAF headquarters
+            L.marker([1.9167, 35.1667])
+                .addTo(contactMap)
+                .bindPopup(`
+                    <strong>KACAF Headquarters</strong><br>
+                    West Pokot County, Kenya<br>
+                    <a href="tel:+254796761841" class="text-success">+254 796 761 841</a>
+                `)
+                .openPopup();
+        });
+
+        // Form submission enhancement
+        document.querySelector('form[action*="contact_submit"]')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Show success message (replace with actual form submission)
+            alert('Thank you for your message! We will respond within 24 hours.');
+            this.reset();
+        });
+
+        // Newsletter form enhancement
+        document.querySelector('.footer form')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input[type="email"]').value;
+            if (email && email.includes('@')) {
+                alert('Thank you for subscribing to our newsletter!');
+                this.reset();
+            } else {
+                alert('Please enter a valid email address');
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add active class to current page in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || 
+                    (currentPath.includes('contact') && href.includes('contact'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+
+        // Animate contact cards on hover
+        const cards = document.querySelectorAll('.contact-card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

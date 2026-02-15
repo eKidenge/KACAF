@@ -89,6 +89,10 @@ urlpatterns = [
     path("api/communications/", include("communications.urls")),
     path("about/", TemplateView.as_view(template_name="base/about.html"), name="about"),
 
+    # Add this with the other app URLs
+    path("resources/", include(("resources.urls", "resources"), namespace="resources")),
+    path("api/resources/", include(("resources.urls", "resources_api"), namespace="resources_api")),
+
 
     # API Docs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),

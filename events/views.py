@@ -380,3 +380,30 @@ def public_event_detail(request, event_id):
     }
 
     return render(request, 'dashboard/public_event_detail.html', context)
+
+# ADDED TO SERVE CREEATE EVENT PAGE
+from django.contrib.auth.decorators import login_required, permission_required
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .forms import EventForm
+
+@login_required
+@permission_required('events.add_event', raise_exception=True)
+def event_create(request):
+    """Create a new event"""
+    if request.method == 'POST':
+        form = EventForm(request.POST, request.FILES)
+        if form.is_valid():
+            event = form.save(commit=False)
+            event.organizer = request.user
+            event.coordinator = request.user
+            event.save()
+            messages.success(request, 'Event created successfully!')
+            return redirect('events:event_list')
+    else:
+        form = EventForm()
+    
+    return render(request, 'events/event/event_form.html', {
+        'form': form,
+        'title': 'Create New Event'
+    })
