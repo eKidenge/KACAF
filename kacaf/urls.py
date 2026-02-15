@@ -94,7 +94,7 @@ urlpatterns = [
     path("api/resources/", include(("resources.urls", "resources_api"), namespace="resources_api")),
     path('terms/', TemplateView.as_view(template_name='terms_of_service.html'), name='terms'),
     path('privacy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
-
+    path('privacy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy-policy'),
 
     # API Docs
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
