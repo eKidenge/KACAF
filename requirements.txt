@@ -69,3 +69,4 @@ tzdata==2024.1
 
 # For pkg_resources warning
 setuptools==68.2.2  # Downgrade to avoid deprecation warning
+Pillow==10.4.0

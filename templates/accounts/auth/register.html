@@ -1,982 +1,1502 @@
-{% extends 'base/base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Join KACAF - Register{% endblock %}
-
-{% block extra_css %}
-<style>
-    .register-container {
-        background: linear-gradient(135deg, #198754 0%, #20c997 100%);
-        min-height: 100vh;
-        padding: 2rem 0;
-    }
-    .register-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-    }
-    .step-indicator {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 2rem;
-        position: relative;
-    }
-    .step-indicator::before {
-        content: '';
-        position: absolute;
-        top: 20px;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #dee2e6;
-        z-index: 1;
-    }
-    .step {
-        position: relative;
-        z-index: 2;
-        text-align: center;
-        width: 100px;
-    }
-    .step-circle {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: #dee2e6;
-        color: #6c757d;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 0 auto 10px;
-        font-weight: bold;
-        transition: all 0.3s ease;
-    }
-    .step.active .step-circle {
-        background: #198754;
-        color: white;
-        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
-    }
-    .step.completed .step-circle {
-        background: #198754;
-        color: white;
-    }
-    .password-strength-meter {
-        height: 5px;
-        background: #e9ecef;
-        border-radius: 10px;
-        margin-top: 8px;
-        overflow: hidden;
-    }
-    .password-strength-bar {
-        height: 100%;
-        width: 0;
-        transition: width 0.3s ease, background-color 0.3s ease;
-    }
-    .strength-weak { background-color: #dc3545; width: 25%; }
-    .strength-fair { background-color: #ffc107; width: 50%; }
-    .strength-good { background-color: #17a2b8; width: 75%; }
-    .strength-strong { background-color: #198754; width: 100%; }
-    .field-icon {
-        float: right;
-        margin-right: 10px;
-        margin-top: -30px;
-        position: relative;
-        z-index: 2;
-        cursor: pointer;
-        color: #6c757d;
-    }
-    .field-icon:hover {
-        color: #198754;
-    }
-    .is-invalid {
-        border-color: #dc3545 !important;
-    }
-    .is-valid {
-        border-color: #198754 !important;
-    }
-    .membership-card {
-        cursor: pointer;
-        transition: all 0.2s ease;
-        border: 2px solid transparent;
-    }
-    .membership-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-    }
-    .membership-card.selected {
-        border-color: #198754;
-        background-color: rgba(25, 135, 84, 0.05);
-    }
-    .membership-card input[type="radio"] {
-        display: none;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="register-container">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="register-card p-4 p-md-5">
-                    <!-- Header -->
-                    <div class="text-center mb-5">
-                        <h1 class="fw-bold text-success mb-2">
-                            <i class="fas fa-tree me-2"></i>Join KACAF
-                        </h1>
-                        <p class="text-muted">Become a member of Kenya Agroforestry and Climate Action Foundation</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join KACAF - Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --light-green: #d1e7dd;
+            --dark-green: #0d3625;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width */
+        .custom-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+        
+        .navbar {
+            padding: 15px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .brand-logo {
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 5px;
+        }
+        
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .brand-text {
+            color: white;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        
+        .brand-text p {
+            font-size: 0.8rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Navigation Links - Bold & Professional */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 800;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Registration Page Specific Styles */
+        .register-container {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: calc(100vh - 85px);
+            padding: 3rem 0;
+        }
+        .register-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: none;
+            overflow: hidden;
+        }
+        .register-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            padding: 2rem;
+            color: white;
+            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0 3rem;
+            position: relative;
+            padding: 0 1rem;
+        }
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 60px;
+            right: 60px;
+            height: 3px;
+            background: #dee2e6;
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            width: 120px;
+            background: white;
+        }
+        .step-circle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            border: 3px solid #dee2e6;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .step.active .step-circle {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+            box-shadow: 0 5px 15px rgba(25, 135, 84, 0.3);
+            transform: scale(1.1);
+        }
+        .step.completed .step-circle {
+            background: var(--primary-green);
+            border-color: var(--primary-green);
+            color: white;
+        }
+        .step.completed .step-circle i {
+            font-size: 1.2rem;
+        }
+        .step-label {
+            font-weight: 700;
+            color: #495057;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .step.active .step-label {
+            color: var(--primary-green);
+        }
+        .password-strength-meter {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+            border-radius: 10px;
+        }
+        .strength-weak { background-color: #dc3545; width: 25%; }
+        .strength-fair { background-color: #ffc107; width: 50%; }
+        .strength-good { background-color: #17a2b8; width: 75%; }
+        .strength-strong { background-color: #198754; width: 100%; }
+        .field-icon {
+            float: right;
+            margin-right: 15px;
+            margin-top: -35px;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            color: #6c757d;
+            background: white;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        .field-icon:hover {
+            color: var(--primary-green);
+            background: #f8f9fa;
+        }
+        .form-control, .form-select {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: 'Open Sans', sans-serif;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15);
+        }
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .is-valid {
+            border-color: var(--primary-green) !important;
+        }
+        .membership-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            overflow: hidden;
+            height: 100%;
+        }
+        .membership-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-color: var(--primary-green);
+        }
+        .membership-card.selected {
+            border-color: var(--primary-green);
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.05), rgba(32, 201, 151, 0.05));
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+        }
+        .membership-card input[type="radio"] {
+            display: none;
+        }
+        .membership-card .card-body {
+            padding: 1.5rem 1rem;
+        }
+        .membership-card.selected .card-footer {
+            background: var(--primary-green);
+            color: white;
+        }
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+        }
+        .btn-outline-secondary {
+            border: 2px solid #dee2e6;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 12px;
+            color: #6c757d;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.95rem;
+        }
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+        .benefit-item {
+            text-align: center;
+            padding: 1rem;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .benefit-item:hover {
+            background: var(--light-green);
+            transform: translateY(-3px);
+        }
+        .benefit-item i {
+            color: var(--primary-green);
+        }
+        .form-check-input:checked {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+        .form-check-label a {
+            color: var(--primary-green);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .form-check-label a:hover {
+            text-decoration: underline;
+        }
+        fieldset {
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 15px;
+            margin-bottom: 1.5rem;
+        }
+        legend {
+            width: auto;
+            padding: 0 1rem;
+            margin-left: -0.5rem;
+            font-weight: 700;
+            color: var(--primary-green);
+            font-size: 1.1rem;
+            background: white;
+            border-radius: 20px;
+            padding: 0.5rem 1.5rem;
+            border: 2px solid var(--primary-green);
+            font-family: 'Montserrat', sans-serif;
+        }
+        .password-match-indicator {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            font-weight: 500;
+        }
+        .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+        .badge-success-subtle {
+            background: rgba(25, 135, 84, 0.1);
+            color: var(--primary-green);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        hr {
+            opacity: 0.1;
+            margin: 2rem 0;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 991px) {
+            .container-fluid {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 8px 0;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.3rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.7rem;
+            }
+            
+            .brand-logo {
+                width: 45px;
+                height: 45px;
+                margin-right: 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .step-indicator::before {
+                left: 30px;
+                right: 30px;
+            }
+            
+            .step {
+                width: 80px;
+            }
+            
+            .step-circle {
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+            
+            .step-label {
+                font-size: 0.8rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.1rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo">
+                        <img src="{% static 'images/kacaf-logo.png' %}" alt="KACAF Logo">
                     </div>
-                    
-                    <!-- Registration Steps -->
-                    <div class="step-indicator">
-                        <div class="step active" id="step1">
-                            <div class="step-circle">1</div>
-                            <div class="step-label small fw-bold">Account</div>
-                        </div>
-                        <div class="step" id="step2">
-                            <div class="step-circle">2</div>
-                            <div class="step-label small fw-bold">Personal Info</div>
-                        </div>
-                        <div class="step" id="step3">
-                            <div class="step-circle">3</div>
-                            <div class="step-label small fw-bold">Location</div>
-                        </div>
-                        <div class="step" id="step4">
-                            <div class="step-circle">4</div>
-                            <div class="step-label small fw-bold">Membership</div>
-                        </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
                     </div>
-                    
-                    <!-- Registration Form -->
-                    <form method="post" id="registrationForm" enctype="multipart/form-data" novalidate>
-                        {% csrf_token %}
-                        
-                        <!-- Step 1: Account Information -->
-                        <div class="form-step step-1">
-                            <fieldset class="mb-4">
-                                <legend class="h5 text-success border-bottom pb-2">
-                                    <i class="fas fa-user-circle me-2"></i>Account Information
-                                </legend>
-                                
-                                <div class="row">
-                                    <!-- Email -->
-                                    <div class="col-md-12 mb-3">
-                                        <label for="{{ form.email.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-envelope me-1"></i> Email Address <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.email }}
-                                        {% if form.email.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.email.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="form-text">We'll never share your email with anyone else.</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Password -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.password1.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-lock me-1"></i> Password <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="position-relative">
-                                            {{ form.password1 }}
-                                            <span class="field-icon" onclick="togglePassword('{{ form.password1.id_for_label }}', this)">
-                                                <i class="fas fa-eye"></i>
-                                            </span>
-                                        </div>
-                                        {% if form.password1.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.password1.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% else %}
-                                        <!-- Password Strength Meter -->
-                                        <div class="password-strength-meter mt-2">
-                                            <div class="password-strength-bar" id="passwordStrengthBar"></div>
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Confirm Password -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.password2.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-lock me-1"></i> Confirm Password <span class="text-danger">*</span>
-                                        </label>
-                                        <div class="position-relative">
-                                            {{ form.password2 }}
-                                            <span class="field-icon" onclick="togglePassword('{{ form.password2.id_for_label }}', this)">
-                                                <i class="fas fa-eye"></i>
-                                            </span>
-                                        </div>
-                                        {% if form.password2.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.password2.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="password-match-indicator small mt-1" id="passwordMatchIndicator"></div>
-                                    </div>
-                                </div>
-                            </fieldset>
-                            
-                            <div class="d-flex justify-content-end">
-                                <button type="button" class="btn btn-success next-step">
-                                    Next: Personal Information <i class="fas fa-arrow-right ms-2"></i>
-                                </button>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                                HOME
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="register-container">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-11">
+                        <div class="register-card p-4 p-md-5">
+                            <!-- Header -->
+                            <div class="register-header text-center">
+                                <h1 class="display-5 fw-bold mb-2">
+                                    <i class="fas fa-tree me-3"></i>Join KACAF
+                                </h1>
+                                <p class="lead mb-0 opacity-90">Become a member of Kenya Agroforestry and Climate Action Foundation</p>
                             </div>
-                        </div>
-                        
-                        <!-- Step 2: Personal Information -->
-                        <div class="form-step step-2" style="display: none;">
-                            <fieldset class="mb-4">
-                                <legend class="h5 text-success border-bottom pb-2">
-                                    <i class="fas fa-id-card me-2"></i>Personal Information
-                                </legend>
-                                
-                                <div class="row">
-                                    <!-- First Name -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.first_name.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-signature me-1"></i> First Name <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.first_name }}
-                                        {% if form.first_name.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.first_name.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Last Name -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.last_name.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-signature me-1"></i> Last Name <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.last_name }}
-                                        {% if form.last_name.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.last_name.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Phone -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.phone.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-phone me-1"></i> Phone Number <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.phone }}
-                                        {% if form.phone.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.phone.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="form-text">Format: 07XXXXXXXX or 01XXXXXXXX</div>
-                                    </div>
-                                    
-                                    <!-- ID Number -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.id_number.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-id-badge me-1"></i> National ID/Passport <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.id_number }}
-                                        {% if form.id_number.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.id_number.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Date of Birth -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.date_of_birth.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-birthday-cake me-1"></i> Date of Birth <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.date_of_birth }}
-                                        {% if form.date_of_birth.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.date_of_birth.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="form-text">Format: YYYY-MM-DD</div>
-                                    </div>
-                                    
-                                    <!-- Gender -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.gender.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-venus-mars me-1"></i> Gender <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.gender }}
-                                        {% if form.gender.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.gender.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Occupation -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.occupation.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-briefcase me-1"></i> Occupation
-                                        </label>
-                                        {{ form.occupation }}
-                                        {% if form.occupation.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.occupation.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Education Level -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.education_level.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-graduation-cap me-1"></i> Education Level
-                                        </label>
-                                        {{ form.education_level }}
-                                        {% if form.education_level.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.education_level.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Profile Picture -->
-                                    <div class="col-md-12 mb-3">
-                                        <label for="{{ form.profile_picture.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-camera me-1"></i> Profile Picture
-                                        </label>
-                                        {{ form.profile_picture }}
-                                        {% if form.profile_picture.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.profile_picture.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                        <div class="form-text">
-                                            <small>Optional. Max 2MB. JPG, PNG allowed. Recommended size: 300x300px.</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </fieldset>
                             
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary prev-step">
-                                    <i class="fas fa-arrow-left me-2"></i> Previous
-                                </button>
-                                <button type="button" class="btn btn-success next-step">
-                                    Next: Location <i class="fas fa-arrow-right ms-2"></i>
-                                </button>
+                            <!-- Registration Steps -->
+                            <div class="step-indicator">
+                                <div class="step active" id="step1">
+                                    <div class="step-circle">1</div>
+                                    <div class="step-label">Account</div>
+                                </div>
+                                <div class="step" id="step2">
+                                    <div class="step-circle">2</div>
+                                    <div class="step-label">Personal</div>
+                                </div>
+                                <div class="step" id="step3">
+                                    <div class="step-circle">3</div>
+                                    <div class="step-label">Location</div>
+                                </div>
+                                <div class="step" id="step4">
+                                    <div class="step-circle">4</div>
+                                    <div class="step-label">Membership</div>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <!-- Step 3: Location Information -->
-                        <div class="form-step step-3" style="display: none;">
-                            <fieldset class="mb-4">
-                                <legend class="h5 text-success border-bottom pb-2">
-                                    <i class="fas fa-map-marker-alt me-2"></i>Location Information
-                                </legend>
-                                
-                                <div class="row">
-                                    <!-- County -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.county.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-globe-africa me-1"></i> County <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.county }}
-                                        {% if form.county.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.county.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Sub-County -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.sub_county.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-map me-1"></i> Sub-County <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.sub_county }}
-                                        {% if form.sub_county.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.sub_county.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Ward -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.ward.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-map-pin me-1"></i> Ward <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.ward }}
-                                        {% if form.ward.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.ward.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Village -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.village.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-home me-1"></i> Village/Estate <span class="text-danger">*</span>
-                                        </label>
-                                        {{ form.village }}
-                                        {% if form.village.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.village.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <!-- Postal Address -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.postal_address.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-envelope me-1"></i> Postal Address
-                                        </label>
-                                        {{ form.postal_address }}
-                                        {% if form.postal_address.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.postal_address.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                    
-                                    <!-- Postal Code -->
-                                    <div class="col-md-6 mb-3">
-                                        <label for="{{ form.postal_code.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-mail-bulk me-1"></i> Postal Code
-                                        </label>
-                                        {{ form.postal_code }}
-                                        {% if form.postal_code.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.postal_code.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
-                                        </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </fieldset>
                             
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary prev-step">
-                                    <i class="fas fa-arrow-left me-2"></i> Previous
-                                </button>
-                                <button type="button" class="btn btn-success next-step">
-                                    Next: Membership Type <i class="fas fa-arrow-right ms-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Step 4: Membership Type -->
-                        <div class="form-step step-4" style="display: none;">
-                            <fieldset class="mb-4">
-                                <legend class="h5 text-success border-bottom pb-2">
-                                    <i class="fas fa-users me-2"></i>Membership Type
-                                </legend>
+                            <!-- Registration Form -->
+                            <form method="post" id="registrationForm" enctype="multipart/form-data" novalidate>
+                                {% csrf_token %}
                                 
-                                <div class="mb-4">
-                                    <label class="form-label fw-bold">Select Membership Category <span class="text-danger">*</span></label>
-                                    <div class="row g-3">
-                                        {% for value, label in form.user_type.field.choices %}
-                                        <div class="col-md-4">
-                                            <div class="membership-card card h-100 {% if value == 'member' %}selected{% endif %}" onclick="selectMembership(this, '{{ value }}')">
-                                                <input type="radio" name="{{ form.user_type.name }}" 
-                                                       id="id_user_type_{{ forloop.counter0 }}" 
-                                                       value="{{ value }}"
-                                                       {% if value == 'member' %}checked{% endif %}>
-                                                <div class="card-body text-center p-3">
-                                                    {% if value == 'member' %}
-                                                    <i class="fas fa-user-circle fa-3x text-success mb-3"></i>
-                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
-                                                    <p class="small text-muted mb-0">
-                                                        General community member
-                                                    </p>
-                                                    {% elif value == 'farmer' %}
-                                                    <i class="fas fa-tractor fa-3x text-success mb-3"></i>
-                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
-                                                    <p class="small text-muted mb-0">
-                                                        Active farmer or agripreneur
-                                                    </p>
-                                                    {% elif value == 'youth' %}
-                                                    <i class="fas fa-user-graduate fa-3x text-success mb-3"></i>
-                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
-                                                    <p class="small text-muted mb-0">
-                                                        Youth (18-35 years)
-                                                    </p>
-                                                    {% elif value == 'organization' %}
-                                                    <i class="fas fa-building fa-3x text-success mb-3"></i>
-                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
-                                                    <p class="small text-muted mb-0">
-                                                        NGO, CBO, or Company
-                                                    </p>
-                                                    {% elif value == 'student' %}
-                                                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
-                                                    <h6 class="fw-bold mb-2">{{ label }}</h6>
-                                                    <p class="small text-muted mb-0">
-                                                        Full-time student
-                                                    </p>
-                                                    {% endif %}
+                                <!-- Step 1: Account Information -->
+                                <div class="form-step step-1">
+                                    <fieldset>
+                                        <legend><i class="fas fa-user-circle me-2"></i>Account Information</legend>
+                                        
+                                        <div class="row">
+                                            <!-- Email -->
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.email.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-envelope me-1"></i> Email Address <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.email }}
+                                                {% if form.email.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.email.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
                                                 </div>
-                                                <div class="card-footer bg-transparent border-0 text-center">
-                                                    <span class="badge bg-success-subtle text-success">Select</span>
+                                                {% endif %}
+                                                <div class="form-text"><i class="fas fa-info-circle me-1"></i>We'll never share your email with anyone else.</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Password -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.password1.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-lock me-1"></i> Password <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="position-relative">
+                                                    {{ form.password1 }}
+                                                    <span class="field-icon" onclick="togglePassword('{{ form.password1.id_for_label }}', this)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </span>
+                                                </div>
+                                                {% if form.password1.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.password1.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% else %}
+                                                <!-- Password Strength Meter -->
+                                                <div class="password-strength-meter mt-2">
+                                                    <div class="password-strength-bar" id="passwordStrengthBar"></div>
+                                                </div>
+                                                <div class="form-text">
+                                                    <small>Min 8 chars with uppercase, lowercase, number & special char</small>
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Confirm Password -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.password2.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-lock me-1"></i> Confirm Password <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="position-relative">
+                                                    {{ form.password2 }}
+                                                    <span class="field-icon" onclick="togglePassword('{{ form.password2.id_for_label }}', this)">
+                                                        <i class="fas fa-eye"></i>
+                                                    </span>
+                                                </div>
+                                                {% if form.password2.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.password2.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="password-match-indicator" id="passwordMatchIndicator"></div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <div class="d-flex justify-content-end">
+                                        <button type="button" class="btn btn-success next-step px-5">
+                                            Next Step <i class="fas fa-arrow-right ms-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <!-- Step 2: Personal Information -->
+                                <div class="form-step step-2" style="display: none;">
+                                    <fieldset>
+                                        <legend><i class="fas fa-id-card me-2"></i>Personal Information</legend>
+                                        
+                                        <div class="row">
+                                            <!-- First Name -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.first_name.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-signature me-1"></i> First Name <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.first_name }}
+                                                {% if form.first_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.first_name.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Last Name -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.last_name.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-signature me-1"></i> Last Name <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.last_name }}
+                                                {% if form.last_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.last_name.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Phone -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.phone.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-phone me-1"></i> Phone Number <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.phone }}
+                                                {% if form.phone.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.phone.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="form-text">Format: 07XXXXXXXX or 01XXXXXXXX</div>
+                                            </div>
+                                            
+                                            <!-- ID Number -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.id_number.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-id-badge me-1"></i> National ID/Passport <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.id_number }}
+                                                {% if form.id_number.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.id_number.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Date of Birth -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.date_of_birth.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-birthday-cake me-1"></i> Date of Birth <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.date_of_birth }}
+                                                {% if form.date_of_birth.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.date_of_birth.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="form-text">Format: YYYY-MM-DD</div>
+                                            </div>
+                                            
+                                            <!-- Gender -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.gender.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-venus-mars me-1"></i> Gender <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.gender }}
+                                                {% if form.gender.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.gender.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Occupation -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.occupation.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-briefcase me-1"></i> Occupation
+                                                </label>
+                                                {{ form.occupation }}
+                                                {% if form.occupation.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.occupation.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Education Level -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.education_level.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-graduation-cap me-1"></i> Education Level
+                                                </label>
+                                                {{ form.education_level }}
+                                                {% if form.education_level.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.education_level.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Profile Picture -->
+                                            <div class="col-md-12 mb-3">
+                                                <label for="{{ form.profile_picture.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-camera me-1"></i> Profile Picture
+                                                </label>
+                                                {{ form.profile_picture }}
+                                                {% if form.profile_picture.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.profile_picture.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="form-text">
+                                                    <small><i class="fas fa-info-circle me-1"></i>Optional. Max 2MB. JPG, PNG allowed. Recommended size: 300x300px.</small>
                                                 </div>
                                             </div>
                                         </div>
-                                        {% endfor %}
+                                    </fieldset>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary prev-step px-4">
+                                            <i class="fas fa-arrow-left me-2"></i> Previous
+                                        </button>
+                                        <button type="button" class="btn btn-success next-step px-5">
+                                            Next Step <i class="fas fa-arrow-right ms-2"></i>
+                                        </button>
                                     </div>
-                                    {% if form.user_type.errors %}
-                                    <div class="text-danger small mt-2">
-                                        {% for error in form.user_type.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
                                 </div>
                                 
-                                <!-- Organization Name (conditional) -->
-                                <div id="organizationField" style="display: none;">
-                                    <div class="mb-3">
-                                        <label for="{{ form.organization_name.id_for_label }}" class="form-label fw-bold">
-                                            <i class="fas fa-building me-1"></i> Organization Name
-                                        </label>
-                                        {{ form.organization_name }}
-                                        {% if form.organization_name.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.organization_name.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
+                                <!-- Step 3: Location Information -->
+                                <div class="form-step step-3" style="display: none;">
+                                    <fieldset>
+                                        <legend><i class="fas fa-map-marker-alt me-2"></i>Location Information</legend>
+                                        
+                                        <div class="row">
+                                            <!-- County -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.county.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-globe-africa me-1"></i> County <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.county }}
+                                                {% if form.county.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.county.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Sub-County -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.sub_county.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-map me-1"></i> Sub-County <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.sub_county }}
+                                                {% if form.sub_county.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.sub_county.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                        {% endif %}
-                                    </div>
-                                </div>
-                                
-                                <!-- Referral Source -->
-                                <div class="mb-3">
-                                    <label for="{{ form.referral_source.id_for_label }}" class="form-label fw-bold">
-                                        <i class="fas fa-info-circle me-1"></i> How did you hear about us?
-                                    </label>
-                                    {{ form.referral_source }}
-                                    {% if form.referral_source.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.referral_source.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Interests -->
-                                <div class="mb-3">
-                                    <label for="{{ form.interests.id_for_label }}" class="form-label fw-bold">
-                                        <i class="fas fa-heart me-1"></i> Areas of Interest
-                                    </label>
-                                    {{ form.interests }}
-                                    {% if form.interests.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.interests.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                    <div class="form-text">Select all that apply</div>
-                                </div>
-                                
-                                <!-- Skills -->
-                                <div class="mb-3">
-                                    <label for="{{ form.skills.id_for_label }}" class="form-label fw-bold">
-                                        <i class="fas fa-tools me-1"></i> Skills
-                                    </label>
-                                    {{ form.skills }}
-                                    {% if form.skills.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.skills.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                                
-                                <!-- Newsletter Subscription -->
-                                <div class="mb-4">
-                                    <div class="form-check">
-                                        {{ form.newsletter_subscription }}
-                                        <label class="form-check-label" for="{{ form.newsletter_subscription.id_for_label }}">
-                                            <i class="fas fa-newspaper me-1"></i> Subscribe to our newsletter
-                                        </label>
-                                        {% if form.newsletter_subscription.errors %}
-                                        <div class="text-danger small mt-1">
-                                            {% for error in form.newsletter_subscription.errors %}
-                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                            {% endfor %}
+                                        
+                                        <div class="row">
+                                            <!-- Ward -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.ward.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-map-pin me-1"></i> Ward <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.ward }}
+                                                {% if form.ward.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.ward.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Village -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.village.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-home me-1"></i> Village/Estate <span class="text-danger">*</span>
+                                                </label>
+                                                {{ form.village }}
+                                                {% if form.village.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.village.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                        {% endif %}
-                                        <div class="form-text">Receive updates on tree planting events, training opportunities, and climate action news.</div>
+                                        
+                                        <div class="row">
+                                            <!-- Postal Address -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.postal_address.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-envelope me-1"></i> Postal Address
+                                                </label>
+                                                {{ form.postal_address }}
+                                                {% if form.postal_address.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.postal_address.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Postal Code -->
+                                            <div class="col-md-6 mb-3">
+                                                <label for="{{ form.postal_code.id_for_label }}" class="form-label">
+                                                    <i class="fas fa-mail-bulk me-1"></i> Postal Code
+                                                </label>
+                                                {{ form.postal_code }}
+                                                {% if form.postal_code.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.postal_code.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary prev-step px-4">
+                                            <i class="fas fa-arrow-left me-2"></i> Previous
+                                        </button>
+                                        <button type="button" class="btn btn-success next-step px-5">
+                                            Next Step <i class="fas fa-arrow-right ms-2"></i>
+                                        </button>
                                     </div>
                                 </div>
-                            </fieldset>
+                                
+                                <!-- Step 4: Membership Type -->
+                                <div class="form-step step-4" style="display: none;">
+                                    <fieldset>
+                                        <legend><i class="fas fa-users me-2"></i>Membership Type</legend>
+                                        
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Select Membership Category <span class="text-danger">*</span></label>
+                                            <div class="row g-4">
+                                                {% for value, label in form.user_type.field.choices %}
+                                                <div class="col-md-4">
+                                                    <div class="membership-card card" onclick="selectMembership(this, '{{ value }}')">
+                                                        <input type="radio" name="{{ form.user_type.name }}" 
+                                                               id="id_user_type_{{ forloop.counter0 }}" 
+                                                               value="{{ value }}"
+                                                               {% if value == 'member' %}checked{% endif %}>
+                                                        <div class="card-body text-center">
+                                                            {% if value == 'member' %}
+                                                            <i class="fas fa-user-circle fa-4x text-success mb-3"></i>
+                                                            <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                            <p class="small text-muted mb-0">General community member</p>
+                                                            {% elif value == 'farmer' %}
+                                                            <i class="fas fa-tractor fa-4x text-success mb-3"></i>
+                                                            <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                            <p class="small text-muted mb-0">Active farmer or agripreneur</p>
+                                                            {% elif value == 'youth' %}
+                                                            <i class="fas fa-user-graduate fa-4x text-success mb-3"></i>
+                                                            <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                            <p class="small text-muted mb-0">Youth (18-35 years)</p>
+                                                            {% elif value == 'organization' %}
+                                                            <i class="fas fa-building fa-4x text-success mb-3"></i>
+                                                            <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                            <p class="small text-muted mb-0">NGO, CBO, or Company</p>
+                                                            {% elif value == 'student' %}
+                                                            <i class="fas fa-graduation-cap fa-4x text-success mb-3"></i>
+                                                            <h6 class="fw-bold mb-2">{{ label }}</h6>
+                                                            <p class="small text-muted mb-0">Full-time student</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="card-footer bg-transparent border-0 text-center pb-3">
+                                                            <span class="badge bg-success-subtle text-success px-3 py-2">Select</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% if form.user_type.errors %}
+                                            <div class="text-danger small mt-2">
+                                                {% for error in form.user_type.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- Organization Name (conditional) -->
+                                        <div id="organizationField" style="display: none;">
+                                            <div class="mb-4">
+                                                <label for="{{ form.organization_name.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-building me-1"></i> Organization Name
+                                                </label>
+                                                {{ form.organization_name }}
+                                                {% if form.organization_name.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.organization_name.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Referral Source -->
+                                            <div class="col-md-6 mb-4">
+                                                <label for="{{ form.referral_source.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-info-circle me-1"></i> How did you hear about us?
+                                                </label>
+                                                {{ form.referral_source }}
+                                                {% if form.referral_source.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.referral_source.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <!-- Interests -->
+                                            <div class="col-md-6 mb-4">
+                                                <label for="{{ form.interests.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-heart me-1"></i> Areas of Interest
+                                                </label>
+                                                {{ form.interests }}
+                                                {% if form.interests.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.interests.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="form-text">Select all that apply</div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <!-- Skills -->
+                                            <div class="col-md-12 mb-4">
+                                                <label for="{{ form.skills.id_for_label }}" class="form-label fw-bold">
+                                                    <i class="fas fa-tools me-1"></i> Skills
+                                                </label>
+                                                {{ form.skills }}
+                                                {% if form.skills.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.skills.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Newsletter Subscription -->
+                                        <div class="mb-4 p-3 bg-light rounded-3">
+                                            <div class="form-check">
+                                                {{ form.newsletter_subscription }}
+                                                <label class="form-check-label fw-bold" for="{{ form.newsletter_subscription.id_for_label }}">
+                                                    <i class="fas fa-newspaper me-1 text-success"></i> Subscribe to our monthly newsletter
+                                                </label>
+                                                {% if form.newsletter_subscription.errors %}
+                                                <div class="text-danger small mt-1">
+                                                    {% for error in form.newsletter_subscription.errors %}
+                                                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                    {% endfor %}
+                                                </div>
+                                                {% endif %}
+                                                <div class="form-text mt-2">
+                                                    <i class="fas fa-info-circle me-1"></i>Receive updates on tree planting events, training opportunities, and climate action news.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </fieldset>
+                                    
+                                    <!-- Terms and Conditions -->
+                                    <div class="mb-4 p-3 border rounded-3">
+                                        <div class="form-check mb-3">
+                                            {{ form.terms_accepted }}
+                                            <label class="form-check-label fw-bold" for="{{ form.terms_accepted.id_for_label }}">
+                                                <i class="fas fa-file-contract me-1 text-success"></i> I agree to the 
+                                                <a href="{% url 'accounts:terms' %}" target="_blank" class="text-success">Terms and Conditions</a> 
+                                                and <a href="{% url 'accounts:privacy' %}" target="_blank" class="text-success">Privacy Policy</a> 
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            {% if form.terms_accepted.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.terms_accepted.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        
+                                        <!-- GDPR Consent -->
+                                        <div class="form-check">
+                                            {{ form.data_consent }}
+                                            <label class="form-check-label" for="{{ form.data_consent.id_for_label }}">
+                                                <i class="fas fa-shield-alt me-1 text-success"></i> I consent to KACAF storing and processing my personal data
+                                            </label>
+                                            {% if form.data_consent.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.data_consent.errors %}
+                                                <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Submit Button -->
+                                    <div class="d-flex justify-content-between">
+                                        <button type="button" class="btn btn-outline-secondary prev-step px-4">
+                                            <i class="fas fa-arrow-left me-2"></i> Previous
+                                        </button>
+                                        <button type="submit" class="btn btn-success btn-lg px-5">
+                                            <i class="fas fa-user-plus me-2"></i> Complete Registration
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
                             
-                            <!-- Terms and Conditions -->
-                            <div class="mb-4">
-                                <div class="form-check">
-                                    {{ form.terms_accepted }}
-                                    <label class="form-check-label fw-bold" for="{{ form.terms_accepted.id_for_label }}">
-                                        I agree to the <a href="{% url 'accounts:terms' %}" target="_blank" class="text-success">Terms and Conditions</a> 
-                                        and <a href="{% url 'accounts:privacy' %}" target="_blank" class="text-success">Privacy Policy</a> <span class="text-danger">*</span>
-                                    </label>
-                                    {% if form.terms_accepted.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.terms_accepted.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
+                            <hr>
+                            
+                            <!-- Registration Benefits -->
+                            <div class="mt-4">
+                                <h5 class="text-success fw-bold mb-4">
+                                    <i class="fas fa-gift me-2"></i>Benefits of Joining KACAF
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-3 col-6">
+                                        <div class="benefit-item">
+                                            <i class="fas fa-tree fa-2x mb-2"></i>
+                                            <h6 class="small fw-bold mb-1">Free Seedlings</h6>
+                                            <p class="small text-muted mb-0">For agroforestry</p>
+                                        </div>
                                     </div>
-                                    {% endif %}
+                                    <div class="col-md-3 col-6">
+                                        <div class="benefit-item">
+                                            <i class="fas fa-graduation-cap fa-2x mb-2"></i>
+                                            <h6 class="small fw-bold mb-1">Free Training</h6>
+                                            <p class="small text-muted mb-0">Climate-smart agri</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="benefit-item">
+                                            <i class="fas fa-handshake fa-2x mb-2"></i>
+                                            <h6 class="small fw-bold mb-1">Networking</h6>
+                                            <p class="small text-muted mb-0">Connect & grow</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3 col-6">
+                                        <div class="benefit-item">
+                                            <i class="fas fa-seedling fa-2x mb-2"></i>
+                                            <h6 class="small fw-bold mb-1">Farm Visits</h6>
+                                            <p class="small text-muted mb-0">Expert advice</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <!-- GDPR Consent -->
-                            <div class="mb-4">
-                                <div class="form-check">
-                                    {{ form.data_consent }}
-                                    <label class="form-check-label" for="{{ form.data_consent.id_for_label }}">
-                                        <i class="fas fa-shield-alt me-1"></i> I consent to KACAF storing and processing my personal data
-                                    </label>
-                                    {% if form.data_consent.errors %}
-                                    <div class="text-danger small mt-1">
-                                        {% for error in form.data_consent.errors %}
-                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                                        {% endfor %}
-                                    </div>
-                                    {% endif %}
-                                </div>
-                            </div>
-                            
-                            <!-- Submit Button -->
-                            <div class="d-flex justify-content-between">
-                                <button type="button" class="btn btn-outline-secondary prev-step">
-                                    <i class="fas fa-arrow-left me-2"></i> Previous
-                                </button>
-                                <button type="submit" class="btn btn-success btn-lg px-5">
-                                    <i class="fas fa-user-plus me-2"></i> Complete Registration
-                                </button>
+                            <!-- Already have account -->
+                            <div class="text-center mt-4 pt-3">
+                                <p class="mb-0">Already have an account? 
+                                    <a href="{% url 'accounts:login' %}" class="text-success fw-bold text-decoration-none">
+                                        Login here <i class="fas fa-arrow-right ms-1"></i>
+                                    </a>
+                                </p>
                             </div>
                         </div>
-                    </form>
-                    
-                    <!-- Registration Benefits -->
-                    <div class="mt-5 pt-4 border-top">
-                        <h6 class="text-success mb-3">
-                            <i class="fas fa-gift me-2"></i>Benefits of Joining KACAF
-                        </h6>
-                        <div class="row g-3">
-                            <div class="col-md-3 col-6">
-                                <div class="text-center p-2">
-                                    <i class="fas fa-tree fa-2x text-success mb-2"></i>
-                                    <h6 class="small fw-bold mb-1">Free Seedlings</h6>
-                                    <p class="small text-muted mb-0">For agroforestry</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-6">
-                                <div class="text-center p-2">
-                                    <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
-                                    <h6 class="small fw-bold mb-1">Free Training</h6>
-                                    <p class="small text-muted mb-0">Climate-smart agri</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-6">
-                                <div class="text-center p-2">
-                                    <i class="fas fa-handshake fa-2x text-success mb-2"></i>
-                                    <h6 class="small fw-bold mb-1">Networking</h6>
-                                    <p class="small text-muted mb-0">Connect & grow</p>
-                                </div>
-                            </div>
-                            <div class="col-md-3 col-6">
-                                <div class="text-center p-2">
-                                    <i class="fas fa-seedling fa-2x text-success mb-2"></i>
-                                    <h6 class="small fw-bold mb-1">Farm Visits</h6>
-                                    <p class="small text-muted mb-0">Expert advice</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Already have account -->
-                    <div class="text-center mt-4">
-                        <p class="mb-0">Already have an account? 
-                            <a href="{% url 'accounts:login' %}" class="text-success fw-bold text-decoration-none">
-                                Login here <i class="fas fa-arrow-right ms-1"></i>
-                            </a>
-                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </main>
 
-{% block extra_js %}
-<script>
-    // Password visibility toggle
-    function togglePassword(inputId, element) {
-        const input = document.getElementById(inputId);
-        const icon = element.querySelector('i');
-        
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
+    <!-- Footer -->
+    <footer class="footer" style="background: var(--dark-green); color: white; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo me-3" style="width: 50px; height: 50px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" alt="KACAF Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <div>
+                            <h4 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">KACAF</h4>
+                            <p class="mb-0" style="font-size: 0.8rem; opacity: 0.9;">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p style="opacity: 0.8;">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Home</a></p>
+                        <p><a href="#about" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Events</a></p>
+                        <p><a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Contact Us</h5>
+                    <p style="opacity: 0.8;"><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p style="opacity: 0.8;"><i class="fas fa-phone me-2"></i> <a href="tel:+254700000000" style="color: white; text-decoration: none;">+254 700 000 000</a></p>
+                    <p style="opacity: 0.8;"><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" style="color: white; text-decoration: none;">info@kacaf.org</a></p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Follow Us</h5>
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="https://facebook.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="https://twitter.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="https://instagram.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="https://youtube.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-youtube fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr style="background: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0" style="opacity: 0.7;">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; margin-right: 1rem;">Privacy Policy</a>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.7); text-decoration: none;">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    // Password strength checker
-    document.addEventListener('DOMContentLoaded', function() {
-        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
-        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
-        const strengthBar = document.getElementById('passwordStrengthBar');
-        const matchIndicator = document.getElementById('passwordMatchIndicator');
-        
-        if (password1) {
-            password1.addEventListener('input', function() {
-                const strength = checkPasswordStrength(this.value);
-                updatePasswordStrength(strength);
-            });
-        }
-        
-        if (password2) {
-            password2.addEventListener('input', function() {
-                checkPasswordMatch();
-            });
-        }
-        
-        if (password1) {
-            password1.addEventListener('input', function() {
-                checkPasswordMatch();
-            });
-        }
-        
-        function checkPasswordStrength(password) {
-            let strength = 0;
+    <!-- Custom JS -->
+    <script>
+        // Password visibility toggle
+        function togglePassword(inputId, element) {
+            const input = document.getElementById(inputId);
+            const icon = element.querySelector('i');
             
-            if (password.length >= 8) strength += 25;
-            if (password.match(/[a-z]+/)) strength += 25;
-            if (password.match(/[A-Z]+/)) strength += 25;
-            if (password.match(/[0-9]+/)) strength += 25;
-            if (password.match(/[$@#&!]+/)) strength += 25;
-            
-            return Math.min(strength, 100);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
         
-        function updatePasswordStrength(strength) {
-            if (strengthBar) {
-                strengthBar.style.width = strength + '%';
-                strengthBar.className = 'password-strength-bar';
+        // Password strength checker
+        document.addEventListener('DOMContentLoaded', function() {
+            const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+            const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const matchIndicator = document.getElementById('passwordMatchIndicator');
+            
+            if (password1) {
+                password1.addEventListener('input', function() {
+                    const strength = checkPasswordStrength(this.value);
+                    updatePasswordStrength(strength);
+                    checkPasswordMatch();
+                });
+            }
+            
+            if (password2) {
+                password2.addEventListener('input', function() {
+                    checkPasswordMatch();
+                });
+            }
+            
+            function checkPasswordStrength(password) {
+                let strength = 0;
                 
-                if (strength < 25) {
-                    strengthBar.classList.add('strength-weak');
-                } else if (strength < 50) {
-                    strengthBar.classList.add('strength-fair');
-                } else if (strength < 75) {
-                    strengthBar.classList.add('strength-good');
-                } else {
-                    strengthBar.classList.add('strength-strong');
-                }
-            }
-        }
-        
-        function checkPasswordMatch() {
-            if (password1 && password2 && matchIndicator) {
-                if (password1.value && password2.value) {
-                    if (password1.value === password2.value) {
-                        matchIndicator.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Passwords match';
-                        matchIndicator.className = 'password-match-indicator small mt-1 text-success';
-                    } else {
-                        matchIndicator.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i> Passwords do not match';
-                        matchIndicator.className = 'password-match-indicator small mt-1 text-danger';
-                    }
-                } else {
-                    matchIndicator.innerHTML = '';
-                }
-            }
-        }
-    });
-    
-    // Multi-step form navigation
-    document.addEventListener('DOMContentLoaded', function() {
-        const steps = document.querySelectorAll('.form-step');
-        const stepIndicators = document.querySelectorAll('.step');
-        let currentStep = 1;
-        
-        function showStep(step) {
-            steps.forEach(s => s.style.display = 'none');
-            stepIndicators.forEach(s => s.classList.remove('active', 'completed'));
-            
-            const stepElement = document.querySelector(`.form-step.step-${step}`);
-            if (stepElement) stepElement.style.display = 'block';
-            
-            for (let i = 1; i < step; i++) {
-                const stepIndicator = document.getElementById(`step${i}`);
-                if (stepIndicator) stepIndicator.classList.add('completed');
+                if (password.length >= 8) strength += 25;
+                if (password.match(/[a-z]+/)) strength += 25;
+                if (password.match(/[A-Z]+/)) strength += 25;
+                if (password.match(/[0-9]+/)) strength += 25;
+                if (password.match(/[$@#&!]+/)) strength += 25;
+                
+                return Math.min(strength, 100);
             }
             
-            const currentStepIndicator = document.getElementById(`step${step}`);
-            if (currentStepIndicator) currentStepIndicator.classList.add('active');
-            
-            currentStep = step;
-        }
-        
-        // Next button click
-        document.querySelectorAll('.next-step').forEach(button => {
-            button.addEventListener('click', function() {
-                if (currentStep < 4) {
-                    showStep(currentStep + 1);
-                }
-            });
-        });
-        
-        // Previous button click
-        document.querySelectorAll('.prev-step').forEach(button => {
-            button.addEventListener('click', function() {
-                if (currentStep > 1) {
-                    showStep(currentStep - 1);
-                }
-            });
-        });
-    });
-    
-    // Membership card selection
-    function selectMembership(card, value) {
-        // Remove selected class from all cards
-        document.querySelectorAll('.membership-card').forEach(c => {
-            c.classList.remove('selected');
-        });
-        
-        // Add selected class to clicked card
-        card.classList.add('selected');
-        
-        // Check the radio button
-        const radio = card.querySelector('input[type="radio"]');
-        if (radio) radio.checked = true;
-        
-        // Show/hide organization field
-        const orgField = document.getElementById('organizationField');
-        if (orgField) {
-            orgField.style.display = value === 'organization' ? 'block' : 'none';
-        }
-    }
-    
-    // Form validation
-    document.getElementById('registrationForm').addEventListener('submit', function(e) {
-        const terms = document.getElementById('{{ form.terms_accepted.id_for_label }}');
-        const dataConsent = document.getElementById('{{ form.data_consent.id_for_label }}');
-        
-        if (terms && !terms.checked) {
-            e.preventDefault();
-            alert('You must agree to the Terms and Conditions and Privacy Policy to register.');
-            terms.focus();
-            return false;
-        }
-        
-        if (dataConsent && !dataConsent.checked) {
-            e.preventDefault();
-            alert('You must consent to data processing to register.');
-            dataConsent.focus();
-            return false;
-        }
-        
-        // Check if passwords match
-        const password1 = document.getElementById('{{ form.password1.id_for_label }}');
-        const password2 = document.getElementById('{{ form.password2.id_for_label }}');
-        
-        if (password1 && password2 && password1.value !== password2.value) {
-            e.preventDefault();
-            alert('Passwords do not match!');
-            password2.focus();
-            return false;
-        }
-        
-        return true;
-    });
-    
-    // File input preview
-    document.addEventListener('DOMContentLoaded', function() {
-        const profilePic = document.getElementById('{{ form.profile_picture.id_for_label }}');
-        
-        if (profilePic) {
-            profilePic.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    if (file.size > 2 * 1024 * 1024) {
-                        alert('File size must be less than 2MB');
-                        this.value = '';
-                    }
+            function updatePasswordStrength(strength) {
+                if (strengthBar) {
+                    strengthBar.style.width = strength + '%';
+                    strengthBar.className = 'password-strength-bar';
                     
-                    const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-                    if (!validTypes.includes(file.type)) {
-                        alert('Please upload a valid image file (JPG, PNG)');
-                        this.value = '';
+                    if (strength < 25) {
+                        strengthBar.classList.add('strength-weak');
+                    } else if (strength < 50) {
+                        strengthBar.classList.add('strength-fair');
+                    } else if (strength < 75) {
+                        strengthBar.classList.add('strength-good');
+                    } else {
+                        strengthBar.classList.add('strength-strong');
                     }
                 }
-            });
-        }
-    });
-    
-    // Auto-hide alerts after 5 seconds
-    setTimeout(function() {
-        document.querySelectorAll('.alert').forEach(alert => {
-            alert.style.transition = 'opacity 0.5s ease';
-            alert.style.opacity = '0';
-            setTimeout(() => alert.remove(), 500);
+            }
+            
+            function checkPasswordMatch() {
+                if (password1 && password2 && matchIndicator) {
+                    if (password1.value && password2.value) {
+                        if (password1.value === password2.value) {
+                            matchIndicator.innerHTML = '<i class="fas fa-check-circle text-success me-1"></i> Passwords match ✓';
+                            matchIndicator.className = 'password-match-indicator text-success';
+                        } else {
+                            matchIndicator.innerHTML = '<i class="fas fa-times-circle text-danger me-1"></i> Passwords do not match ✗';
+                            matchIndicator.className = 'password-match-indicator text-danger';
+                        }
+                    } else {
+                        matchIndicator.innerHTML = '';
+                    }
+                }
+            }
         });
-    }, 5000);
-</script>
-{% endblock %}
+        
+        // Multi-step form navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const steps = document.querySelectorAll('.form-step');
+            const stepIndicators = document.querySelectorAll('.step');
+            let currentStep = 1;
+            
+            function showStep(step) {
+                steps.forEach(s => s.style.display = 'none');
+                stepIndicators.forEach(s => s.classList.remove('active', 'completed'));
+                
+                const stepElement = document.querySelector(`.form-step.step-${step}`);
+                if (stepElement) stepElement.style.display = 'block';
+                
+                for (let i = 1; i < step; i++) {
+                    const stepIndicator = document.getElementById(`step${i}`);
+                    if (stepIndicator) {
+                        stepIndicator.classList.add('completed');
+                        stepIndicator.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+                    }
+                }
+                
+                const currentStepIndicator = document.getElementById(`step${step}`);
+                if (currentStepIndicator) {
+                    currentStepIndicator.classList.add('active');
+                    if (currentStepIndicator.querySelector('.step-circle').innerHTML !== step.toString()) {
+                        currentStepIndicator.querySelector('.step-circle').innerHTML = step;
+                    }
+                }
+                
+                currentStep = step;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            
+            // Next button click
+            document.querySelectorAll('.next-step').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (currentStep < 4) {
+                        showStep(currentStep + 1);
+                    }
+                });
+            });
+            
+            // Previous button click
+            document.querySelectorAll('.prev-step').forEach(button => {
+                button.addEventListener('click', function() {
+                    if (currentStep > 1) {
+                        showStep(currentStep - 1);
+                    }
+                });
+            });
+        });
+        
+        // Membership card selection
+        function selectMembership(card, value) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.membership-card').forEach(c => {
+                c.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked card
+            card.classList.add('selected');
+            
+            // Check the radio button
+            const radio = card.querySelector('input[type="radio"]');
+            if (radio) radio.checked = true;
+            
+            // Show/hide organization field
+            const orgField = document.getElementById('organizationField');
+            if (orgField) {
+                orgField.style.display = value === 'organization' ? 'block' : 'none';
+            }
+        }
+        
+        // Form validation
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            const terms = document.getElementById('{{ form.terms_accepted.id_for_label }}');
+            const dataConsent = document.getElementById('{{ form.data_consent.id_for_label }}');
+            
+            if (terms && !terms.checked) {
+                e.preventDefault();
+                alert('You must agree to the Terms and Conditions and Privacy Policy to register.');
+                terms.focus();
+                return false;
+            }
+            
+            if (dataConsent && !dataConsent.checked) {
+                e.preventDefault();
+                alert('You must consent to data processing to register.');
+                dataConsent.focus();
+                return false;
+            }
+            
+            // Check if passwords match
+            const password1 = document.getElementById('{{ form.password1.id_for_label }}');
+            const password2 = document.getElementById('{{ form.password2.id_for_label }}');
+            
+            if (password1 && password2 && password1.value !== password2.value) {
+                e.preventDefault();
+                alert('Passwords do not match! Please check and try again.');
+                password2.focus();
+                return false;
+            }
+            
+            return true;
+        });
+        
+        // File input preview and validation
+        document.addEventListener('DOMContentLoaded', function() {
+            const profilePic = document.getElementById('{{ form.profile_picture.id_for_label }}');
+            
+            if (profilePic) {
+                profilePic.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                            alert('File size must be less than 2MB');
+                            this.value = '';
+                        }
+                        
+                        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('Please upload a valid image file (JPG, PNG)');
+                            this.value = '';
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Add active class to current page in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

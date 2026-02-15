@@ -1,156 +1,699 @@
-{% extends 'base/base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Login - KACAF{% endblock %}
-
-{% block extra_css %}
-<style>
-    .login-container {
-        min-height: 80vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
-                    url('{% static "images/login-bg.jpg" %}');
-        background-size: cover;
-        background-position: center;
-    }
-    .login-card {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        max-width: 400px;
-        width: 100%;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="login-container py-5">
-    <div class="login-card p-4">
-        <!-- Logo -->
-        <div class="text-center mb-4">
-            <div class="bg-success rounded-circle d-inline-flex p-3 mb-2">
-                <i class="fas fa-tree fa-3x text-white"></i>
-            </div>
-            <h3 class="fw-bold text-success">Welcome Back</h3>
-            <p class="text-muted">Login to your KACAF account</p>
-        </div>
-        
-        <!-- Login Form -->
-        <form method="post" action="{% url 'accounts:login' %}">
-            {% csrf_token %}
-            
-            {% if form.non_field_errors %}
-            <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
-                {% endfor %}
-            </div>
-            {% endif %}
-            
-            <!-- Username/Email -->
-            <div class="mb-3">
-                <label for="{{ form.username.id_for_label }}" class="form-label">
-                    <i class="fas fa-user me-1"></i> Username or Email
-                </label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-envelope"></i>
-                    </span>
-                    {{ form.username }}
-                </div>
-                {% if form.username.errors %}
-                <div class="text-danger small mt-1">
-                    {% for error in form.username.errors %}
-                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Password -->
-            <div class="mb-3">
-                <label for="{{ form.password.id_for_label }}" class="form-label">
-                    <i class="fas fa-lock me-1"></i> Password
-                </label>
-                <div class="input-group">
-                    <span class="input-group-text">
-                        <i class="fas fa-key"></i>
-                    </span>
-                    {{ form.password }}
-                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-                {% if form.password.errors %}
-                <div class="text-danger small mt-1">
-                    {% for error in form.password.errors %}
-                    <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
-                    {% endfor %}
-                </div>
-                {% endif %}
-            </div>
-            
-            <!-- Remember Me & Forgot Password -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div class="form-check">
-                    {{ form.remember_me }}
-                    <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
-                        Remember me
-                    </label>
-                </div>
-                <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none">
-                    Forgot Password?
-                </a>
-            </div>
-            
-            <!-- Submit Button -->
-            <button type="submit" class="btn btn-success btn-lg w-100 mb-3">
-                <i class="fas fa-sign-in-alt me-2"></i> Login
-            </button>
-            
-            <!-- Divider -->
-            <div class="text-center my-3 position-relative">
-                <hr>
-                <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
-                    or
-                </span>
-            </div>
-            
-            <!-- Register Link -->
-            <div class="text-center">
-                <p class="mb-0">Don't have an account?</p>
-                <a href="{% url 'accounts:register' %}" class="btn btn-outline-success btn-sm mt-2">
-                    <i class="fas fa-user-plus me-1"></i> Join KACAF
-                </a>
-            </div>
-            
-            <!-- Hidden next parameter -->
-            {% if next %}
-            <input type="hidden" name="next" value="{{ next }}">
-            {% endif %}
-        </form>
-    </div>
-</div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-    // Toggle password visibility
-    document.getElementById('togglePassword').addEventListener('click', function() {
-        const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
-        const icon = this.querySelector('i');
-        
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - KACAF | Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --light-green: #d1e7dd;
+            --dark-green: #0d3625;
         }
-    });
-</script>
-{% endblock %}
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width */
+        .custom-header {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+        }
+        
+        .navbar {
+            padding: 15px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+        }
+        
+        .brand-logo {
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            padding: 5px;
+        }
+        
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .brand-text {
+            color: white;
+        }
+        
+        .brand-text h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+        }
+        
+        .brand-text p {
+            font-size: 0.8rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        /* Navigation Links - Bold & Professional */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0.7rem 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 6px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 800;
+            position: relative;
+        }
+        
+        .navbar-nav .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+        }
+        
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 0.5rem 0.75rem;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Login Page Specific Styles */
+        .login-page {
+            min-height: calc(100vh - 85px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            padding: 3rem 1rem;
+        }
+        
+        .login-container {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('{% static "images/login-bg.jpg" %}');
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.98);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo-circle {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+            overflow: hidden;
+            padding: 15px;
+        }
+        
+        .logo-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0) invert(1); /* Makes logo white */
+        }
+        
+        .login-header h3 {
+            color: var(--primary-green);
+            font-weight: 800;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .login-header p {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .input-group {
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .input-group-text {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-right: none;
+            color: var(--primary-green);
+            font-size: 1rem;
+        }
+        
+        .form-control {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e9ecef;
+            border-left: none;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-green);
+            box-shadow: none;
+        }
+        
+        .input-group .btn-outline-secondary {
+            border: 2px solid #e9ecef;
+            border-left: none;
+            color: #6c757d;
+        }
+        
+        .input-group .btn-outline-secondary:hover {
+            background: #f8f9fa;
+            color: var(--primary-green);
+            border-color: #e9ecef;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            border: none;
+            padding: 0.875rem;
+            font-weight: 600;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 1rem;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+        }
+        
+        .btn-outline-success {
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            font-weight: 600;
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .btn-outline-success:hover {
+            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            border-color: transparent;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .form-check-input:checked {
+            background-color: var(--primary-green);
+            border-color: var(--primary-green);
+        }
+        
+        .text-success {
+            color: var(--primary-green) !important;
+        }
+        
+        .text-success:hover {
+            color: var(--secondary-green) !important;
+        }
+        
+        .alert-danger {
+            background: rgba(220, 53, 69, 0.1);
+            border: none;
+            border-left: 4px solid #dc3545;
+            color: #dc3545;
+            border-radius: 12px;
+            padding: 1rem;
+        }
+        
+        hr {
+            opacity: 0.2;
+        }
+        
+        .position-relative span {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 991px) {
+            .container-fluid {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .navbar-nav {
+                padding: 1rem 0;
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 8px 0;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.3rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.7rem;
+            }
+            
+            .brand-logo {
+                width: 45px;
+                height: 45px;
+                margin-right: 10px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .login-card {
+                margin: 1rem;
+            }
+            
+            .logo-circle {
+                width: 80px;
+                height: 80px;
+                padding: 12px;
+            }
+            
+            .login-header h3 {
+                font-size: 1.75rem;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.1rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.6rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo">
+                        <img src="{% static 'images/kacaf-logo.png' %}" alt="KACAF Logo">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
+                                HOME
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="login-page">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="login-container">
+                            <div class="login-card p-4 p-md-5">
+                                <!-- Logo -->
+                                <div class="login-header">
+                                    <div class="logo-circle">
+                                        <img src="{% static 'images/kacaf-logo.png' %}" alt="KACAF Logo">
+                                    </div>
+                                    <h3 class="fw-bold">Welcome Back</h3>
+                                    <p class="text-muted">Login to your KACAF account</p>
+                                </div>
+                                
+                                <!-- Login Form -->
+                                <form method="post" action="{% url 'accounts:login' %}">
+                                    {% csrf_token %}
+                                    
+                                    {% if form.non_field_errors %}
+                                    <div class="alert alert-danger mb-4">
+                                        {% for error in form.non_field_errors %}
+                                        <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Username/Email -->
+                                    <div class="mb-4">
+                                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                                            <i class="fas fa-user me-1"></i> Username or Email
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-envelope"></i>
+                                            </span>
+                                            {{ form.username }}
+                                        </div>
+                                        {% if form.username.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.username.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Password -->
+                                    <div class="mb-4">
+                                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                                            <i class="fas fa-lock me-1"></i> Password
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text">
+                                                <i class="fas fa-key"></i>
+                                            </span>
+                                            {{ form.password }}
+                                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        {% if form.password.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.password.errors %}
+                                            <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <!-- Remember Me & Forgot Password -->
+                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                        <div class="form-check">
+                                            {{ form.remember_me }}
+                                            <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
+                                                Remember me
+                                            </label>
+                                        </div>
+                                        <a href="{% url 'accounts:password_reset' %}" class="text-success text-decoration-none fw-bold">
+                                            Forgot Password?
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-success w-100 mb-4">
+                                        <i class="fas fa-sign-in-alt me-2"></i> Login
+                                    </button>
+                                    
+                                    <!-- Divider -->
+                                    <div class="text-center my-4 position-relative">
+                                        <hr>
+                                        <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted">
+                                            or
+                                        </span>
+                                    </div>
+                                    
+                                    <!-- Register Link -->
+                                    <div class="text-center">
+                                        <p class="mb-2">Don't have an account?</p>
+                                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-success px-4 py-2">
+                                            <i class="fas fa-user-plus me-2"></i> Join KACAF
+                                        </a>
+                                    </div>
+                                    
+                                    <!-- Hidden next parameter -->
+                                    {% if next %}
+                                    <input type="hidden" name="next" value="{{ next }}">
+                                    {% endif %}
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" style="background: var(--dark-green); color: white; padding: 60px 0 20px;">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo me-3" style="width: 50px; height: 50px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 5px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" alt="KACAF Logo" style="width: 100%; height: 100%; object-fit: contain;">
+                        </div>
+                        <div>
+                            <h4 class="mb-0" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">KACAF</h4>
+                            <p class="mb-0" style="font-size: 0.8rem; opacity: 0.9;">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p style="opacity: 0.8;">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Home</a></p>
+                        <p><a href="#about" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Events</a></p>
+                        <p><a href="#" style="color: rgba(255, 255, 255, 0.8); text-decoration: none; transition: color 0.3s; font-weight: 500;">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Contact Us</h5>
+                    <p style="opacity: 0.8;"><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p style="opacity: 0.8;"><i class="fas fa-phone me-2"></i> <a href="tel:+254700000000" style="color: white; text-decoration: none;">+254 700 000 000</a></p>
+                    <p style="opacity: 0.8;"><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" style="color: white; text-decoration: none;">info@kacaf.org</a></p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3" style="font-family: 'Montserrat', sans-serif; font-weight: 700;">Follow Us</h5>
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="https://facebook.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="https://twitter.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="https://instagram.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="https://youtube.com/kacaf" target="_blank" style="color: white; opacity: 0.8; transition: opacity 0.3s;"><i class="fab fa-youtube fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr style="background: rgba(255,255,255,0.1);">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0" style="opacity: 0.7;">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" style="color: rgba(255, 255, 255, 0.7); text-decoration: none; margin-right: 1rem;">Privacy Policy</a>
+                    <a href="#" style="color: rgba(255, 255, 255, 0.7); text-decoration: none;">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Toggle password visibility
+        document.getElementById('togglePassword')?.addEventListener('click', function() {
+            const passwordInput = document.getElementById('{{ form.password.id_for_label }}');
+            const icon = this.querySelector('i');
+            
+            if (passwordInput) {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    passwordInput.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            }
+        });
+        
+        // Add active class to current page in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
