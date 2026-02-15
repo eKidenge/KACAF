@@ -1,0 +1,1769 @@
+{% load static %}
+{% load humanize %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - KACAF</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --light-green: #d1e7dd;
+            --dark-green: #0d3625;
+            --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --accent-purple: #6f42c1;
+            --accent-orange: #fd7e14;
+            --accent-red: #dc3545;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
+            background: var(--gray-100);
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.8rem 1.3rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 900;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        .navbar-nav .nav-link.active {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15); }
+            50% { box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15); }
+        }
+        
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Hero Section */
+        .privacy-hero {
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.85)), 
+                        url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-4.0.3&auto=format&fit=crop&w=2074&q=80');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 0;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .privacy-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 800px;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Last Updated Banner */
+        .last-updated {
+            background: var(--gray-100);
+            border-left: 4px solid var(--primary-green);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.02);
+        }
+
+        /* Privacy Content */
+        .privacy-content {
+            background: white;
+            border-radius: 40px;
+            padding: 3rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            margin-bottom: 3rem;
+        }
+
+        .privacy-section {
+            margin-bottom: 2.5rem;
+            scroll-margin-top: 100px;
+        }
+
+        .privacy-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--dark-green);
+        }
+
+        .section-content {
+            padding-left: 4rem;
+        }
+
+        .section-content p {
+            line-height: 1.8;
+            color: var(--gray-600);
+            margin-bottom: 1rem;
+        }
+
+        .section-content ul, .section-content ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        .section-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+            color: var(--gray-600);
+        }
+
+        .section-content strong {
+            color: var(--gray-800);
+        }
+
+        .section-content .table {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-content .table th {
+            background: var(--gray-100);
+            font-weight: 600;
+        }
+
+        .legal-note {
+            background: rgba(25, 135, 84, 0.03);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px dashed var(--primary-green);
+        }
+
+        .legal-note i {
+            color: var(--primary-green);
+            margin-right: 0.5rem;
+        }
+
+        /* Table of Contents */
+        .toc-card {
+            background: white;
+            border-radius: 30px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: sticky;
+            top: 100px;
+        }
+
+        .toc-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--dark-green);
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--gray-200);
+        }
+
+        .toc-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .toc-item {
+            margin-bottom: 0.75rem;
+        }
+
+        .toc-link {
+            color: var(--gray-600);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .toc-link:hover {
+            color: var(--primary-green);
+            background: rgba(25, 135, 84, 0.05);
+            transform: translateX(5px);
+        }
+
+        .toc-link i {
+            font-size: 0.8rem;
+            color: var(--primary-green);
+        }
+
+        /* Data Categories Table */
+        .data-categories-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .data-categories-table th {
+            background: var(--primary-green);
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .data-categories-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .data-categories-table tr:hover {
+            background: rgba(25, 135, 84, 0.02);
+        }
+
+        /* Rights Cards */
+        .rights-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            height: 100%;
+            border: 1px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .rights-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 10px 25px rgba(25, 135, 84, 0.1);
+        }
+
+        .rights-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, rgba(25, 135, 84, 0.1), rgba(32, 201, 151, 0.1));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+        }
+
+        .rights-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--dark-green);
+        }
+
+        .rights-description {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green), var(--accent-gold));
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-block;
+            padding: 0.25rem 0;
+        }
+
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .footer-social a:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-contact-item i {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-green);
+        }
+
+        .footer-newsletter .input-group {
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .footer-newsletter .form-control {
+            border: none;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .footer-newsletter .form-control::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .footer-newsletter .btn {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer-newsletter .btn:hover {
+            background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-title { font-size: 3rem; }
+        }
+        
+        @media (max-width: 991px) {
+            .hero-title { font-size: 2.5rem; }
+            .privacy-content { padding: 2rem; }
+            .section-content { padding-left: 0; }
+            .toc-card { position: static; margin-bottom: 2rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .section-title { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width with Logo -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="/">HOME</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'programs:program_list' %}">PROGRAMS</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'events:event_list' %}">EVENTS</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'resources:resource_list' %}">RESOURCES</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'communications:announcement_list' %}">ANNOUNCEMENTS</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'about' %}">ABOUT US</a></li>
+                        <li class="nav-item"><a class="nav-link active" href="{% url 'privacy-policy' %}">PRIVACY</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'communications:contact' %}">CONTACT</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="privacy-hero">
+        <div class="container">
+            <h1 class="hero-title" data-aos="fade-up">Privacy Policy</h1>
+            <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="100">
+                Your privacy is fundamental to our mission. This policy explains how we collect, use, protect, and handle your personal information when you interact with KACAF's programs, website, and services.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container py-5">
+        <div class="row">
+            <!-- Table of Contents -->
+            <div class="col-lg-3 mb-4" data-aos="fade-right">
+                <div class="toc-card">
+                    <h4 class="toc-title">Contents</h4>
+                    <ul class="toc-list">
+                        <li class="toc-item"><a href="#introduction" class="toc-link"><i class="fas fa-chevron-right"></i> 1. Introduction</a></li>
+                        <li class="toc-item"><a href="#definitions" class="toc-link"><i class="fas fa-chevron-right"></i> 2. Key Definitions</a></li>
+                        <li class="toc-item"><a href="#information-we-collect" class="toc-link"><i class="fas fa-chevron-right"></i> 3. Information We Collect</a></li>
+                        <li class="toc-item"><a href="#how-we-collect" class="toc-link"><i class="fas fa-chevron-right"></i> 4. How We Collect Information</a></li>
+                        <li class="toc-item"><a href="#how-we-use" class="toc-link"><i class="fas fa-chevron-right"></i> 5. How We Use Your Information</a></li>
+                        <li class="toc-item"><a href="#legal-basis" class="toc-link"><i class="fas fa-chevron-right"></i> 6. Legal Basis for Processing</a></li>
+                        <li class="toc-item"><a href="#sharing" class="toc-link"><i class="fas fa-chevron-right"></i> 7. Information Sharing & Disclosure</a></li>
+                        <li class="toc-item"><a href="#data-retention" class="toc-link"><i class="fas fa-chevron-right"></i> 8. Data Retention</a></li>
+                        <li class="toc-item"><a href="#data-security" class="toc-link"><i class="fas fa-chevron-right"></i> 9. Data Security</a></li>
+                        <li class="toc-item"><a href="#your-rights" class="toc-link"><i class="fas fa-chevron-right"></i> 10. Your Rights & Choices</a></li>
+                        <li class="toc-item"><a href="#cookies" class="toc-link"><i class="fas fa-chevron-right"></i> 11. Cookies & Tracking</a></li>
+                        <li class="toc-item"><a href="#children" class="toc-link"><i class="fas fa-chevron-right"></i> 12. Children's Privacy</a></li>
+                        <li class="toc-item"><a href="#international" class="toc-link"><i class="fas fa-chevron-right"></i> 13. International Data Transfers</a></li>
+                        <li class="toc-item"><a href="#third-party" class="toc-link"><i class="fas fa-chevron-right"></i> 14. Third-Party Links</a></li>
+                        <li class="toc-item"><a href="#changes" class="toc-link"><i class="fas fa-chevron-right"></i> 15. Changes to Privacy Policy</a></li>
+                        <li class="toc-item"><a href="#contact" class="toc-link"><i class="fas fa-chevron-right"></i> 16. Contact Information</a></li>
+                        <li class="toc-item"><a href="#dpo" class="toc-link"><i class="fas fa-chevron-right"></i> 17. Data Protection Officer</a></li>
+                        <li class="toc-item"><a href="#complaints" class="toc-link"><i class="fas fa-chevron-right"></i> 18. Complaints Procedure</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Privacy Content -->
+            <div class="col-lg-9" data-aos="fade-left">
+                <div class="privacy-content">
+                    <!-- Last Updated Banner -->
+                    <div class="last-updated">
+                        <i class="fas fa-calendar-alt text-success me-2"></i>
+                        <strong>Last Updated:</strong> February 15, 2025 | 
+                        <strong>Version:</strong> 2.1 | 
+                        <strong>Effective Date:</strong> March 1, 2025
+                    </div>
+
+                    <!-- Introduction Section -->
+                    <section id="introduction" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-shield-alt"></i></div>
+                            <h2 class="section-title">1. Introduction</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>Kenya Agroforestry & Climate Action Foundation ("KACAF", "we", "our", "us") is committed to protecting the privacy and security of your personal information. This Privacy Policy describes how we collect, use, process, and disclose your personal information when you:</p>
+                            <ul>
+                                <li>Visit our website (kacaf.org) or any of our affiliated platforms</li>
+                                <li>Register as a member or create an account</li>
+                                <li>Participate in our programs, events, or training sessions</li>
+                                <li>Make donations or financial contributions</li>
+                                <li>Subscribe to our newsletters or communications</li>
+                                <li>Volunteer with us or apply for positions</li>
+                                <li>Interact with us on social media</li>
+                                <li>Contact us for support or inquiries</li>
+                            </ul>
+                            <p>By using our services, you trust us with your information. We take this responsibility seriously and have implemented comprehensive measures to protect your privacy in accordance with the Kenya Data Protection Act, 2019, and applicable international privacy laws.</p>
+                            <p class="fw-bold">This Privacy Policy is incorporated into our Terms and Conditions. Please read both documents carefully.</p>
+                        </div>
+                    </section>
+
+                    <!-- Key Definitions -->
+                    <section id="definitions" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-book"></i></div>
+                            <h2 class="section-title">2. Key Definitions</h2>
+                        </div>
+                        <div class="section-content">
+                            <table class="table table-bordered data-categories-table">
+                                <thead>
+                                    <tr>
+                                        <th>Term</th>
+                                        <th>Definition</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Personal Data</strong></td>
+                                        <td>Any information relating to an identified or identifiable natural person.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Sensitive Personal Data</strong></td>
+                                        <td>Data revealing racial or ethnic origin, political opinions, religious beliefs, health status, or biometric data. We collect minimal sensitive data only with explicit consent.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Processing</strong></td>
+                                        <td>Any operation performed on personal data, including collection, storage, use, or disclosure.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Data Controller</strong></td>
+                                        <td>KACAF determines the purposes and means of processing personal data.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Data Processor</strong></td>
+                                        <td>Third parties who process data on behalf of KACAF (e.g., payment processors, email service providers).</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Consent</strong></td>
+                                        <td>Freely given, specific, informed, and unambiguous indication of agreement to processing.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Information We Collect -->
+                    <section id="information-we-collect" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-database"></i></div>
+                            <h2 class="section-title">3. Information We Collect</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We collect various types of information to provide and improve our services, communicate with you, and fulfill our mission. The categories of information we may collect include:</p>
+                            
+                            <table class="table table-bordered data-categories-table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Examples</th>
+                                        <th>Purpose</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Identity Information</strong></td>
+                                        <td>Full name, username, date of birth, national ID/passport number, photograph</td>
+                                        <td>Account creation, verification, membership management</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contact Information</strong></td>
+                                        <td>Email address, phone number, physical address, village, sub-county, county</td>
+                                        <td>Communication, event coordination, program participation</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Demographic Information</strong></td>
+                                        <td>Age, gender, occupation, household information, farmer status, land ownership details</td>
+                                        <td>Program targeting, impact assessment, grant reporting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Financial Information</strong></td>
+                                        <td>Bank account details, M-Pesa transaction IDs, donation history, membership fee records</td>
+                                        <td>Processing donations, financial management, tax receipting</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Program Participation Data</strong></td>
+                                        <td>Training attendance, trees planted, events participated in, certifications earned</td>
+                                        <td>Impact tracking, program improvement, reporting to funders</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Technical Data</strong></td>
+                                        <td>IP address, browser type, device information, cookies, usage patterns</td>
+                                        <td>Website optimization, security, analytics</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Communications</strong></td>
+                                        <td>Emails, feedback forms, contact messages, survey responses</td>
+                                        <td>Responding to inquiries, improving services, community engagement</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Volunteer/Employment Information</strong></td>
+                                        <td>CV, qualifications, references, background checks, skills assessment</td>
+                                        <td>Recruitment, volunteer coordination</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p class="fw-bold mt-3">Special Categories of Data:</p>
+                            <p>In limited circumstances, we may collect sensitive data such as health information (for accessibility needs at events) or biometric data (for specific programs). We will always obtain explicit consent before collecting such information and will use it only for the specified purpose.</p>
+                        </div>
+                    </section>
+
+                    <!-- How We Collect Information -->
+                    <section id="how-we-collect" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-cloud-download-alt"></i></div>
+                            <h2 class="section-title">4. How We Collect Information</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We collect information through various channels and methods:</p>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-user text-success me-2"></i>Direct Interactions</h6>
+                                        <ul class="small mt-2">
+                                            <li>Registration and membership forms</li>
+                                            <li>Event registration forms</li>
+                                            <li>Donation forms</li>
+                                            <li>Contact us forms</li>
+                                            <li>Feedback and surveys</li>
+                                            <li>Volunteer applications</li>
+                                            <li>Program enrollment forms</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-laptop text-success me-2"></i>Automated Technologies</h6>
+                                        <ul class="small mt-2">
+                                            <li>Cookies and similar technologies</li>
+                                            <li>Web beacons and pixels</li>
+                                            <li>Log files and analytics</li>
+                                            <li>Session recordings (with consent)</li>
+                                            <li>Social media pixels</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-handshake text-success me-2"></i>Third Parties</h6>
+                                        <ul class="small mt-2">
+                                            <li>Payment processors (M-Pesa, banks)</li>
+                                            <li>Social media platforms (Facebook, LinkedIn, Twitter)</li>
+                                            <li>Partner organizations (with consent)</li>
+                                            <li>Public databases (for verification)</li>
+                                            <li>Grant reporting systems</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-camera text-success me-2"></i>Program Activities</h6>
+                                        <ul class="small mt-2">
+                                            <li>Event photographs and videos</li>
+                                            <li>Training attendance records</li>
+                                            <li>Tree planting documentation</li>
+                                            <li>Impact assessment interviews</li>
+                                            <li>Field visit documentation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- How We Use Your Information -->
+                    <section id="how-we-use" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-tasks"></i></div>
+                            <h2 class="section-title">5. How We Use Your Information</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We use your personal information for the following purposes:</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-id-card"></i>
+                                        </div>
+                                        <h6 class="rights-title">Membership Management</h6>
+                                        <p class="rights-description">Creating and managing your account, processing membership applications, verifying eligibility, communicating membership benefits.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-hand-holding-heart"></i>
+                                        </div>
+                                        <h6 class="rights-title">Donation Processing</h6>
+                                        <p class="rights-description">Processing donations, issuing tax receipts, maintaining donor records, sending thank-you communications, managing recurring donations.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                        <h6 class="rights-title">Event Coordination</h6>
+                                        <p class="rights-description">Registering for events, sending confirmations, managing attendance, coordinating logistics, post-event follow-up.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-chart-line"></i>
+                                        </div>
+                                        <h6 class="rights-title">Program Implementation</h6>
+                                        <p class="rights-description">Enrolling in programs, tracking participation, measuring impact, reporting to funders, improving program design.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <h6 class="rights-title">Communications</h6>
+                                        <p class="rights-description">Sending newsletters, program updates, event invitations, fundraising appeals, responding to inquiries, personalized communications based on interests.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-chart-pie"></i>
+                                        </div>
+                                        <h6 class="rights-title">Analytics & Improvement</h6>
+                                        <p class="rights-description">Analyzing website usage, understanding community needs, evaluating program effectiveness, conducting surveys and research.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-shield-alt"></i>
+                                        </div>
+                                        <h6 class="rights-title">Legal Compliance</h6>
+                                        <p class="rights-description">Maintaining records as required by law, responding to legal requests, preventing fraud, ensuring data protection compliance.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-bullhorn"></i>
+                                        </div>
+                                        <h6 class="rights-title">Advocacy & Awareness</h6>
+                                        <p class="rights-description">Sharing impact stories, promoting climate action, raising awareness (with explicit consent for photos/stories).</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Legal Basis for Processing -->
+                    <section id="legal-basis" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-gavel"></i></div>
+                            <h2 class="section-title">6. Legal Basis for Processing</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>Under the Kenya Data Protection Act, 2019 and GDPR for EU residents, we process your personal data based on the following legal grounds:</p>
+                            
+                            <table class="table table-bordered data-categories-table">
+                                <thead>
+                                    <tr>
+                                        <th>Legal Basis</th>
+                                        <th>Description</th>
+                                        <th>Examples</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Consent</strong></td>
+                                        <td>You have given clear consent for us to process your personal data for a specific purpose.</td>
+                                        <td>Marketing communications, photo/video use, sharing impact stories</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Contract</strong></td>
+                                        <td>Processing is necessary for a contract you have with us, or because you have asked us to take specific steps before entering into a contract.</td>
+                                        <td>Membership agreements, event registration, donation commitments</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Legal Obligation</strong></td>
+                                        <td>Processing is necessary for us to comply with the law.</td>
+                                        <td>Tax reporting, fraud prevention, regulatory compliance</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Vital Interests</strong></td>
+                                        <td>Processing is necessary to protect someone's life.</td>
+                                        <td>Emergency contact information at events</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Public Interest</strong></td>
+                                        <td>Processing is necessary for the performance of a task carried out in the public interest.</td>
+                                        <td>Environmental conservation activities, community development programs</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Legitimate Interests</strong></td>
+                                        <td>Processing is necessary for our legitimate interests or the legitimate interests of a third party, provided those interests are not overridden by your rights and interests.</td>
+                                        <td>Program improvement, analytics, fraud prevention, donor communications</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            
+                            <p class="mt-3">Where we rely on legitimate interests, we have conducted a legitimate interests assessment to balance our interests against your rights. You have the right to object to processing based on legitimate interests.</p>
+                        </div>
+                    </section>
+
+                    <!-- Information Sharing & Disclosure -->
+                    <section id="sharing" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-share-alt"></i></div>
+                            <h2 class="section-title">7. Information Sharing & Disclosure</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We do not sell, rent, or trade your personal information. We may share your information in the following circumstances:</p>
+                            
+                            <h6 class="fw-bold mt-3">1. Service Providers & Partners</h6>
+                            <p>We engage trusted third parties to perform functions on our behalf, including:</p>
+                            <ul>
+                                <li><strong>Payment processors:</strong> Safaricom (M-Pesa), banks, PayPal (for donation processing)</li>
+                                <li><strong>Email service providers:</strong> Mailchimp, SendGrid (for newsletters and communications)</li>
+                                <li><strong>Cloud service providers:</strong> For data storage and hosting</li>
+                                <li><strong>Analytics providers:</strong> Google Analytics, Facebook Pixel</li>
+                                <li><strong>Event management platforms:</strong> For registration and coordination</li>
+                                <li><strong>Consultants and advisors:</strong> For program evaluation and reporting</li>
+                            </ul>
+                            <p>All service providers are contractually bound to protect your data and use it only for the specified purposes.</p>
+
+                            <h6 class="fw-bold mt-3">2. Partner Organizations</h6>
+                            <p>We collaborate with partner organizations to implement programs. When necessary for program delivery, we may share limited information with:</p>
+                            <ul>
+                                <li>Government agencies (e.g., Ministry of Environment, county governments)</li>
+                                <li>Funding organizations and donors (aggregate, non-identifiable data for reporting)</li>
+                                <li>Research institutions (with ethics approval and anonymization)</li>
+                                <li>Community-based organizations implementing joint programs</li>
+                            </ul>
+                            <p>We will obtain your consent before sharing identifiable information with partners unless required for program implementation where you have already enrolled.</p>
+
+                            <h6 class="fw-bold mt-3">3. Legal Requirements</h6>
+                            <p>We may disclose your information if required to do so by law or in response to valid requests by public authorities (e.g., court orders, law enforcement requests).</p>
+
+                            <h6 class="fw-bold mt-3">4. Business Transfers</h6>
+                            <p>In the event of a merger, acquisition, or asset sale, your personal information may be transferred. We will notify you of any such change and outline your choices.</p>
+
+                            <h6 class="fw-bold mt-3">5. With Your Consent</h6>
+                            <p>We may share your information for any other purpose disclosed to you and with your explicit consent (e.g., sharing your success story with media).</p>
+
+                            <div class="alert alert-success mt-3">
+                                <i class="fas fa-lock me-2"></i>
+                                <strong>Commitment:</strong> We never sell your personal information to third parties for marketing or any other purposes.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Data Retention -->
+                    <section id="data-retention" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-clock"></i></div>
+                            <h2 class="section-title">8. Data Retention</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We retain your personal information only for as long as necessary to fulfill the purposes for which it was collected, including for legal, accounting, or reporting requirements.</p>
+                            
+                            <table class="table table-bordered data-categories-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data Category</th>
+                                        <th>Retention Period</th>
+                                        <th>Justification</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Membership records</td>
+                                        <td>Duration of membership + 5 years</td>
+                                        <td>Legal and audit requirements</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Donation records</td>
+                                        <td>7 years (Kenya tax law)</td>
+                                        <td>Tax reporting and audit compliance</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Event registration</td>
+                                        <td>3 years</td>
+                                        <td>Program evaluation and reporting</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Website analytics</td>
+                                        <td>26 months</td>
+                                        <td>Analysis and improvement</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Newsletter subscriptions</td>
+                                        <td>Until unsubscribed + 1 year</td>
+                                        <td>Communication preferences</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Contact form inquiries</td>
+                                        <td>2 years</td>
+                                        <td>Reference and follow-up</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Employment applications</td>
+                                        <td>1 year (unsuccessful applicants)</td>
+                                        <td>Future opportunities and compliance</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Program participation data</td>
+                                        <td>10 years (aggregated)</td>
+                                        <td>Long-term impact assessment</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <p>When we no longer need your personal information, we securely delete or anonymize it. In some circumstances, we may anonymize your personal information so that it can no longer be associated with you, in which case we may use such information without further notice to you.</p>
+                        </div>
+                    </section>
+
+                    <!-- Data Security -->
+                    <section id="data-security" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-lock"></i></div>
+                            <h2 class="section-title">9. Data Security</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We implement comprehensive technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction:</p>
+                            
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-shield-alt text-success me-2"></i>Technical Measures</h6>
+                                        <ul class="small mt-2">
+                                            <li>SSL/TLS encryption for all data transmission</li>
+                                            <li>Encrypted databases for sensitive information</li>
+                                            <li>Firewalls and intrusion detection systems</li>
+                                            <li>Regular security audits and penetration testing</li>
+                                            <li>Secure access controls and authentication</li>
+                                            <li>Regular software updates and patch management</li>
+                                            <li>Automated backups with encryption</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-3 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-users-cog text-success me-2"></i>Organizational Measures</h6>
+                                        <ul class="small mt-2">
+                                            <li>Staff training on data protection</li>
+                                            <li>Confidentiality agreements for all staff and volunteers</li>
+                                            <li>Access controls based on need-to-know principle</li>
+                                            <li>Data protection policies and procedures</li>
+                                            <li>Incident response plan</li>
+                                            <li>Regular privacy impact assessments</li>
+                                            <li>Vetting of third-party service providers</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p class="mt-3">Despite our safeguards, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to protect your personal information, we cannot guarantee absolute security. In the event of a data breach, we will notify affected individuals and relevant authorities as required by law.</p>
+                        </div>
+                    </section>
+
+                    <!-- Your Rights & Choices -->
+                    <section id="your-rights" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-user-check"></i></div>
+                            <h2 class="section-title">10. Your Rights & Choices</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>Under the Kenya Data Protection Act, 2019 and applicable international laws, you have the following rights regarding your personal information:</p>
+                            
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-info-circle"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to be Informed</h6>
+                                        <p class="rights-description">You have the right to be informed about the collection and use of your personal data (fulfilled through this Privacy Policy).</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-file-alt"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right of Access</h6>
+                                        <p class="rights-description">You can request a copy of the personal information we hold about you, free of charge.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-pen"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to Rectification</h6>
+                                        <p class="rights-description">You can ask us to correct inaccurate or incomplete information.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to Erasure</h6>
+                                        <p class="rights-description">You can request deletion of your personal information where there is no compelling reason for its continued processing.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-ban"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to Restrict Processing</h6>
+                                        <p class="rights-description">You can ask us to suspend the processing of your personal data in certain circumstances.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-download"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to Data Portability</h6>
+                                        <p class="rights-description">You can request your personal data in a structured, commonly used, machine-readable format.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-times-circle"></i>
+                                        </div>
+                                        <h6 class="rights-title">Right to Object</h6>
+                                        <p class="rights-description">You can object to processing based on legitimate interests or for direct marketing.</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="rights-card">
+                                        <div class="rights-icon">
+                                            <i class="fas fa-robot"></i>
+                                        </div>
+                                        <h6 class="rights-title">Rights related to Automated Decision-Making</h6>
+                                        <p class="rights-description">You can request human intervention in decisions based solely on automated processing.</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold mt-4">How to Exercise Your Rights:</h6>
+                            <p>To exercise any of these rights, please contact us using the information in the Contact section below. We will respond to your request within 30 days (as required by Kenyan law).</p>
+                            
+                            <h6 class="fw-bold mt-3">Communication Preferences:</h6>
+                            <p>You can manage your communication preferences at any time:</p>
+                            <ul>
+                                <li>Click "unsubscribe" in any marketing email</li>
+                                <li>Update your account settings</li>
+                                <li>Contact us directly to update preferences</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Cookies & Tracking -->
+                    <section id="cookies" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-cookie-bite"></i></div>
+                            <h2 class="section-title">11. Cookies & Tracking Technologies</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We use cookies and similar tracking technologies to enhance your experience, analyze usage, and support our marketing efforts.</p>
+                            
+                            <h6 class="fw-bold">What are Cookies?</h6>
+                            <p>Cookies are small text files placed on your device when you visit a website. They help us remember your preferences and understand how you use our site.</p>
+
+                            <table class="table table-bordered data-categories-table">
+                                <thead>
+                                    <tr>
+                                        <th>Cookie Type</th>
+                                        <th>Purpose</th>
+                                        <th>Duration</th>
+                                        <th>Opt-out</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Essential Cookies</strong></td>
+                                        <td>Required for website functionality (login, security, form submissions)</td>
+                                        <td>Session / Persistent</td>
+                                        <td>Cannot opt out</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Analytics Cookies</strong></td>
+                                        <td>Google Analytics: understand how visitors use our site, track page views, referral sources</td>
+                                        <td>26 months max</td>
+                                        <td><a href="#" class="text-success">Google Analytics Opt-out</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Functional Cookies</strong></td>
+                                        <td>Remember your preferences, language, region</td>
+                                        <td>1 year</td>
+                                        <td>Browser settings</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Marketing Cookies</strong></td>
+                                        <td>Facebook Pixel, LinkedIn Insight Tag: track conversions, retargeting, audience building</td>
+                                        <td>90 days - 2 years</td>
+                                        <td>Browser settings / Platform settings</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Social Media Cookies</strong></td>
+                                        <td>Enable sharing on social platforms, track interactions</td>
+                                        <td>Varies by platform</td>
+                                        <td>Platform settings</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h6 class="fw-bold mt-3">Cookie Management:</h6>
+                            <p>Most web browsers allow you to control cookies through their settings. You can:</p>
+                            <ul>
+                                <li>Delete all cookies</li>
+                                <li>Block all cookies</li>
+                                <li>Allow cookies on a per-site basis</li>
+                                <li>Set preferences for third-party cookies</li>
+                            </ul>
+                            <p>Please note that blocking essential cookies may impact website functionality.</p>
+
+                            <div class="bg-light p-3 rounded-3 mt-3">
+                                <h6 class="fw-bold"><i class="fas fa-sliders-h text-success me-2"></i>Cookie Preferences</h6>
+                                <p>You can manage your cookie preferences here:</p>
+                                <button class="btn btn-sm btn-outline-success me-2">Accept All</button>
+                                <button class="btn btn-sm btn-outline-secondary">Reject Non-Essential</button>
+                                <button class="btn btn-sm btn-outline-secondary">Customize Settings</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Children's Privacy -->
+                    <section id="children" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-child"></i></div>
+                            <h2 class="section-title">12. Children's Privacy</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>KACAF is committed to protecting children's privacy. Our programs often involve working with children and youth, and we have special safeguards in place:</p>
+                            
+                            <ul>
+                                <li>We do not knowingly collect personal information from children under 13 without parental consent.</li>
+                                <li>For children aged 13-18, we require parental/guardian consent for participation in programs and collection of personal data.</li>
+                                <li>When we collect information about children (for program participation), we:
+                                    <ul>
+                                        <li>Obtain verifiable parental consent</li>
+                                        <li>Collect only information necessary for program participation</li>
+                                        <li>Use information only for the specified purpose</li>
+                                        <li>Do not share children's information with third parties (except as required for program delivery with consent)</li>
+                                        <li>Provide parents with access to their child's information and the right to request deletion</li>
+                                    </ul>
+                                </li>
+                                <li>Photos and videos of children in our programs are only used with explicit parental consent.</li>
+                                <li>We implement enhanced security measures for children's data.</li>
+                            </ul>
+
+                            <p class="fw-bold">If you believe we may have collected information from a child without appropriate consent, please contact us immediately at privacy@kacaf.org.</p>
+                        </div>
+                    </section>
+
+                    <!-- International Data Transfers -->
+                    <section id="international" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-globe"></i></div>
+                            <h2 class="section-title">13. International Data Transfers</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>KACAF is based in Kenya, but we may transfer your personal information to service providers located in other countries. When we transfer data internationally, we ensure appropriate safeguards are in place:</p>
+                            
+                            <ul>
+                                <li><strong>Adequacy decisions:</strong> For transfers to countries deemed adequate by the Kenya Data Protection Commissioner or EU Commission.</li>
+                                <li><strong>Standard Contractual Clauses:</strong> We use approved contractual clauses to protect data transferred to countries without adequacy decisions.</li>
+                                <li><strong>Binding Corporate Rules:</strong> For transfers within our partner network where applicable.</li>
+                                <li><strong>Explicit consent:</strong> Where appropriate, we obtain your explicit consent for international transfers.</li>
+                            </ul>
+
+                            <p>Our primary service providers are located in:</p>
+                            <ul>
+                                <li>Kenya (local data hosting, M-Pesa)</li>
+                                <li>United States (email services, analytics, cloud hosting)</li>
+                                <li>European Union (certain processing activities)</li>
+                            </ul>
+
+                            <p>By using our services, you consent to the transfer of your information to countries that may have different data protection laws than your jurisdiction.</p>
+                        </div>
+                    </section>
+
+                    <!-- Third-Party Links -->
+                    <section id="third-party" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-external-link-alt"></i></div>
+                            <h2 class="section-title">14. Third-Party Links</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>Our website and communications may contain links to third-party websites, plug-ins, and applications (e.g., Facebook, LinkedIn, Twitter, YouTube, partner organizations). Clicking on those links may allow third parties to collect or share data about you.</p>
+                            <p>We do not control these third-party websites and are not responsible for their privacy practices. When you leave our website, we encourage you to read the privacy policy of every website you visit.</p>
+                            <p>This Privacy Policy applies solely to information collected by KACAF.</p>
+                        </div>
+                    </section>
+
+                    <!-- Changes to Privacy Policy -->
+                    <section id="changes" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-sync-alt"></i></div>
+                            <h2 class="section-title">15. Changes to Privacy Policy</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>We may update this Privacy Policy from time to time to reflect changes in our practices, legal requirements, or operational needs. We will notify you of material changes by:</p>
+                            <ul>
+                                <li>Posting the updated policy on our website with a new effective date</li>
+                                <li>Sending an email notification to registered users (for significant changes)</li>
+                                <li>Displaying a notice on our website</li>
+                            </ul>
+                            <p>We encourage you to review this Privacy Policy periodically to stay informed about how we protect your information. Your continued use of our services after any changes constitutes acceptance of the updated policy.</p>
+                        </div>
+                    </section>
+
+                    <!-- Contact Information -->
+                    <section id="contact" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-envelope"></i></div>
+                            <h2 class="section-title">16. Contact Information</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>If you have questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
+                            
+                            <div class="row g-4 mt-2">
+                                <div class="col-md-6">
+                                    <div class="bg-light p-4 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-building text-success me-2"></i>Postal Address</h6>
+                                        <p class="mb-0 small">
+                                            Kenya Agroforestry & Climate Action Foundation<br>
+                                            P.O. Box 123-30600<br>
+                                            Kapenguria, West Pokot County<br>
+                                            Kenya
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-4 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-envelope text-success me-2"></i>Email</h6>
+                                        <p class="mb-2 small">
+                                            <strong>General Inquiries:</strong><br>
+                                            <a href="mailto:info@kacaf.org" class="text-success">info@kacaf.org</a>
+                                        </p>
+                                        <p class="mb-2 small">
+                                            <strong>Privacy-Specific:</strong><br>
+                                            <a href="mailto:privacy@kacaf.org" class="text-success">privacy@kacaf.org</a>
+                                        </p>
+                                        <p class="mb-0 small">
+                                            <strong>Data Protection Officer:</strong><br>
+                                            <a href="mailto:dpo@kacaf.org" class="text-success">dpo@kacaf.org</a>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-4 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-phone-alt text-success me-2"></i>Phone</h6>
+                                        <p class="mb-1 small"><a href="tel:+254796761841" class="text-success">+254 796 761 841</a> (Main)</p>
+                                        <p class="mb-0 small"><a href="tel:+254700000000" class="text-success">+254 700 000 000</a> (Privacy Hotline)</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="bg-light p-4 rounded-3">
+                                        <h6 class="fw-bold"><i class="fas fa-clock text-success me-2"></i>Office Hours</h6>
+                                        <p class="mb-1 small">Monday - Friday: 8:00 AM - 5:00 PM (EAT)</p>
+                                        <p class="mb-0 small">Saturday: 9:00 AM - 1:00 PM</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Data Protection Officer -->
+                    <section id="dpo" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-user-shield"></i></div>
+                            <h2 class="section-title">17. Data Protection Officer</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>KACAF has appointed a Data Protection Officer (DPO) to oversee our compliance with data protection laws and to serve as your point of contact for privacy matters. You can reach our DPO at:</p>
+                            
+                            <div class="bg-light p-4 rounded-3">
+                                <p class="mb-2"><strong>Name:</strong> Davis Masibo</p>
+                                <p class="mb-2"><strong>Title:</strong> Data Protection Officer</p>
+                                <p class="mb-2"><strong>Email:</strong> <a href="mailto:dpo@kacaf.org" class="text-success">dpo@kacaf.org</a></p>
+                                <p class="mb-2"><strong>Phone:</strong> <a href="tel:+254796761841" class="text-success">+254 796 761 841</a></p>
+                                <p class="mb-0"><strong>Address:</strong> P.O. Box 123-30600, Kapenguria, Kenya</p>
+                            </div>
+
+                            <p class="mt-3">The DPO is responsible for:</p>
+                            <ul>
+                                <li>Monitoring compliance with data protection laws</li>
+                                <li>Advising on data protection impact assessments</li>
+                                <li>Cooperating with the supervisory authority</li>
+                                <li>Handling data subject requests and complaints</li>
+                                <li>Maintaining records of processing activities</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- Complaints Procedure -->
+                    <section id="complaints" class="privacy-section">
+                        <div class="section-header">
+                            <div class="section-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                            <h2 class="section-title">18. Complaints Procedure</h2>
+                        </div>
+                        <div class="section-content">
+                            <p>If you believe we have not handled your personal information properly or have violated your privacy rights, you have the right to lodge a complaint.</p>
+
+                            <h6 class="fw-bold">Internal Resolution Process:</h6>
+                            <ol>
+                                <li>Contact our Data Protection Officer directly at <a href="mailto:dpo@kacaf.org" class="text-success">dpo@kacaf.org</a></li>
+                                <li>We will acknowledge your complaint within 48 hours</li>
+                                <li>We will investigate and provide a substantive response within 30 days</li>
+                                <li>If you are unsatisfied with our response, you can escalate to our Executive Director at <a href="mailto:director@kacaf.org" class="text-success">director@kacaf.org</a></li>
+                            </ol>
+
+                            <h6 class="fw-bold mt-3">External Remedies:</h6>
+                            <p>You have the right to lodge a complaint with the supervisory authority:</p>
+                            
+                            <div class="bg-light p-4 rounded-3 mt-2">
+                                <h6 class="fw-bold">Office of the Data Protection Commissioner (Kenya)</h6>
+                                <p class="mb-1 small">
+                                    <i class="fas fa-map-marker-alt text-success me-2"></i>
+                                    P.O. Box 1986 - 00202, Nairobi, Kenya
+                                </p>
+                                <p class="mb-1 small">
+                                    <i class="fas fa-phone-alt text-success me-2"></i>
+                                    <a href="tel:+254703033000" class="text-success">+254 703 033 000</a>
+                                </p>
+                                <p class="mb-1 small">
+                                    <i class="fas fa-envelope text-success me-2"></i>
+                                    <a href="mailto:commissioner@odpc.go.ke" class="text-success">commissioner@odpc.go.ke</a>
+                                </p>
+                                <p class="mb-0 small">
+                                    <i class="fas fa-globe text-success me-2"></i>
+                                    <a href="https://www.odpc.go.ke" target="_blank" class="text-success">www.odpc.go.ke</a>
+                                </p>
+                            </div>
+
+                            <p class="mt-3">For EU residents, you also have the right to lodge a complaint with your local data protection authority.</p>
+                        </div>
+                    </section>
+
+                    <!-- Legal Note -->
+                    <div class="legal-note">
+                        <i class="fas fa-balance-scale"></i>
+                        <strong>Legal Notice:</strong> This Privacy Policy was last updated on February 15, 2025. It constitutes the complete privacy statement for KACAF and supersedes any prior policies. In the event of any conflict between this Privacy Policy and our Terms and Conditions, the Terms and Conditions shall prevail unless explicitly stated otherwise. This policy is designed to comply with the Kenya Data Protection Act, 2019, and incorporates principles from the GDPR where applicable.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer with Updated Social Media Links -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <!-- About Section -->
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                        </div>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry, climate action, and environmental education in West Pokot County and beyond. Registered non-profit in Kenya.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <!-- LinkedIn - Updated with provided company URL -->
+                        <a href="https://www.linkedin.com/company/kenya-agroforerstry-and-climate-action-foundation/" target="_blank" aria-label="LinkedIn" title="KACAF LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                        <!-- Facebook - Updated with provided group URL -->
+                        <a href="https://www.facebook.com/groups/1689529035466372/?ref=share&mibextid=NSMWBT" target="_blank" aria-label="Facebook Group" title="KACAF Facebook Group">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <!-- Twitter - Placeholder -->
+                        <a href="#" target="_blank" aria-label="Twitter" title="Follow us on Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <!-- Instagram - Placeholder -->
+                        <a href="#" target="_blank" aria-label="Instagram" title="Follow us on Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <!-- YouTube - Placeholder -->
+                        <a href="#" target="_blank" aria-label="YouTube" title="Subscribe to our YouTube channel">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="{% url 'about' %}">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="{% url 'resources:resource_list' %}">Resources</a></p>
+                        <p><a href="{% url 'communications:announcement_list' %}">Announcements</a></p>
+                        <p><a href="{% url 'communications:contact' %}">Contact</a></p>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>P.O. Box 123-30600, Kapenguria, West Pokot County, Kenya</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <a href="tel:+254796761841" class="text-white text-decoration-none">+254 796 761 841</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:info@kacaf.org" class="text-white text-decoration-none">info@kacaf.org</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Mon-Fri: 8:00 AM - 5:00 PM (EAT)</span>
+                    </div>
+                </div>
+                
+                <!-- Newsletter & Legal -->
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Stay Updated</h5>
+                    <p class="small">Subscribe to our newsletter for program updates, success stories, and volunteer opportunities.</p>
+                    <form class="footer-newsletter">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email address">
+                            <button class="btn" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="small mt-3 mb-0 opacity-75">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        We respect your privacy. Unsubscribe anytime.
+                    </p>
+                    <div class="mt-3 small">
+                        <a href="{% url 'privacy-policy' %}" class="text-white">Privacy Policy</a>
+                        <span class="text-white-50 mx-2">|</span>
+                        <a href="{% url 'terms' %}" class="text-white-50">Terms of Service</a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <hr class="bg-white opacity-25 my-4">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <p class="mb-0 small">&copy; {% now "Y" %} Kenya Agroforestry & Climate Action Foundation (KACAF). All rights reserved. Registration Number: [Your Registration Number].</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <p class="mb-0 small">
+                        <i class="fas fa-tree me-1"></i> 
+                        Protecting Kamatura Forest | 
+                        <i class="fas fa-hand-holding-heart ms-2 me-1"></i> 
+                        Climate Justice
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 800,
+            once: true,
+            offset: 100
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('.toc-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Cookie Preferences
+        document.querySelectorAll('.btn-outline-success, .btn-outline-secondary').forEach(button => {
+            button.addEventListener('click', function() {
+                const preference = this.textContent.trim();
+                alert(`Cookie preference set: ${preference}. This is a demo - in production, this would save your preferences.`);
+            });
+        });
+
+        // Active navigation highlighting
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath.includes('privacy') && href.includes('privacy'))) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

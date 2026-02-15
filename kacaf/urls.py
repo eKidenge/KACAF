@@ -92,6 +92,8 @@ urlpatterns = [
     # Add this with the other app URLs
     path("resources/", include(("resources.urls", "resources"), namespace="resources")),
     path("api/resources/", include(("resources.urls", "resources_api"), namespace="resources_api")),
+    path('terms/', TemplateView.as_view(template_name='terms_of_service.html'), name='terms'),
+    path('privacy/', TemplateView.as_view(template_name='privacy_policy.html'), name='privacy_policy'),
 
 
     # API Docs
