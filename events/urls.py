@@ -17,6 +17,7 @@ urlpatterns = [
     # Web views for templates
     path('events/', views.event_list, name='event_list'),
     path('events/calendar/', views.event_calendar, name='event_calendar'),
+    path('public/dashboard/', views.public_dashboard, name='public_dashboard'),
     
     # API routes (router URLs)
     path('', include(router.urls)),

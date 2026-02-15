@@ -1,5 +1,6 @@
 {% load static %}
 {% load humanize %}
+{% load program_extras %}
 
 <!DOCTYPE html>
 <html lang="en">
@@ -172,6 +173,16 @@
             opacity: 1;
         }
         
+        .partner-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        
+        .partner-link:hover {
+            transform: translateY(-5px);
+        }
+        
         /* CTA Section */
         .cta-section {
             background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
@@ -196,6 +207,14 @@
         
         .footer-links a:hover {
             color: white;
+            text-decoration: underline;
+        }
+        
+        /* Newsletter Success Message */
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
         }
         
         /* Responsive adjustments */
@@ -238,8 +257,8 @@
     <header class="custom-header">
         <nav class="navbar navbar-expand-lg">
             <div class="container">
-                <!-- Brand Logo & Name -->
-                <a class="header-brand" href="#">
+                <!-- Brand Logo & Name - Link to homepage root -->
+                <a class="header-brand" href="/">
                     <div class="brand-logo">
                         <i class="fas fa-tree fa-2x text-success"></i>
                     </div>
@@ -258,20 +277,20 @@
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#">
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
                                 <i class="fas fa-home me-1"></i> Home
                             </a>
                         </li>
                         {% if 'programs' in request.resolver_match.app_names or True %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'programs:program_list' %}">
+                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}">
                                 <i class="fas fa-project-diagram me-1"></i> Programs
                             </a>
                         </li>
                         {% endif %}
                         {% if 'events' in request.resolver_match.app_names or True %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:event_list' %}">
                                 <i class="fas fa-calendar-alt me-1"></i> Events
                             </a>
                         </li>
@@ -286,14 +305,33 @@
                                 <i class="fas fa-bullhorn me-1"></i> Announcements
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-info-circle me-1"></i> About Us
+                            </a>
+                        </li>
                         {% if 'communications' in request.resolver_match.app_names or True %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'communications:contact' %}">
+                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}">
                                 <i class="fas fa-envelope me-1"></i> Contact
                             </a>
                         </li>
                         {% endif %}
                     </ul>
+                    <div class="d-flex ms-lg-3">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-light btn-sm">
+                            <i class="fas fa-user me-1"></i> {{ user.get_full_name|default:user.username }}
+                        </a>
+                        {% else %}
+                        <a href="{% url 'accounts:login' %}" class="btn btn-outline-light btn-sm me-2">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-sm">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </nav>
@@ -320,7 +358,7 @@
                                 <i class="fas fa-user-plus me-2"></i> Join KACAF
                             </a>
                             {% endif %}
-                            <a href="#" class="btn btn-outline-light btn-lg">
+                            <a href="#about" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-info-circle me-2"></i> Learn More
                             </a>
                             {% if 'programs' in request.resolver_match.app_names or True %}
@@ -335,19 +373,19 @@
                             <h4 class="mb-3">Our Impact</h4>
                             <div class="row">
                                 <div class="col-6 mb-3">
-                                    <div class="display-6 text-success">{{ total_trees_planted|intword }}</div>
+                                    <div class="display-6 text-success">{{ total_trees_planted|default:"0"|intword }}</div>
                                     <small>Trees Planted</small>
                                 </div>
                                 <div class="col-6 mb-3">
-                                    <div class="display-6 text-success">{{ total_members|intcomma }}</div>
+                                    <div class="display-6 text-success">{{ total_members|default:"0"|intcomma }}</div>
                                     <small>Members</small>
                                 </div>
                                 <div class="col-6">
-                                    <div class="display-6 text-success">{{ total_area_coverage }}</div>
+                                    <div class="display-6 text-success">{{ total_area_coverage|default:"0" }}</div>
                                     <small>Hectares</small>
                                 </div>
                                 <div class="col-6">
-                                    <div class="display-6 text-success">{{ total_beneficiaries|intcomma }}</div>
+                                    <div class="display-6 text-success">{{ total_beneficiaries|default:"0"|intcomma }}</div>
                                     <small>Beneficiaries</small>
                                 </div>
                             </div>
@@ -366,7 +404,7 @@
                             <div class="counter-icon bg-white text-success">
                                 <i class="fas fa-tree fa-3x"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_trees_planted|intword }}</div>
+                            <div class="display-4 fw-bold">{{ total_trees_planted|default:"0"|intword }}</div>
                             <p class="mb-0">Trees Planted</p>
                         </div>
                     </div>
@@ -375,7 +413,7 @@
                             <div class="counter-icon bg-white text-info">
                                 <i class="fas fa-users fa-3x"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_members|intcomma }}</div>
+                            <div class="display-4 fw-bold">{{ total_members|default:"0"|intcomma }}</div>
                             <p class="mb-0">Community Members</p>
                         </div>
                     </div>
@@ -384,7 +422,7 @@
                             <div class="counter-icon bg-white text-warning">
                                 <i class="fas fa-map-marked-alt fa-3x"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_area_coverage }}</div>
+                            <div class="display-4 fw-bold">{{ total_area_coverage|default:"0" }}</div>
                             <p class="mb-0">Hectares Restored</p>
                         </div>
                     </div>
@@ -393,7 +431,7 @@
                             <div class="counter-icon bg-white text-primary">
                                 <i class="fas fa-cloud-sun fa-3x"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ carbon_sequestered|floatformat:0|intcomma }}</div>
+                            <div class="display-4 fw-bold">{{ carbon_sequestered|default:"0"|floatformat:0|intcomma }}</div>
                             <p class="mb-0">Tons CO₂ Sequestered</p>
                         </div>
                     </div>
@@ -401,7 +439,7 @@
             </div>
         </section>
 
-        <!-- Our Programs -->
+        <!-- Our Programs - CORRECTED TO USE YOUR ACTUAL MODEL FIELDS -->
         <section class="py-5 bg-light">
             <div class="container">
                 <div class="row mb-5">
@@ -419,8 +457,8 @@
                     {% for program in featured_programs|slice:":3" %}
                     <div class="col-lg-4 col-md-6 mb-4">
                         <div class="program-card">
-                            {% if program.featured_image %}
-                            <img src="{{ program.featured_image.url }}" 
+                            {% if program.image %}
+                            <img src="{{ program.image.url }}" 
                                  class="program-image w-100" 
                                  alt="{{ program.title }}">
                             {% else %}
@@ -437,20 +475,42 @@
                                 </div>
                                 <h5 class="card-title">{{ program.title }}</h5>
                                 <p class="card-text text-muted">{{ program.description|truncatechars:150 }}</p>
+                                
+                                <!-- Stats using your actual model fields -->
                                 <div class="row g-2 mb-3">
-                                    <div class="col-4 text-center">
-                                        <small class="text-muted d-block">Trees</small>
-                                        <strong>{{ program.total_trees_planted }}</strong>
+                                    <div class="col-6 text-center">
+                                        <small class="text-muted d-block">Projects</small>
+                                        <strong>{{ program.projects.count }}</strong>
                                     </div>
-                                    <div class="col-4 text-center">
-                                        <small class="text-muted d-block">Farmers</small>
-                                        <strong>{{ program.beneficiaries_reached }}</strong>
-                                    </div>
-                                    <div class="col-4 text-center">
+                                    <div class="col-6 text-center">
                                         <small class="text-muted d-block">Progress</small>
                                         <strong>{{ program.progress }}%</strong>
                                     </div>
                                 </div>
+                                
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6 text-center">
+                                        <small class="text-muted d-block">Target</small>
+                                        <strong>{{ program.beneficiaries_target|intcomma }}</strong>
+                                    </div>
+                                    <div class="col-6 text-center">
+                                        <small class="text-muted d-block">Reached</small>
+                                        <strong>{{ program.beneficiaries_reached|intcomma }}</strong>
+                                    </div>
+                                </div>
+                                
+                                <!-- Location info from your model -->
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-map-marker-alt me-1"></i> {{ program.county }}
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        <i class="fas fa-calendar me-1"></i> 
+                                        {{ program.start_date|date:"M Y" }} - 
+                                        {% if program.end_date %}{{ program.end_date|date:"M Y" }}{% else %}Ongoing{% endif %}
+                                    </small>
+                                </div>
+                                
                                 <a href="{% url 'programs:program_detail' program.id %}" 
                                    class="btn btn-outline-success w-100">
                                     Learn More
@@ -498,7 +558,7 @@
                                 <i class="fas fa-handshake me-2"></i> Partner With Us
                             </a>
                             {% endif %}
-                            {% if 'accounts' in request.resolver_match.app_names or True %}
+                            {% if 'donations' in request.resolver_match.app_names or True %}
                             <a href="{% url 'accounts:donate' %}" class="btn btn-outline-light btn-lg">
                                 <i class="fas fa-donate me-2"></i> Support Our Work
                             </a>
@@ -556,7 +616,7 @@
                                     <div>
                                         <small class="text-muted">
                                             <i class="fas fa-users me-1"></i>
-                                            {{ event.total_registrations }} registered
+                                            {{ event.total_registrations|default:"0" }} registered
                                         </small>
                                     </div>
                                     {% if event.registration_fee == 0 %}
@@ -566,10 +626,17 @@
                             </div>
                             <div class="card-footer bg-transparent">
                                 {% if event.requires_registration %}
-                                <a href="{% url 'events:event_register' event.id %}" 
-                                   class="btn btn-success w-100">
-                                    <i class="fas fa-user-plus me-2"></i> Register Now
-                                </a>
+                                    {% if user.is_authenticated %}
+                                    <a href="{% url 'events:event_register' event.id %}" 
+                                       class="btn btn-success w-100">
+                                        <i class="fas fa-user-plus me-2"></i> Register Now
+                                    </a>
+                                    {% else %}
+                                    <a href="{% url 'accounts:login' %}?next={% url 'events:event_register' event.id %}" 
+                                       class="btn btn-outline-success w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i> Login to Register
+                                    </a>
+                                    {% endif %}
                                 {% else %}
                                 <a href="{% url 'events:event_detail' event.id %}" 
                                    class="btn btn-outline-success w-100">
@@ -617,20 +684,25 @@
                     <div class="col-md-4 mb-4">
                         <div class="testimonial-card">
                             <div class="d-flex align-items-center mb-3">
-                                {% if testimonial.member.profile_picture %}
-                                <img src="{{ testimonial.member.profile_picture.url }}" 
+                                {% if testimonial.member.profile.profile_picture %}
+                                <img src="{{ testimonial.member.profile.profile_picture.url }}" 
                                      class="rounded-circle me-3" 
                                      width="60" 
+                                     height="60"
+                                     style="object-fit: cover;"
                                      alt="{{ testimonial.member.get_full_name }}">
                                 {% else %}
                                 <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-3" 
                                      style="width: 60px; height: 60px;">
-                                    <i class="fas fa-user text-white"></i>
+                                    <i class="fas fa-user fa-2x text-white"></i>
                                 </div>
                                 {% endif %}
                                 <div>
-                                    <h6 class="mb-0">{{ testimonial.member.get_full_name }}</h6>
-                                    <small class="text-muted">{{ testimonial.member.village }}, {{ testimonial.member.county }}</small>
+                                    <h6 class="mb-0">{{ testimonial.member.get_full_name|default:testimonial.member.username }}</h6>
+                                    <small class="text-muted">
+                                        {% if testimonial.member.profile.village %}{{ testimonial.member.profile.village }}, {% endif %}
+                                        {% if testimonial.member.profile.county %}{{ testimonial.member.profile.county }}{% endif %}
+                                    </small>
                                 </div>
                             </div>
                             <p class="mb-0">
@@ -641,7 +713,7 @@
                             <div class="mt-3">
                                 <small class="text-muted">
                                     <i class="fas fa-tree me-1"></i>
-                                    {{ testimonial.member.member_profile.trees_planted|default:0 }} trees planted
+                                    {{ testimonial.member.profile.trees_planted|default:"0" }} trees planted
                                 </small>
                             </div>
                         </div>
@@ -677,14 +749,14 @@
                     <div class="col-md-3 col-6 mb-4 text-center">
                         {% if partner.logo %}
                         <img src="{{ partner.logo.url }}" 
-                             class="partner-logo" 
+                             class="partner-logo mb-2" 
                              alt="{{ partner.name }}">
                         {% else %}
-                        <div class="partner-logo d-flex align-items-center justify-content-center">
+                        <div class="partner-logo d-flex align-items-center justify-content-center mb-2">
                             <i class="fas fa-handshake fa-3x text-muted"></i>
                         </div>
                         {% endif %}
-                        <p class="mt-2 mb-0">{{ partner.name }}</p>
+                        <p class="mt-2 mb-0 fw-bold">{{ partner.name }}</p>
                     </div>
                     {% empty %}
                     <div class="col-12 text-center">
@@ -724,20 +796,20 @@
                                     {% csrf_token %}
                                     <div class="mb-3">
                                         <label class="form-label">Your Name</label>
-                                        <input type="text" class="form-control" name="name" required>
+                                        <input type="text" class="form-control" name="name" value="{{ user.get_full_name }}" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Email Address</label>
-                                        <input type="email" class="form-control" name="email" required>
+                                        <input type="email" class="form-control" name="email" value="{{ user.email }}" required>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label">Interests (Optional)</label>
-                                        <select class="form-select" name="interests" multiple>
-                                            <option value="agroforestry">Agroforestry</option>
-                                            <option value="training">Training Programs</option>
-                                            <option value="events">Community Events</option>
-                                            <option value="funding">Funding Opportunities</option>
-                                            <option value="volunteer">Volunteer Opportunities</option>
+                                        <select class="form-select" name="interests" multiple size="3">
+                                            <option value="agroforestry">🌳 Agroforestry</option>
+                                            <option value="training">📚 Training Programs</option>
+                                            <option value="events">🎉 Community Events</option>
+                                            <option value="funding">💰 Funding Opportunities</option>
+                                            <option value="volunteer">🤝 Volunteer Opportunities</option>
                                         </select>
                                         <small class="text-muted">Hold Ctrl/Cmd to select multiple</small>
                                     </div>
@@ -778,25 +850,26 @@
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h5 class="mb-3">Quick Links</h5>
                     <div class="footer-links">
-                        <p><a href="#">Home</a></p>
-                        <p><a href="#">About Us</a></p>
+                        <p><a href="/">Home</a></p>
+                        <p><a href="#about">About Us</a></p>
                         <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
                         <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="#">Resources</a></p>
                     </div>
                 </div>
                 <div class="col-lg-3 col-md-6 mb-4">
                     <h5 class="mb-3">Contact Us</h5>
                     <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
-                    <p><i class="fas fa-phone me-2"></i> +254 700 000 000</p>
-                    <p><i class="fas fa-envelope me-2"></i> info@kacaf.org</p>
+                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254700000000" class="text-white">+254 700 000 000</a></p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
                 </div>
                 <div class="col-lg-3 mb-4">
                     <h5 class="mb-3">Follow Us</h5>
                     <div class="d-flex gap-3 mb-3">
-                        <a href="#" class="text-white"><i class="fab fa-facebook fa-2x"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="#" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
+                        <a href="https://facebook.com/kacaf" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="https://twitter.com/kacaf" target="_blank" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="https://instagram.com/kacaf" target="_blank" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="https://youtube.com/kacaf" target="_blank" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
                     </div>
                 </div>
             </div>
@@ -837,8 +910,10 @@
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const counter = entry.target.querySelector('.display-4');
-                    const value = parseInt(counter.textContent.replace(/,/g, ''));
-                    animateCounter(counter, 0, value, 2000);
+                    if (counter) {
+                        const value = parseInt(counter.textContent.replace(/,/g, '')) || 0;
+                        animateCounter(counter, 0, value, 2000);
+                    }
                     observer.unobserve(entry.target);
                 }
             });
@@ -855,14 +930,25 @@
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
             
             navLinks.forEach(link => {
-                if (link.getAttribute('href') === currentPath || 
-                    (currentPath === '/' && link.getAttribute('href') === '#') ||
-                    (currentPath.includes('/home') && link.textContent.includes('Home'))) {
+                const href = link.getAttribute('href');
+                if (href === currentPath || 
+                    (currentPath === '/' && href === '/') ||
+                    (currentPath === '/home/' && href === '/') ||
+                    (href && currentPath.includes(href) && href !== '#' && href !== '/')) {
                     link.classList.add('active');
                 } else {
                     link.classList.remove('active');
                 }
             });
+        });
+
+        // Newsletter form enhancement
+        document.querySelector('form[action*="newsletter_subscribe"]')?.addEventListener('submit', function(e) {
+            const email = this.querySelector('input[name="email"]').value;
+            if (!email.includes('@')) {
+                e.preventDefault();
+                alert('Please enter a valid email address');
+            }
         });
     </script>
 </body>

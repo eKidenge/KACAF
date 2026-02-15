@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'documents.apps.DocumentsConfig',
     'communications.apps.CommunicationsConfig',
     #'pages.apps.PagesConfig',
+    'testimonials.apps.TestimonialsConfig',
+    'partners.apps.PartnersConfig',
 ]
 
 INSTALLED_APPS += ['django_extensions']

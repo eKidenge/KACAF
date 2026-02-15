@@ -284,7 +284,7 @@ def event_list(request):
         'past_count': events.filter(start_datetime__lt=timezone.now()).count(),
         'filter_type': filter_type,
     }
-    return render(request, 'events/event_list.html', context)
+    return render(request, 'events/event/event_list.html', context)
 
 
 @login_required
@@ -317,3 +317,66 @@ def event_calendar(request):
         'total_events': events.count(),
     }
     return render(request, 'events/event_calendar.html', context)
+
+
+
+    # Additional web views for event detail, create/edit, registration management, etc. can be added similarly.
+    # events/views.py
+from django.shortcuts import render
+from django.utils import timezone
+from .models import Event, EventPhoto, EventResource
+
+def public_dashboard(request):
+    """
+    Public dashboard showing upcoming events, featured photos, and resources.
+    """
+    # Only public events that are upcoming
+    upcoming_events = Event.objects.filter(
+        is_public=True,
+        start_datetime__gte=timezone.now(),
+        status__in=['published', 'ongoing']
+    ).order_by('start_datetime')
+
+    # Featured photos for public gallery
+    featured_photos = EventPhoto.objects.filter(
+        is_featured=True,
+        event__is_public=True
+    ).order_by('-uploaded_at')
+
+    # Public resources
+    public_resources = EventResource.objects.filter(
+        is_public=True,
+        event__is_public=True
+    ).order_by('-uploaded_at')
+
+    context = {
+        'upcoming_events': upcoming_events,
+        'featured_photos': featured_photos,
+        'public_resources': public_resources,
+        'total_events': upcoming_events.count(),
+        'total_photos': featured_photos.count(),
+        'total_resources': public_resources.count(),
+    }
+
+    return render(request, 'dashboard/public_dashboard.html', context)
+
+
+def public_event_detail(request, event_id):
+    """
+    Public view for a single event detail page.
+    """
+    try:
+        event = Event.objects.get(id=event_id, is_public=True)
+    except Event.DoesNotExist:
+        event = None
+
+    photos = event.photos.filter(is_featured=True) if event else []
+    resources = event.resources.filter(is_public=True) if event else []
+
+    context = {
+        'event': event,
+        'photos': photos,
+        'resources': resources,
+    }
+
+    return render(request, 'dashboard/public_event_detail.html', context)

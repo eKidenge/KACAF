@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.http import HttpResponseRedirect
 from django.views.generic import TemplateView
 from accounts import views as accounts_views
+from programs import views as programs_views
 from rest_framework import permissions
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -60,7 +61,9 @@ urlpatterns = [
     path("", root_redirect, name="root"),
 
     # Accounts app handles home and dashboards
-    path("home/", accounts_views.public_dashboard, name="public_home"),  # <-- THIS fixes /home/
+    #path("home/", accounts_views.public_dashboard, name="public_home"),  # <-- THIS fixes /home/
+    path("home/", programs_views.public_dashboard, name="public_home"),
+
     path("accounts/", include("accounts.urls", namespace="accounts")),
 
 
@@ -75,7 +78,11 @@ urlpatterns = [
     # App APIs
     #path("api/accounts/", include("accounts.urls")),
     path("api/governance/", include("governance.urls")),
-    path("api/programs/", include("programs.urls")),
+    #path("api/programs/", include("programs.urls")),
+    #path("programs/", include("programs.urls")),  # Handles both web and API
+    path("programs/", include(("programs.urls", "programs"), namespace="programs")),
+    path("api/programs/", include(("programs.urls", "programs_api"), namespace="programs_api")),
+
     path("api/finance/", include("finance.urls")),
     path("api/events/", include("events.urls")),
     path("api/documents/", include("documents.urls")),

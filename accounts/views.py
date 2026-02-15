@@ -175,7 +175,7 @@ def member_dashboard(request):
     """Regular member dashboard"""
     # Get member profile - handle case where it doesn't exist
     try:
-        profile = request.user.memberprofile
+        profile = request.user.member_profile
     except (MemberProfile.DoesNotExist, AttributeError):
         # Create a profile if it doesn't exist and user is a member
         if request.user.user_type == 'member':
@@ -207,7 +207,7 @@ def profile(request):
     """
     user_profile = None
     try:
-        user_profile = request.user.memberprofile
+        user_profile = request.user.member_profile
     except (MemberProfile.DoesNotExist, AttributeError):
         # Create a profile if it doesn't exist and user is a member
         if request.user.user_type == 'member':
@@ -274,7 +274,7 @@ class UserDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         
         # Get member profile if exists
         try:
-            context['member_profile'] = user_obj.memberprofile
+            context['member_profile'] = user_obj.member_profile
         except (MemberProfile.DoesNotExist, AttributeError):
             context['member_profile'] = None
             
@@ -486,6 +486,7 @@ def terms_view(request):
 def privacy_view(request):
     """Render the Privacy Policy page"""
     return render(request, 'accounts/privacy.html')
+
 
 # accounts/views.py - Add this function
 
