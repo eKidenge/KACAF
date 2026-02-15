@@ -1,773 +1,1257 @@
-{% extends 'base/base.html' %}
 {% load static %}
-{% load humanize %}  <!-- ADD THIS LINE -->
-{% load program_extras %}  <!-- ADD THIS LINE -->
+{% load humanize %}
+{% load program_extras %}
 
-{% block title %}Our Programs - KACAF{% endblock %}
-
-{% block extra_css %}
-<style>
-    .program-card {
-        transition: transform 0.3s, box-shadow 0.3s;
-        height: 100%;
-        border-top: 4px solid;
-    }
-    .program-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-    }
-    .program-agroforestry {
-        border-top-color: #198754;
-    }
-    .program-climate_smart_ag {
-        border-top-color: #20c997;
-    }
-    .program-biodiversity {
-        border-top-color: #0dcaf0;
-    }
-    .program-restoration {
-        border-top-color: #ffc107;
-    }
-    .program-education {
-        border-top-color: #6f42c1;
-    }
-    .program-card-img {
-        height: 200px;
-        object-fit: cover;
-    }
-    .progress-circle {
-        width: 80px;
-        height: 80px;
-    }
-    .stat-badge {
-        font-size: 0.8rem;
-    }
-</style>
-{% endblock %}
-
-{% block content %}
-<div class="container-fluid">
-    <!-- Hero Section -->
-    <div class="bg-success text-white rounded-3 p-5 mb-5 position-relative overflow-hidden">
-        <div class="position-absolute top-0 end-0 opacity-25">
-            <i class="fas fa-seedling fa-10x"></i>
-        </div>
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h1 class="display-5 fw-bold mb-3">
-                    <i class="fas fa-project-diagram me-3"></i>
-                    Our Programs
-                </h1>
-                <p class="lead mb-4">
-                    Transforming West Pokot County through sustainable agroforestry, 
-                    biodiversity conservation, and climate action initiatives.
-                </p>
-                <div class="d-flex flex-wrap gap-3">
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-tree me-2"></i>{{ total_trees_planted|intcomma }} Trees Planted
-                    </span>
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-users me-2"></i>{{ total_beneficiaries|intcomma }} Beneficiaries
-                    </span>
-                    <span class="badge bg-light text-dark fs-6 py-2">
-                        <i class="fas fa-map-marked-alt me-2"></i>{{ total_area_coverage }} Hectares
-                    </span>
-                </div>
-            </div>
-            <div class="col-lg-4 text-center">
-                <div class="bg-white rounded-3 p-4 shadow">
-                    <div class="display-6 text-success mb-2">{{ carbon_sequestered|floatformat:0 }}</div>
-                    <p class="text-muted mb-0">Tons of CO₂ Sequestered</p>
-                    <small class="text-muted">Equivalent to {{ equivalent_cars }} cars off the road</small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Program Filters -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="row g-3">
-                <div class="col-md-3">
-                    <div class="input-group">
-                        <span class="input-group-text bg-success text-white">
-                            <i class="fas fa-search"></i>
-                        </span>
-                        <input type="text" class="form-control" id="searchPrograms" placeholder="Search programs...">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Programs - KACAF</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Leaflet Maps -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --light-green: #d1e7dd;
+            --dark-green: #0d3625;
+            --accent-gold: #ffc107;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional with Enhanced Hover */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.8rem 1.3rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        /* Bold Hover Effect */
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Active Link Style with Bold Indicator */
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 900;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Navbar Toggler - Enhanced */
+        .navbar-toggler {
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .navbar-toggler:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+        
+        .navbar-toggler:focus {
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .navbar-toggler-icon {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+        }
+        
+        /* Program Cards */
+        .program-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+            height: 100%;
+            border-top: 4px solid;
+        }
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        .program-agroforestry {
+            border-top-color: #198754;
+        }
+        .program-climate_smart_ag {
+            border-top-color: #20c997;
+        }
+        .program-biodiversity {
+            border-top-color: #0dcaf0;
+        }
+        .program-restoration {
+            border-top-color: #ffc107;
+        }
+        .program-education {
+            border-top-color: #6f42c1;
+        }
+        .program-card-img {
+            height: 200px;
+            object-fit: cover;
+        }
+        .progress-circle {
+            width: 80px;
+            height: 80px;
+        }
+        .stat-badge {
+            font-size: 0.8rem;
+        }
+        
+        /* Program Type Cards */
+        .program-type-card {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .program-type-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .brand-text h1 {
+                font-size: 1.6rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.8rem;
+            }
+            
+            .navbar-nav .nav-link {
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+            }
+        }
+        
+        @media (max-width: 991px) {
+            .container-fluid {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+            
+            .navbar-nav {
+                padding: 1rem 0;
+                background: rgba(10, 92, 59, 0.95);
+                border-radius: 15px;
+                margin-top: 15px;
+                backdrop-filter: blur(10px);
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 5px 15px;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+                border-radius: 10px;
+            }
+            
+            .navbar-nav .nav-link:hover {
+                transform: translateY(-2px);
+            }
+            
+            .navbar-nav .nav-link.active::before {
+                bottom: 5px;
+                width: 60px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.4rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.7rem;
+            }
+            
+            .brand-logo-container {
+                width: 55px;
+                height: 55px;
+                margin-right: 12px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .brand-text h1 {
+                font-size: 1.2rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.65rem;
+            }
+            
+            .brand-logo-container {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            .brand-text h1 {
+                font-size: 1rem;
+            }
+            
+            .brand-text p {
+                font-size: 0.6rem;
+                line-height: 1.2;
+            }
+            
+            .navbar-nav .nav-link {
+                font-size: 0.9rem;
+                padding: 0.8rem 1rem;
+            }
+            
+            .brand-logo-container {
+                width: 40px;
+                height: 40px;
+                border-radius: 10px;
+                margin-right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Full Width with Logo -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="programTypeFilter">
-                        <option value="">All Program Types</option>
-                        {% for type in program_types %}
-                        <option value="{{ type.0 }}">{{ type.1 }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="statusFilter">
-                        <option value="">All Status</option>
-                        <option value="active">Active</option>
-                        <option value="completed">Completed</option>
-                        <option value="planning">Planning</option>
-                    </select>
-                </div>
-                <div class="col-md-3">
-                    <select class="form-select" id="countyFilter">
-                        <option value="">All Counties</option>
-                        {% for county in counties %}
-                        <option value="{{ county }}">{{ county }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-            <div class="row mt-3">
-                <div class="col">
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="featuredFilter" value="featured">
-                        <label class="form-check-label" for="featuredFilter">
-                            Show Featured Only
-                        </label>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
                     </div>
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="checkbox" id="myProgramsFilter" value="my-programs">
-                        <label class="form-check-label" for="myProgramsFilter">
-                            My Programs Only
-                        </label>
-                    </div>
-                    <button class="btn btn-sm btn-outline-success float-end" id="resetFiltersBtn">
-                        <i class="fas fa-redo"></i> Reset
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Program Stats -->
-    <div class="row mb-4">
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-project-diagram"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ total_programs }}</div>
-                    <p class="text-muted mb-0">Total Programs</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-tasks"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ active_programs }}</div>
-                    <p class="text-muted mb-0">Active Programs</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="h4 mb-0">{{ total_team_members }}</div>
-                    <p class="text-muted mb-0">Team Members</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-            <div class="card text-center h-100">
-                <div class="card-body">
-                    <div class="text-success display-6 mb-2">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="h5 mb-0">KES {{ total_budget|intcomma }}</div>
-                    <p class="text-muted mb-0">Total Budget</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Program Categories -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <h3 class="h4 mb-3">
-                <i class="fas fa-layer-group text-success me-2"></i>
-                Program Categories
-            </h3>
-            <div class="row g-3">
-                {% for type in program_types %}
-                <div class="col-md-4 col-lg-2 mb-3">
-                    <div class="card text-center program-type-card" data-type="{{ type.0 }}">
-                        <div class="card-body">
-                            {% if type.0 == 'agroforestry' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-tree"></i>
-                            </div>
-                            <h6 class="mb-0">Agroforestry</h6>
-                            {% elif type.0 == 'climate_smart_ag' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-cloud-sun"></i>
-                            </div>
-                            <h6 class="mb-0">Climate-Smart Ag</h6>
-                            {% elif type.0 == 'biodiversity' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-dove"></i>
-                            </div>
-                            <h6 class="mb-0">Biodiversity</h6>
-                            {% elif type.0 == 'restoration' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-mountain"></i>
-                            </div>
-                            <h6 class="mb-0">Restoration</h6>
-                            {% elif type.0 == 'education' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <h6 class="mb-0">Education</h6>
-                            {% elif type.0 == 'capacity' %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                            <h6 class="mb-0">Capacity Building</h6>
-                            {% else %}
-                            <div class="text-success display-6 mb-2">
-                                <i class="fas fa-hands-helping"></i>
-                            </div>
-                            <h6 class="mb-0">{{ type.1 }}</h6>
-                            {% endif %}
-                            <small class="text-muted">
-                                {{ programs_by_type|get_item:type.0 }} programs
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-        </div>
-    </div>
-
-    <!-- Programs Grid -->
-    <div class="row mb-4" id="programsGrid">
-        {% for program in programs %}
-        <div class="col-lg-4 col-md-6 mb-4 program-item" 
-             data-type="{{ program.program_type }}"
-             data-status="{{ program.status }}"
-             data-county="{{ program.county }}"
-             data-featured="{{ program.is_featured|yesno:'true,false' }}"
-             data-myprogram="{{ program|is_my_program:user|yesno:'true,false' }}">
-            <div class="card program-card program-{{ program.program_type }} h-100">
-                <!-- Program Header -->
-                <div class="card-header position-relative">
-                    {% if program.is_featured %}
-                    <span class="position-absolute top-0 start-0 translate-middle-y badge bg-warning">
-                        <i class="fas fa-star me-1"></i> Featured
-                    </span>
-                    {% endif %}
-                    
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h5 class="card-title mb-1">{{ program.title|truncatechars:40 }}</h5>
-                            <div class="d-flex flex-wrap gap-1">
-                                <span class="badge bg-{% if program.program_type == 'agroforestry' %}success{% elif program.program_type == 'climate_smart_ag' %}info{% elif program.program_type == 'biodiversity' %}primary{% else %}secondary{% endif %} stat-badge">
-                                    {{ program.get_program_type_display }}
-                                </span>
-                                <span class="badge bg-{% if program.status == 'active' %}success{% elif program.status == 'completed' %}secondary{% else %}warning{% endif %} stat-badge">
-                                    {{ program.get_status_display }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-success dropdown-toggle" 
-                                    type="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'programs:program_detail' program.id %}">
-                                        <i class="fas fa-eye me-2"></i> View Details
-                                    </a>
-                                </li>
-                                {% if user in program.team_members.all or perms.programs.change_program %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'programs:program_edit' program.id %}">
-                                        <i class="fas fa-edit me-2"></i> Edit
-                                    </a>
-                                </li>
-                                {% endif %}
-                                <li>
-                                    <a class="dropdown-item" href="{% url 'programs:program_report' program.id %}">
-                                        <i class="fas fa-download me-2"></i> Download Report
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                </a>
                 
-                <!-- Program Image -->
-                {% if program.featured_image %}
-                <img src="{{ program.featured_image.url }}" 
-                     class="card-img-top program-card-img" 
-                     alt="{{ program.title }}">
-                {% else %}
-                <div class="program-card-img bg-light d-flex align-items-center justify-content-center">
-                    <i class="fas fa-project-diagram fa-5x text-muted"></i>
-                </div>
-                {% endif %}
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
                 
-                <!-- Card Body -->
-                <div class="card-body">
-                    <!-- Description -->
-                    <p class="card-text">{{ program.description|truncatechars:150 }}</p>
-                    
-                    <!-- Location -->
-                    <div class="mb-3">
-                        <small class="text-muted">
-                            <i class="fas fa-map-marker-alt me-1"></i>
-                            {{ program.county }}
-                            {% if program.sub_counties %}
-                            - {{ program.sub_counties|truncatechars:30 }}
-                            {% endif %}
-                        </small>
-                    </div>
-                    
-                    <!-- Progress -->
-                    <div class="mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <small>Progress</small>
-                            <small>{{ program.progress }}%</small>
-                        </div>
-                        <div class="progress" style="height: 8px;">
-                            <div class="progress-bar bg-success" role="progressbar" 
-                                 style="width: {{ program.progress }}%;">
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Stats -->
-                    <div class="row g-2 mb-3">
-                        <div class="col-4 text-center">
-                            <div class="border rounded py-1">
-                                <small class="text-muted d-block">Trees</small>
-                                <strong>{{ program.total_trees_planted }}</strong>
-                            </div>
-                        </div>
-                        <div class="col-4 text-center">
-                            <div class="border rounded py-1">
-                                <small class="text-muted d-block">Farmers</small>
-                                <strong>{{ program.beneficiaries_reached }}</strong>
-                            </div>
-                        </div>
-                        <div class="col-4 text-center">
-                            <div class="border rounded py-1">
-                                <small class="text-muted d-block">Projects</small>
-                                <strong>{{ program.projects_count }}</strong>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Timeline -->
-                    <div class="mb-3">
-                        <small class="text-muted d-block mb-1">
-                            <i class="fas fa-calendar-alt me-1"></i>
-                            {{ program.start_date|date:"M Y" }} - 
-                            {% if program.end_date %}
-                            {{ program.end_date|date:"M Y" }}
-                            {% else %}
-                            Ongoing
-                            {% endif %}
-                        </small>
-                        <small class="text-muted">
-                            <i class="fas fa-clock me-1"></i>
-                            {{ program.duration_months }} months
-                        </small>
-                    </div>
-                    
-                    <!-- Program Manager -->
-                    {% if program.program_manager %}
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            {% if program.program_manager.profile_picture %}
-                            <img src="{{ program.program_manager.profile_picture.url }}" 
-                                 class="rounded-circle" 
-                                 width="30" 
-                                 alt="{{ program.program_manager.get_full_name }}">
-                            {% else %}
-                            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" 
-                                 style="width: 30px; height: 30px;">
-                                <i class="fas fa-user text-white"></i>
-                            </div>
-                            {% endif %}
-                        </div>
-                        <div class="flex-grow-1 ms-2">
-                            <small class="d-block">Program Manager</small>
-                            <small class="fw-bold">{{ program.program_manager.get_full_name }}</small>
-                        </div>
-                    </div>
-                    {% endif %}
-                </div>
-                
-                <!-- Card Footer -->
-                <div class="card-footer bg-transparent">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            {% if user in program.team_members.all %}
-                            <span class="badge bg-success">
-                                <i class="fas fa-user-check me-1"></i> Team Member
-                            </span>
-                            {% else %}
-                            <a href="{% url 'programs:program_join' program.id %}" 
-                               class="btn btn-sm btn-outline-success">
-                                <i class="fas fa-user-plus me-1"></i> Join Program
+                <!-- Navigation Links with Enhanced Hover -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/">
+                                HOME
                             </a>
-                            {% endif %}
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="{% url 'programs:program_list' %}">
+                                PROGRAMS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'events:event_list' %}">
+                                EVENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                RESOURCES
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ANNOUNCEMENTS
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                ABOUT US
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'communications:contact' %}">
+                                CONTACT
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <div class="container-fluid py-4">
+            <!-- Hero Section -->
+            <div class="bg-success text-white rounded-3 p-5 mb-5 position-relative overflow-hidden">
+                <div class="position-absolute top-0 end-0 opacity-25">
+                    <i class="fas fa-seedling fa-10x"></i>
+                </div>
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-5 fw-bold mb-3">
+                            <i class="fas fa-project-diagram me-3"></i>
+                            Our Programs
+                        </h1>
+                        <p class="lead mb-4">
+                            Transforming West Pokot County through sustainable agroforestry, 
+                            biodiversity conservation, and climate action initiatives.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <span class="badge bg-light text-dark fs-6 py-2">
+                                <i class="fas fa-tree me-2"></i>{{ total_trees_planted|default:"0"|intcomma }} Trees Planted
+                            </span>
+                            <span class="badge bg-light text-dark fs-6 py-2">
+                                <i class="fas fa-users me-2"></i>{{ total_beneficiaries|default:"0"|intcomma }} Beneficiaries
+                            </span>
+                            <span class="badge bg-light text-dark fs-6 py-2">
+                                <i class="fas fa-map-marked-alt me-2"></i>{{ total_area_coverage|default:"0" }} Hectares
+                            </span>
                         </div>
-                        <a href="{% url 'programs:program_detail' program.id %}" 
-                           class="btn btn-sm btn-success">
-                            View Details <i class="fas fa-arrow-right ms-1"></i>
-                        </a>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <div class="bg-white rounded-3 p-4 shadow">
+                            <div class="display-6 text-success mb-2">{{ carbon_sequestered|default:"0"|floatformat:0 }}</div>
+                            <p class="text-muted mb-0">Tons of CO₂ Sequestered</p>
+                            <small class="text-muted">Equivalent to {{ equivalent_cars|default:"0" }} cars off the road</small>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-            <div class="card">
-                <div class="card-body text-center py-5">
-                    <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
-                    <h5 class="text-muted">No Programs Found</h5>
-                    <p class="text-muted">There are no programs matching your criteria.</p>
-                    {% if perms.programs.add_program %}
-                    <a href="{% url 'programs:program_create' %}" class="btn btn-success">
-                        <i class="fas fa-plus me-1"></i> Create First Program
-                    </a>
-                    {% endif %}
+
+            <!-- Program Filters -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="input-group">
+                                <span class="input-group-text bg-success text-white">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" class="form-control" id="searchPrograms" placeholder="Search programs...">
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="programTypeFilter">
+                                <option value="">All Program Types</option>
+                                {% for type in program_types %}
+                                <option value="{{ type.0 }}">{{ type.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="statusFilter">
+                                <option value="">All Status</option>
+                                <option value="active">Active</option>
+                                <option value="completed">Completed</option>
+                                <option value="planning">Planning</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <select class="form-select" id="countyFilter">
+                                <option value="">All Counties</option>
+                                {% for county in counties %}
+                                <option value="{{ county }}">{{ county }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="featuredFilter" value="featured">
+                                <label class="form-check-label" for="featuredFilter">
+                                    Show Featured Only
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="myProgramsFilter" value="my-programs">
+                                <label class="form-check-label" for="myProgramsFilter">
+                                    My Programs Only
+                                </label>
+                            </div>
+                            <button class="btn btn-sm btn-outline-success float-end" id="resetFiltersBtn">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
-    </div>
 
-    <!-- Map View -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">
-                <i class="fas fa-map me-2"></i>Program Locations Map
-            </h6>
-            <button class="btn btn-sm btn-light" id="toggleMapView">
-                <i class="fas fa-expand-alt"></i> Full Screen
-            </button>
-        </div>
-        <div class="card-body p-0">
-            <div id="programMap" style="height: 400px;"></div>
-        </div>
-    </div>
-
-    <!-- Featured Programs -->
-    {% if featured_programs %}
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h6 class="mb-0">
-                <i class="fas fa-star me-2"></i>Featured Programs
-            </h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                {% for program in featured_programs|slice:":3" %}
-                <div class="col-md-4 mb-3">
-                    <div class="card border-success h-100">
+            <!-- Program Stats -->
+            <div class="row mb-4">
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card text-center h-100">
                         <div class="card-body">
-                            <div class="d-flex align-items-start mb-3">
-                                <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
-                                     style="width: 50px; height: 50px;">
-                                    <i class="fas fa-star text-white"></i>
-                                </div>
-                                <div class="ms-3">
-                                    <h5 class="card-title mb-1">{{ program.title }}</h5>
-                                    <p class="card-text small text-muted">{{ program.description|truncatechars:100 }}</p>
-                                </div>
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-project-diagram"></i>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
+                            <div class="h4 mb-0">{{ total_programs|default:"0" }}</div>
+                            <p class="text-muted mb-0">Total Programs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="h4 mb-0">{{ active_programs|default:"0" }}</div>
+                            <p class="text-muted mb-0">Active Programs</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="h4 mb-0">{{ total_team_members|default:"0" }}</div>
+                            <p class="text-muted mb-0">Team Members</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-3">
+                    <div class="card text-center h-100">
+                        <div class="card-body">
+                            <div class="text-success display-6 mb-2">
+                                <i class="fas fa-money-bill-wave"></i>
+                            </div>
+                            <div class="h5 mb-0">KES {{ total_budget|default:"0"|intcomma }}</div>
+                            <p class="text-muted mb-0">Total Budget</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Program Categories -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <h3 class="h4 mb-3">
+                        <i class="fas fa-layer-group text-success me-2"></i>
+                        Program Categories
+                    </h3>
+                    <div class="row g-3">
+                        {% for type in program_types %}
+                        <div class="col-md-4 col-lg-2 mb-3">
+                            <div class="card text-center program-type-card" data-type="{{ type.0 }}">
+                                <div class="card-body">
+                                    {% if type.0 == 'agroforestry' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-tree"></i>
+                                    </div>
+                                    <h6 class="mb-0">Agroforestry</h6>
+                                    {% elif type.0 == 'climate_smart_ag' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-cloud-sun"></i>
+                                    </div>
+                                    <h6 class="mb-0">Climate-Smart Ag</h6>
+                                    {% elif type.0 == 'biodiversity' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-dove"></i>
+                                    </div>
+                                    <h6 class="mb-0">Biodiversity</h6>
+                                    {% elif type.0 == 'restoration' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-mountain"></i>
+                                    </div>
+                                    <h6 class="mb-0">Restoration</h6>
+                                    {% elif type.0 == 'education' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <h6 class="mb-0">Education</h6>
+                                    {% elif type.0 == 'capacity' %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-chalkboard-teacher"></i>
+                                    </div>
+                                    <h6 class="mb-0">Capacity Building</h6>
+                                    {% else %}
+                                    <div class="text-success display-6 mb-2">
+                                        <i class="fas fa-hands-helping"></i>
+                                    </div>
+                                    <h6 class="mb-0">{{ type.1 }}</h6>
+                                    {% endif %}
                                     <small class="text-muted">
-                                        <i class="fas fa-map-marker-alt me-1"></i>
-                                        {{ program.county }}
+                                        {{ programs_by_type|get_item:type.0 }} programs
                                     </small>
                                 </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Programs Grid -->
+            <div class="row mb-4" id="programsGrid">
+                {% for program in programs %}
+                <div class="col-lg-4 col-md-6 mb-4 program-item" 
+                     data-type="{{ program.program_type }}"
+                     data-status="{{ program.status }}"
+                     data-county="{{ program.county }}"
+                     data-featured="{{ program.is_featured|yesno:'true,false' }}"
+                     data-myprogram="{{ program|is_my_program:user|yesno:'true,false' }}">
+                    <div class="card program-card program-{{ program.program_type }} h-100">
+                        <!-- Program Header -->
+                        <div class="card-header position-relative">
+                            {% if program.is_featured %}
+                            <span class="position-absolute top-0 start-0 translate-middle-y badge bg-warning">
+                                <i class="fas fa-star me-1"></i> Featured
+                            </span>
+                            {% endif %}
+                            
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 class="card-title mb-1">{{ program.title|truncatechars:40 }}</h5>
+                                    <div class="d-flex flex-wrap gap-1">
+                                        <span class="badge bg-{% if program.program_type == 'agroforestry' %}success{% elif program.program_type == 'climate_smart_ag' %}info{% elif program.program_type == 'biodiversity' %}primary{% else %}secondary{% endif %} stat-badge">
+                                            {{ program.get_program_type_display }}
+                                        </span>
+                                        <span class="badge bg-{% if program.status == 'active' %}success{% elif program.status == 'completed' %}secondary{% else %}warning{% endif %} stat-badge">
+                                            {{ program.get_status_display }}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-outline-success dropdown-toggle" 
+                                            type="button" data-bs-toggle="dropdown">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'programs:program_detail' program.id %}">
+                                                <i class="fas fa-eye me-2"></i> View Details
+                                            </a>
+                                        </li>
+                                        {% if user in program.team_members.all or perms.programs.change_program %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'programs:program_edit' program.id %}">
+                                                <i class="fas fa-edit me-2"></i> Edit
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                        <li>
+                                            <a class="dropdown-item" href="{% url 'programs:program_report' program.id %}">
+                                                <i class="fas fa-download me-2"></i> Download Report
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Program Image -->
+                        {% if program.featured_image %}
+                        <img src="{{ program.featured_image.url }}" 
+                             class="card-img-top program-card-img" 
+                             alt="{{ program.title }}">
+                        {% else %}
+                        <div class="program-card-img bg-light d-flex align-items-center justify-content-center">
+                            <i class="fas fa-project-diagram fa-5x text-muted"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Card Body -->
+                        <div class="card-body">
+                            <!-- Description -->
+                            <p class="card-text">{{ program.description|truncatechars:150 }}</p>
+                            
+                            <!-- Location -->
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-map-marker-alt me-1"></i>
+                                    {{ program.county }}
+                                    {% if program.sub_counties %}
+                                    - {{ program.sub_counties|truncatechars:30 }}
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <!-- Progress -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <small>Progress</small>
+                                    <small>{{ program.progress|default:"0" }}%</small>
+                                </div>
+                                <div class="progress" style="height: 8px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ program.progress|default:'0' }}%;">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Stats -->
+                            <div class="row g-2 mb-3">
+                                <div class="col-4 text-center">
+                                    <div class="border rounded py-1">
+                                        <small class="text-muted d-block">Trees</small>
+                                        <strong>{{ program.total_trees_planted|default:"0" }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="border rounded py-1">
+                                        <small class="text-muted d-block">Farmers</small>
+                                        <strong>{{ program.beneficiaries_reached|default:"0" }}</strong>
+                                    </div>
+                                </div>
+                                <div class="col-4 text-center">
+                                    <div class="border rounded py-1">
+                                        <small class="text-muted d-block">Projects</small>
+                                        <strong>{{ program.projects_count|default:"0" }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Timeline -->
+                            <div class="mb-3">
+                                <small class="text-muted d-block mb-1">
+                                    <i class="fas fa-calendar-alt me-1"></i>
+                                    {{ program.start_date|date:"M Y" }} - 
+                                    {% if program.end_date %}
+                                    {{ program.end_date|date:"M Y" }}
+                                    {% else %}
+                                    Ongoing
+                                    {% endif %}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-clock me-1"></i>
+                                    {{ program.duration_months|default:"0" }} months
+                                </small>
+                            </div>
+                            
+                            <!-- Program Manager -->
+                            {% if program.program_manager %}
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    {% if program.program_manager.profile_picture %}
+                                    <img src="{{ program.program_manager.profile_picture.url }}" 
+                                         class="rounded-circle" 
+                                         width="30" 
+                                         alt="{{ program.program_manager.get_full_name }}">
+                                    {% else %}
+                                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center" 
+                                         style="width: 30px; height: 30px;">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1 ms-2">
+                                    <small class="d-block">Program Manager</small>
+                                    <small class="fw-bold">{{ program.program_manager.get_full_name }}</small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Card Footer -->
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if user in program.team_members.all %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-user-check me-1"></i> Team Member
+                                    </span>
+                                    {% else %}
+                                    <a href="{% url 'programs:program_join' program.id %}" 
+                                       class="btn btn-sm btn-outline-success">
+                                        <i class="fas fa-user-plus me-1"></i> Join Program
+                                    </a>
+                                    {% endif %}
+                                </div>
                                 <a href="{% url 'programs:program_detail' program.id %}" 
-                                   class="btn btn-sm btn-outline-success">
-                                    Learn More
+                                   class="btn btn-sm btn-success">
+                                    View Details <i class="fas fa-arrow-right ms-1"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                 </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-project-diagram fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">No Programs Found</h5>
+                            <p class="text-muted">There are no programs matching your criteria.</p>
+                            {% if perms.programs.add_program %}
+                            <a href="{% url 'programs:program_create' %}" class="btn btn-success">
+                                <i class="fas fa-plus me-1"></i> Create First Program
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
                 {% endfor %}
             </div>
-        </div>
-    </div>
-    {% endif %}
 
-    <!-- Program Impact Statistics -->
-    <div class="card">
-        <div class="card-header bg-success text-white">
-            <h6 class="mb-0">
-                <i class="fas fa-chart-line me-2"></i>Program Impact Statistics
-            </h6>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <canvas id="impactChart" height="250"></canvas>
+            <!-- Map View -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-map me-2"></i>Program Locations Map
+                    </h6>
+                    <button class="btn btn-sm btn-light" id="toggleMapView">
+                        <i class="fas fa-expand-alt"></i> Full Screen
+                    </button>
                 </div>
-                <div class="col-md-6 mb-3">
-                    <canvas id="budgetChart" height="250"></canvas>
+                <div class="card-body p-0">
+                    <div id="programMap" style="height: 400px;"></div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Program</th>
-                            <th>Trees Planted</th>
-                            <th>Beneficiaries</th>
-                            <th>Area (ha)</th>
-                            <th>Budget (KES)</th>
-                            <th>Progress</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for program in top_programs %}
-                        <tr>
-                            <td>{{ program.title|truncatechars:30 }}</td>
-                            <td>{{ program.total_trees_planted }}</td>
-                            <td>{{ program.beneficiaries_reached }}</td>
-                            <td>{{ program.total_area|floatformat:2 }}</td>
-                            <td>{{ program.estimated_budget|floatformat:0 }}</td>
-                            <td>
-                                <div class="progress" style="height: 10px; width: 100px;">
-                                    <div class="progress-bar bg-success" style="width: {{ program.progress }}%;"></div>
+
+            <!-- Featured Programs -->
+            {% if featured_programs %}
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Featured Programs
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for program in featured_programs|slice:":3" %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card border-success h-100">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-start mb-3">
+                                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center" 
+                                             style="width: 50px; height: 50px;">
+                                            <i class="fas fa-star text-white"></i>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h5 class="card-title mb-1">{{ program.title }}</h5>
+                                            <p class="card-text small text-muted">{{ program.description|truncatechars:100 }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-muted">
+                                                <i class="fas fa-map-marker-alt me-1"></i>
+                                                {{ program.county }}
+                                            </small>
+                                        </div>
+                                        <a href="{% url 'programs:program_detail' program.id %}" 
+                                           class="btn btn-sm btn-outline-success">
+                                            Learn More
+                                        </a>
+                                    </div>
                                 </div>
-                                <small>{{ program.progress }}%</small>
-                            </td>
-                        </tr>
+                            </div>
+                        </div>
                         {% endfor %}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Program Impact Statistics -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Program Impact Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <canvas id="impactChart" height="250"></canvas>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <canvas id="budgetChart" height="250"></canvas>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Trees Planted</th>
+                                    <th>Beneficiaries</th>
+                                    <th>Area (ha)</th>
+                                    <th>Budget (KES)</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for program in top_programs %}
+                                <tr>
+                                    <td>{{ program.title|truncatechars:30 }}</td>
+                                    <td>{{ program.total_trees_planted|default:"0" }}</td>
+                                    <td>{{ program.beneficiaries_reached|default:"0" }}</td>
+                                    <td>{{ program.total_area|default:"0"|floatformat:2 }}</td>
+                                    <td>{{ program.estimated_budget|default:"0"|floatformat:0 }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 10px; width: 100px;">
+                                            <div class="progress-bar bg-success" style="width: {{ program.progress|default:'0' }}%;"></div>
+                                        </div>
+                                        <small>{{ program.progress|default:"0" }}%</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-{% endblock %}
+    </main>
 
-{% block extra_js %}
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Leaflet Maps -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                        </div>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
+                        </div>
+                    </div>
+                    <p>Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="#about">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:event_list' %}">Events</a></p>
+                        <p><a href="#">Resources</a></p>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
+                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254700000000" class="text-white">+254 700 000 000</a></p>
+                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
+                </div>
+                <div class="col-lg-3 mb-4">
+                    <h5 class="mb-3">Follow Us</h5>
+                    <div class="d-flex gap-3 mb-3">
+                        <a href="https://facebook.com/kacaf" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x"></i></a>
+                        <a href="https://twitter.com/kacaf" target="_blank" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="https://instagram.com/kacaf" target="_blank" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
+                        <a href="https://youtube.com/kacaf" target="_blank" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-white">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-white me-3">Privacy Policy</a>
+                    <a href="#" class="text-white">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-<script>
-    // Program filtering
-    function filterPrograms() {
-        const searchTerm = document.getElementById('searchPrograms').value.toLowerCase();
-        const typeFilter = document.getElementById('programTypeFilter').value;
-        const statusFilter = document.getElementById('statusFilter').value;
-        const countyFilter = document.getElementById('countyFilter').value;
-        const featuredFilter = document.getElementById('featuredFilter').checked;
-        const myProgramsFilter = document.getElementById('myProgramsFilter').checked;
-        
-        const programItems = document.querySelectorAll('.program-item');
-        
-        programItems.forEach(item => {
-            const title = item.querySelector('.card-title').textContent.toLowerCase();
-            const type = item.dataset.type;
-            const status = item.dataset.status;
-            const county = item.dataset.county;
-            const featured = item.dataset.featured === 'true';
-            const myprogram = item.dataset.myprogram === 'true';
-            
-            let show = true;
-            
-            // Search filter
-            if (searchTerm && !title.includes(searchTerm)) {
-                show = false;
-            }
-            
-            // Type filter
-            if (typeFilter && type !== typeFilter) {
-                show = false;
-            }
-            
-            // Status filter
-            if (statusFilter && status !== statusFilter) {
-                show = false;
-            }
-            
-            // County filter
-            if (countyFilter && county !== countyFilter) {
-                show = false;
-            }
-            
-            // Featured filter
-            if (featuredFilter && !featured) {
-                show = false;
-            }
-            
-            // My programs filter
-            if (myProgramsFilter && !myprogram) {
-                show = false;
-            }
-            
-            item.style.display = show ? 'block' : 'none';
-        });
-    }
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    // Event listeners for filters
-    document.getElementById('searchPrograms').addEventListener('keyup', filterPrograms);
-    document.getElementById('programTypeFilter').addEventListener('change', filterPrograms);
-    document.getElementById('statusFilter').addEventListener('change', filterPrograms);
-    document.getElementById('countyFilter').addEventListener('change', filterPrograms);
-    document.getElementById('featuredFilter').addEventListener('change', filterPrograms);
-    document.getElementById('myProgramsFilter').addEventListener('change', filterPrograms);
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    // Reset filters
-    document.getElementById('resetFiltersBtn').addEventListener('click', function() {
-        document.getElementById('searchPrograms').value = '';
-        document.getElementById('programTypeFilter').value = '';
-        document.getElementById('statusFilter').value = '';
-        document.getElementById('countyFilter').value = '';
-        document.getElementById('featuredFilter').checked = false;
-        document.getElementById('myProgramsFilter').checked = false;
-        
-        const programItems = document.querySelectorAll('.program-item');
-        programItems.forEach(item => {
-            item.style.display = 'block';
-        });
-    });
-    
-    // Program type card click
-    document.querySelectorAll('.program-type-card').forEach(card => {
-        card.addEventListener('click', function() {
-            const type = this.dataset.type;
-            document.getElementById('programTypeFilter').value = type;
-            filterPrograms();
-        });
-    });
-    
-    // Initialize map
-    let programMap;
-    document.addEventListener('DOMContentLoaded', function() {
-        programMap = L.map('programMap').setView([1.9167, 35.1667], 9);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(programMap);
-        
-        // Add markers for programs
-        {% for program in programs %}
-        {% if program.gps_coordinates %}
-        const coords = "{{ program.gps_coordinates }}".split(',').map(Number);
-        if (coords.length === 2) {
-            L.marker(coords)
-                .addTo(programMap)
-                .bindPopup(`
-                    <strong>{{ program.title }}</strong><br>
-                    <small>{{ program.get_program_type_display }}</small><br>
-                    <a href="{% url 'programs:program_detail' program.id %}" class="btn btn-sm btn-success mt-1">
-                        View Details
-                    </a>
-                `);
+    <!-- Leaflet Maps -->
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+    <script>
+        // Program filtering
+        function filterPrograms() {
+            const searchTerm = document.getElementById('searchPrograms').value.toLowerCase();
+            const typeFilter = document.getElementById('programTypeFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const countyFilter = document.getElementById('countyFilter').value;
+            const featuredFilter = document.getElementById('featuredFilter').checked;
+            const myProgramsFilter = document.getElementById('myProgramsFilter').checked;
+            
+            const programItems = document.querySelectorAll('.program-item');
+            
+            programItems.forEach(item => {
+                const title = item.querySelector('.card-title').textContent.toLowerCase();
+                const type = item.dataset.type;
+                const status = item.dataset.status;
+                const county = item.dataset.county;
+                const featured = item.dataset.featured === 'true';
+                const myprogram = item.dataset.myprogram === 'true';
+                
+                let show = true;
+                
+                // Search filter
+                if (searchTerm && !title.includes(searchTerm)) {
+                    show = false;
+                }
+                
+                // Type filter
+                if (typeFilter && type !== typeFilter) {
+                    show = false;
+                }
+                
+                // Status filter
+                if (statusFilter && status !== statusFilter) {
+                    show = false;
+                }
+                
+                // County filter
+                if (countyFilter && county !== countyFilter) {
+                    show = false;
+                }
+                
+                // Featured filter
+                if (featuredFilter && !featured) {
+                    show = false;
+                }
+                
+                // My programs filter
+                if (myProgramsFilter && !myprogram) {
+                    show = false;
+                }
+                
+                item.style.display = show ? 'block' : 'none';
+            });
         }
-        {% endif %}
-        {% endfor %}
-    });
-    
-    // Toggle map view
-    document.getElementById('toggleMapView').addEventListener('click', function() {
-        const mapElement = document.getElementById('programMap');
-        mapElement.requestFullscreen();
-    });
-    
-    // Impact Chart
-    const impactCtx = document.getElementById('impactChart').getContext('2d');
-    const impactChart = new Chart(impactCtx, {
-        type: 'line',
-        data: {
-            labels: {{ monthly_labels|safe }},
-            datasets: [
-                {
-                    label: 'Trees Planted',
-                    data: {{ monthly_trees|safe }},
-                    borderColor: '#198754',
-                    backgroundColor: 'rgba(25, 135, 84, 0.1)',
-                    fill: true,
-                    tension: 0.4
+        
+        // Event listeners for filters
+        document.getElementById('searchPrograms')?.addEventListener('keyup', filterPrograms);
+        document.getElementById('programTypeFilter')?.addEventListener('change', filterPrograms);
+        document.getElementById('statusFilter')?.addEventListener('change', filterPrograms);
+        document.getElementById('countyFilter')?.addEventListener('change', filterPrograms);
+        document.getElementById('featuredFilter')?.addEventListener('change', filterPrograms);
+        document.getElementById('myProgramsFilter')?.addEventListener('change', filterPrograms);
+        
+        // Reset filters
+        document.getElementById('resetFiltersBtn')?.addEventListener('click', function() {
+            document.getElementById('searchPrograms').value = '';
+            document.getElementById('programTypeFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('countyFilter').value = '';
+            document.getElementById('featuredFilter').checked = false;
+            document.getElementById('myProgramsFilter').checked = false;
+            
+            const programItems = document.querySelectorAll('.program-item');
+            programItems.forEach(item => {
+                item.style.display = 'block';
+            });
+        });
+        
+        // Program type card click
+        document.querySelectorAll('.program-type-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const type = this.dataset.type;
+                document.getElementById('programTypeFilter').value = type;
+                filterPrograms();
+            });
+        });
+        
+        // Initialize map
+        let programMap;
+        document.addEventListener('DOMContentLoaded', function() {
+            programMap = L.map('programMap').setView([1.9167, 35.1667], 9);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(programMap);
+            
+            // Add markers for programs
+            {% for program in programs %}
+            {% if program.gps_coordinates %}
+            const coords = "{{ program.gps_coordinates }}".split(',').map(Number);
+            if (coords.length === 2) {
+                L.marker(coords)
+                    .addTo(programMap)
+                    .bindPopup(`
+                        <strong>{{ program.title }}</strong><br>
+                        <small>{{ program.get_program_type_display }}</small><br>
+                        <a href="{% url 'programs:program_detail' program.id %}" class="btn btn-sm btn-success mt-1">
+                            View Details
+                        </a>
+                    `);
+            }
+            {% endif %}
+            {% endfor %}
+        });
+        
+        // Toggle map view
+        document.getElementById('toggleMapView')?.addEventListener('click', function() {
+            const mapElement = document.getElementById('programMap');
+            if (mapElement.requestFullscreen) {
+                mapElement.requestFullscreen();
+            }
+        });
+        
+        // Impact Chart
+        const impactCtx = document.getElementById('impactChart')?.getContext('2d');
+        if (impactCtx) {
+            const impactChart = new Chart(impactCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ monthly_labels|safe|default:"[]" }},
+                    datasets: [
+                        {
+                            label: 'Trees Planted',
+                            data: {{ monthly_trees|safe|default:"[]" }},
+                            borderColor: '#198754',
+                            backgroundColor: 'rgba(25, 135, 84, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Beneficiaries',
+                            data: {{ monthly_beneficiaries|safe|default:"[]" }},
+                            borderColor: '#0dcaf0',
+                            backgroundColor: 'rgba(13, 202, 240, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
                 },
-                {
-                    label: 'Beneficiaries',
-                    data: {{ monthly_beneficiaries|safe }},
-                    borderColor: '#0dcaf0',
-                    backgroundColor: 'rgba(13, 202, 240, 0.1)',
-                    fill: true,
-                    tension: 0.4
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Monthly Impact'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    
-    // Budget Chart
-    const budgetCtx = document.getElementById('budgetChart').getContext('2d');
-    const budgetChart = new Chart(budgetCtx, {
-        type: 'bar',
-        data: {
-            labels: {{ program_names|safe }},
-            datasets: [{
-                label: 'Budget (KES)',
-                data: {{ program_budgets|safe }},
-                backgroundColor: [
-                    '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
-                    '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Program Budgets'
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'KES ' + value.toLocaleString();
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Monthly Impact'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 }
-            }
+            });
         }
-    });
-</script>
-{% endblock %}
+        
+        // Budget Chart
+        const budgetCtx = document.getElementById('budgetChart')?.getContext('2d');
+        if (budgetCtx) {
+            const budgetChart = new Chart(budgetCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ program_names|safe|default:"[]" }},
+                    datasets: [{
+                        label: 'Budget (KES)',
+                        data: {{ program_budgets|safe|default:"[]" }},
+                        backgroundColor: [
+                            '#198754', '#20c997', '#0dcaf0', '#ffc107', '#fd7e14',
+                            '#dc3545', '#6f42c1', '#e83e8c', '#20c997', '#198754'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Program Budgets'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return 'KES ' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Add active class to current page in navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || 
+                    (currentPath.includes('programs') && href.includes('programs'))) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
