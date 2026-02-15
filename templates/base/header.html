@@ -1,100 +1,436 @@
-<header class="navbar navbar-expand-lg navbar-dark bg-success fixed-top">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="{% url 'accounts:home' %}">
-            <i class="fas fa-tree"></i>
-            <span class="fw-bold">KACAF</span>
-            <small class="d-none d-md-inline">Kenya Agroforestry & Climate Action Foundation</small>
-        </a>
-        
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        
-        <div class="collapse navbar-collapse" id="navbarMain">
-            <ul class="navbar-nav me-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'programs:program-list' %}">
-                        <i class="fas fa-seedling"></i> Programs
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'events:event-list' %}">
-                        <i class="fas fa-calendar-alt"></i> Events
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href={% url "documents:document-list" %}>
-                        <i class="fas fa-file-alt"></i> Resources
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href={% url 'communications:announcement-list' %}>
-                        <i class="fas fa-bullhorn"></i> Announcements
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'communications:contact-message-list' %}">
-                        <i class="fas fa-envelope"></i> Contact
-                    </a>
-                </li>
-            </ul>
+{% load static %}
+<header class="custom-header">
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <!-- Brand Logo & Name with Actual Logo -->
+            <a class="header-brand" href="{% url 'accounts:home' %}">
+                <div class="brand-logo-container">
+                    <img src="{% static 'images/kacaf-logo.png' %}" 
+                         alt="KACAF Logo" 
+                         class="brand-logo"
+                         onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                </div>
+                <div class="brand-text">
+                    <h1>KACAF</h1>
+                    <p>Kenya Agroforestry & Climate Action Foundation</p>
+                </div>
+            </a>
             
-            <ul class="navbar-nav">
-                {% if user.is_authenticated %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                        <i class="fas fa-user-circle"></i> {{ user.get_full_name|default:user.username }}
-                        {% if user.user_type == 'executive' %}
-                        <span class="badge bg-warning">Executive</span>
-                        {% elif user.user_type == 'staff' %}
-                        <span class="badge bg-info">Staff</span>
-                        {% endif %}
-                    </a>
-                    <ul class="dropdown-menu">
-    {% if user.user_type == 'executive' %}
-    <li><a class="dropdown-item" href="{% url 'accounts:executive_dashboard' %}">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a></li>
-    {% elif user.user_type == 'staff' %}
-    <li><a class="dropdown-item" href="{% url 'accounts:admin_dashboard' %}">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a></li>
-    {% else %}
-    <li><a class="dropdown-item" href="{% url 'accounts:member_dashboard' %}">
-        <i class="fas fa-tachometer-alt"></i> Dashboard
-    </a></li>
-    {% endif %}
+            <!-- Mobile Toggle -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation Links -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'program-list' %}active{% endif %}" href="{% url 'programs:program-list' %}">
+                            <i class="fas fa-seedling me-2"></i> PROGRAMS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'event-list' %}active{% endif %}" href="{% url 'events:event-list' %}">
+                            <i class="fas fa-calendar-alt me-2"></i> EVENTS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'document-list' %}active{% endif %}" href="{% url 'documents:document-list' %}">
+                            <i class="fas fa-file-alt me-2"></i> RESOURCES
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'announcement-list' %}active{% endif %}" href="{% url 'communications:announcement-list' %}">
+                            <i class="fas fa-bullhorn me-2"></i> ANNOUNCEMENTS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'contact-message-list' %}active{% endif %}" href="{% url 'communications:contact-message-list' %}">
+                            <i class="fas fa-envelope me-2"></i> CONTACT
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user-circle me-2"></i> {{ user.get_full_name|default:user.username }}
+                            {% if user.user_type == 'executive' %}
+                            <span class="badge bg-warning ms-2">Executive</span>
+                            {% elif user.user_type == 'staff' %}
+                            <span class="badge bg-info ms-2">Staff</span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if user.user_type == 'executive' %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:executive_dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a></li>
+                            {% elif user.user_type == 'staff' %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:admin_dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:member_dashboard' %}">
+                                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                            </a></li>
+                            {% endif %}
 
-    <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
-        <i class="fas fa-user"></i> My Profile
-    </a></li>
-    <li><hr class="dropdown-divider"></li>
-    
-    {% if user.is_staff %}
-    <li><a class="dropdown-item" href="{% url 'admin:index' %}">
-        <i class="fas fa-cog"></i> Admin Panel
-    </a></li>
-    {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                <i class="fas fa-user me-2"></i> My Profile
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            {% if user.is_staff %}
+                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">
+                                <i class="fas fa-cog me-2"></i> Admin Panel
+                            </a></li>
+                            {% endif %}
 
-    <li><a class="dropdown-item" href="{% url 'accounts:logout' %}">
-        <i class="fas fa-sign-out-alt"></i> Logout
-    </a></li>
-</ul>
-
-                </li>
-                {% else %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:login' %}">
-                        <i class="fas fa-sign-in-alt"></i> Login
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="btn btn-outline-light btn-sm ms-2" href="{% url 'accounts:register' %}">
-                        <i class="fas fa-user-plus"></i> Join KACAF
-                    </a>
-                </li>
-                {% endif %}
-            </ul>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">
+                            <i class="fas fa-sign-in-alt me-2"></i> LOGIN
+                        </a>
+                    </li>
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-light" href="{% url 'accounts:register' %}">
+                            <i class="fas fa-user-plus me-2"></i> JOIN KACAF
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
-    </div>
+    </nav>
 </header>
+
+<!-- Add this CSS to your base template's style section or external CSS file -->
+<style>
+    :root {
+        --primary-green: #198754;
+        --secondary-green: #20c997;
+        --dark-green: #0d3625;
+        --accent-gold: #ffc107;
+    }
+    
+    /* Custom Header - Full Width with Enhanced Design */
+    .custom-header {
+        background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 1030;
+        width: 100%;
+        left: 0;
+        right: 0;
+        border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+    }
+    
+    .custom-header .navbar {
+        padding: 10px 0;
+        width: 100%;
+    }
+    
+    .custom-header .container-fluid {
+        padding-left: 30px;
+        padding-right: 30px;
+        max-width: 100%;
+    }
+    
+    .custom-header .header-brand {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: white;
+        transition: transform 0.3s ease;
+    }
+    
+    .custom-header .header-brand:hover {
+        transform: scale(1.02);
+    }
+    
+    .custom-header .brand-logo-container {
+        width: 65px;
+        height: 65px;
+        background: white;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 18px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+    }
+    
+    .custom-header .header-brand:hover .brand-logo-container {
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        border-color: rgba(255, 255, 255, 0.8);
+    }
+    
+    .custom-header .brand-logo {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .custom-header .brand-text {
+        color: white;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .custom-header .brand-text h1 {
+        font-size: 1.8rem;
+        font-weight: 900;
+        margin: 0;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
+        text-transform: uppercase;
+        background: linear-gradient(135deg, #fff, #f0f0f0);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .custom-header .brand-text p {
+        font-size: 0.9rem;
+        margin: 0;
+        opacity: 0.95;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: rgba(255, 255, 255, 0.95);
+    }
+    
+    /* Navigation Links - Bold & Professional with Enhanced Hover */
+    .custom-header .navbar-nav .nav-link {
+        color: white !important;
+        font-weight: 700;
+        font-size: 0.95rem;
+        padding: 0.7rem 1.2rem;
+        transition: all 0.3s ease;
+        border-radius: 8px;
+        margin: 0 3px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        border: 1px solid transparent;
+    }
+    
+    /* Bold Hover Effect */
+    .custom-header .navbar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(5px);
+    }
+    
+    /* Active Link Style with Bold Indicator */
+    .custom-header .navbar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.25);
+        color: white !important;
+        font-weight: 800;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    .custom-header .navbar-nav .nav-link.active::before {
+        content: '';
+        position: absolute;
+        bottom: -3px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30px;
+        height: 3px;
+        background: var(--accent-gold);
+        border-radius: 3px;
+        box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+    }
+    
+    /* Dropdown Menu Styling */
+    .custom-header .dropdown-menu {
+        background: linear-gradient(135deg, #0a5c3b 0%, #198754 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        margin-top: 10px;
+    }
+    
+    .custom-header .dropdown-item {
+        color: white;
+        font-weight: 500;
+        padding: 0.7rem 1.5rem;
+        transition: all 0.3s ease;
+    }
+    
+    .custom-header .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        transform: translateX(5px);
+    }
+    
+    .custom-header .dropdown-item.text-danger:hover {
+        background: rgba(220, 53, 69, 0.3);
+        color: #ff8b8b !important;
+    }
+    
+    .custom-header .dropdown-divider {
+        border-top-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Badge Styling */
+    .custom-header .badge {
+        font-weight: 600;
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+    }
+    
+    /* Navbar Toggler - Enhanced */
+    .custom-header .navbar-toggler {
+        border: 2px solid rgba(255, 255, 255, 0.6);
+        padding: 0.5rem 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .custom-header .navbar-toggler:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.05);
+    }
+    
+    .custom-header .navbar-toggler:focus {
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
+        outline: none;
+    }
+    
+    .custom-header .navbar-toggler-icon {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='3' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1200px) {
+        .custom-header .brand-text h1 {
+            font-size: 1.6rem;
+        }
+        
+        .custom-header .brand-text p {
+            font-size: 0.8rem;
+        }
+        
+        .custom-header .navbar-nav .nav-link {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 991px) {
+        .custom-header .container-fluid {
+            padding-left: 20px;
+            padding-right: 20px;
+        }
+        
+        .custom-header .navbar-collapse {
+            background: rgba(10, 92, 59, 0.95);
+            border-radius: 15px;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+        }
+        
+        .custom-header .navbar-nav .nav-link {
+            margin: 5px 0;
+            padding: 0.8rem 1.2rem;
+            text-align: left;
+            border-radius: 10px;
+        }
+        
+        .custom-header .navbar-nav .nav-link:hover {
+            transform: translateY(-2px);
+        }
+        
+        .custom-header .navbar-nav .nav-link.active::before {
+            bottom: 5px;
+            width: 50px;
+        }
+        
+        .custom-header .brand-text h1 {
+            font-size: 1.4rem;
+        }
+        
+        .custom-header .brand-text p {
+            font-size: 0.7rem;
+        }
+        
+        .custom-header .brand-logo-container {
+            width: 55px;
+            height: 55px;
+            margin-right: 12px;
+        }
+        
+        .custom-header .dropdown-menu {
+            background: rgba(10, 92, 59, 0.9);
+            border: none;
+            margin-left: 20px;
+            width: calc(100% - 40px);
+        }
+        
+        .btn-outline-light {
+            margin-left: 0 !important;
+            margin-top: 10px;
+            width: 100%;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .custom-header .brand-text h1 {
+            font-size: 1.2rem;
+        }
+        
+        .custom-header .brand-text p {
+            font-size: 0.65rem;
+        }
+        
+        .custom-header .brand-logo-container {
+            width: 45px;
+            height: 45px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .custom-header .container-fluid {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        
+        .custom-header .brand-text h1 {
+            font-size: 1rem;
+        }
+        
+        .custom-header .brand-text p {
+            font-size: 0.6rem;
+            line-height: 1.2;
+        }
+        
+        .custom-header .navbar-nav .nav-link {
+            font-size: 0.85rem;
+            padding: 0.7rem 1rem;
+        }
+        
+        .custom-header .brand-logo-container {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            margin-right: 10px;
+        }
+    }
+</style>

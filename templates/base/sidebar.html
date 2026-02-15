@@ -1,140 +1,627 @@
-<div class="sidebar-sticky pt-3">
-    <ul class="nav flex-column">
-        <!-- Dashboard -->
-        <li class="nav-item">
-            <a class="nav-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'accounts:dashboard' %}">
-                <i class="fas fa-tachometer-alt"></i>
-                Dashboard
-            </a>
-        </li>
-        
-        <!-- Profile -->
-        <li class="nav-item">
-            <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" 
-               href="{% url 'accounts:profile' %}">
-                <i class="fas fa-user"></i>
-                My Profile
-            </a>
-        </li>
-        
-        <!-- Membership -->
-        <li class="nav-item">
-            <a class="nav-link {% if 'membership' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'governance:membership_application_create' %}">
-                <i class="fas fa-id-card"></i>
-                Membership
-            </a>
-        </li>
-        
-        <!-- Events -->
-        <li class="nav-item">
-            <a class="nav-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'events:event_list' %}">
-                <i class="fas fa-calendar-alt"></i>
-                Events
-                {% if upcoming_events_count %}
-                <span class="badge bg-primary rounded-pill float-end">{{ upcoming_events_count }}</span>
+{% load static %}
+{% load humanize %}
+<div class="sidebar-wrapper">
+    <!-- User Profile Summary -->
+    <div class="sidebar-user">
+        <div class="user-avatar">
+            {% if user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="{{ user.get_full_name }}">
+            {% else %}
+            <div class="avatar-placeholder">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            {% endif %}
+        </div>
+        <div class="user-info">
+            <h5 class="user-name">{{ user.get_full_name|default:user.username }}</h5>
+            <p class="user-role">
+                {% if user.user_type == 'executive' %}
+                <span class="role-badge executive">
+                    <i class="fas fa-crown"></i> Executive
+                </span>
+                {% elif user.user_type == 'staff' %}
+                <span class="role-badge staff">
+                    <i class="fas fa-user-tie"></i> Staff
+                </span>
+                {% else %}
+                <span class="role-badge member">
+                    <i class="fas fa-user"></i> Member
+                </span>
                 {% endif %}
-            </a>
-        </li>
-        
-        <!-- My Trees -->
-        <li class="nav-item">
-            <a class="nav-link {% if 'tree' in request.resolver_match.url_name %}active{% endif %}" 
-               href="/api/programs/tree-plantings/my_trees/">
-                <i class="fas fa-tree"></i>
-                My Trees
-            </a>
-        </li>
-        
-        <!-- Resources -->
-        <li class="nav-item">
-            <a class="nav-link {% if 'document' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'documents:document_list' %}">
-                <i class="fas fa-file-alt"></i>
-                Resources
-            </a>
-        </li>
-        
-        <!-- Divider for Executive/Admin Features -->
-        {% if user.user_type == 'executive' or user.is_staff %}
-        <li class="nav-item mt-3">
-            <small class="text-muted px-3">ADMINISTRATION</small>
-        </li>
-        
-        <!-- Program Management -->
-        {% if perms.programs.add_program %}
-        <li class="nav-item">
-            <a class="nav-link {% if 'program' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'programs:program_list' %}">
-                <i class="fas fa-project-diagram"></i>
-                Programs
-            </a>
-        </li>
-        {% endif %}
-        
-        <!-- Financial Management -->
-        {% if perms.finance.view_income %}
-        <li class="nav-item">
-            <a class="nav-link {% if 'finance' in request.resolver_match.url_name %}active{% endif %}" 
-               href="{% url 'finance:transaction_list' %}">
-                <i class="fas fa-money-bill-wave"></i>
-                Finance
-            </a>
-        </li>
-        {% endif %}
-        
-        <!-- Governance -->
-        {% if perms.governance.view_generalassembly %}
-        <li class="nav-item">
-            <a class="nav-link {% if 'governance' in request.resolver_match.url_name %}active{% endif %}" 
-               href="/api/governance/assemblies/">
-                <i class="fas fa-landmark"></i>
-                Governance
-            </a>
-        </li>
-        {% endif %}
-        
-        <!-- User Management -->
-        {% if perms.accounts.view_customuser %}
-        <li class="nav-item">
-            <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}" 
-               href="/api/accounts/users/">
-                <i class="fas fa-users-cog"></i>
-                User Management
-            </a>
-        </li>
-        {% endif %}
-        
-        <!-- Reports -->
-        {% if perms.finance.view_report %}
-        <li class="nav-item">
-            <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}" 
-               href="/api/finance/financial-report/">
-                <i class="fas fa-chart-bar"></i>
-                Reports
-            </a>
-        </li>
-        {% endif %}
-        {% endif %}
-        
-        <!-- Settings -->
-        <li class="nav-item mt-3">
-            <a class="nav-link disabled" 
-               href="#">
-                <i class="fas fa-cog"></i>
-                Settings
-            </a>
-        </li>
-        
-        <!-- Help & Support -->
-        <li class="nav-item">
-            <a class="nav-link disabled" 
-               href="#">
-                <i class="fas fa-question-circle"></i>
-                Help & Support
-            </a>
-        </li>
-    </ul>
+            </p>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="sidebar-stats">
+        <div class="stat-item">
+            <span class="stat-value">{{ user_trees_planted|default:"0" }}</span>
+            <span class="stat-label">Trees</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ user_events_attended|default:"0" }}</span>
+            <span class="stat-label">Events</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value">{{ user_points|default:"0" }}</span>
+            <span class="stat-label">Points</span>
+        </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="sidebar-nav">
+        <ul class="nav flex-column">
+            <!-- Dashboard -->
+            <li class="nav-item">
+                <a class="nav-link {% if 'dashboard' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'accounts:dashboard' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <span class="nav-text">Dashboard</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Profile -->
+            <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'profile' %}active{% endif %}" 
+                   href="{% url 'accounts:profile' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <span class="nav-text">My Profile</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Membership -->
+            <li class="nav-item">
+                <a class="nav-link {% if 'membership' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'governance:membership_application_create' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <span class="nav-text">Membership</span>
+                    {% if membership_status %}
+                    <span class="badge bg-{{ membership_status.color }} ms-auto">{{ membership_status.text }}</span>
+                    {% endif %}
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Events -->
+            <li class="nav-item">
+                <a class="nav-link {% if 'event' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'events:event_list' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <span class="nav-text">Events</span>
+                    {% if upcoming_events_count %}
+                    <span class="badge bg-accent ms-auto">{{ upcoming_events_count }}</span>
+                    {% endif %}
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- My Trees -->
+            <li class="nav-item">
+                <a class="nav-link {% if 'tree' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="/api/programs/tree-plantings/my_trees/">
+                    <div class="nav-icon">
+                        <i class="fas fa-tree"></i>
+                    </div>
+                    <span class="nav-text">My Trees</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Resources -->
+            <li class="nav-item">
+                <a class="nav-link {% if 'document' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'documents:document_list' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <span class="nav-text">Resources</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            
+            <!-- Divider for Executive/Admin Features -->
+            {% if user.user_type == 'executive' or user.is_staff %}
+            <li class="nav-divider">
+                <span class="divider-text">ADMINISTRATION</span>
+            </li>
+            
+            <!-- Program Management -->
+            {% if perms.programs.add_program %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'program' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'programs:program_list' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <span class="nav-text">Programs</span>
+                    {% if pending_programs_count %}
+                    <span class="badge bg-warning ms-auto">{{ pending_programs_count }}</span>
+                    {% endif %}
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- Financial Management -->
+            {% if perms.finance.view_income %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'finance' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="{% url 'finance:transaction_list' %}">
+                    <div class="nav-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <span class="nav-text">Finance</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- Governance -->
+            {% if perms.governance.view_generalassembly %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'governance' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="/api/governance/assemblies/">
+                    <div class="nav-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <span class="nav-text">Governance</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- User Management -->
+            {% if perms.accounts.view_customuser %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'user' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="/api/accounts/users/">
+                    <div class="nav-icon">
+                        <i class="fas fa-users-cog"></i>
+                    </div>
+                    <span class="nav-text">User Management</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            {% endif %}
+            
+            <!-- Reports -->
+            {% if perms.finance.view_report %}
+            <li class="nav-item">
+                <a class="nav-link {% if 'report' in request.resolver_match.url_name %}active{% endif %}" 
+                   href="/api/finance/financial-report/">
+                    <div class="nav-icon">
+                        <i class="fas fa-chart-bar"></i>
+                    </div>
+                    <span class="nav-text">Reports</span>
+                    <span class="nav-indicator"></span>
+                </a>
+            </li>
+            {% endif %}
+            {% endif %}
+            
+            <!-- Bottom Section with Settings & Help -->
+            <li class="nav-bottom-section">
+                <ul class="nav flex-column">
+                    <!-- Settings -->
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">
+                            <div class="nav-icon">
+                                <i class="fas fa-cog"></i>
+                            </div>
+                            <span class="nav-text">Settings</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                    
+                    <!-- Help & Support -->
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#">
+                            <div class="nav-icon">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <span class="nav-text">Help & Support</span>
+                            <span class="nav-indicator"></span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar Footer -->
+    <div class="sidebar-footer">
+        <div class="footer-content">
+            <p class="mb-1">
+                <i class="fas fa-tree text-success me-1"></i>
+                <span>{{ total_trees_planted|default:"0"|intcomma }} trees planted</span>
+            </p>
+            <p class="mb-0 small text-muted">
+                v{{ app_version|default:"1.0" }} | &copy; {% now "Y" %}
+            </p>
+        </div>
+    </div>
 </div>
+
+<!-- Add this CSS to your base template's style section -->
+<style>
+    /* Sidebar Wrapper */
+    .sidebar-wrapper {
+        background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+        height: 100%;
+        min-height: 100vh;
+        border-right: 1px solid rgba(0, 0, 0, 0.05);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* User Profile Section */
+    .sidebar-user {
+        padding: 25px 20px 15px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.2);
+        border: 2px solid white;
+    }
+
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .avatar-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #198754, #20c997);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2.5rem;
+    }
+
+    .user-info {
+        flex: 1;
+    }
+
+    .user-name {
+        font-size: 1rem;
+        font-weight: 700;
+        margin: 0 0 5px;
+        color: #1e293b;
+        line-height: 1.3;
+    }
+
+    .user-role {
+        margin: 0;
+    }
+
+    .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .role-badge.executive {
+        background: linear-gradient(135deg, #fbbf24, #f59e0b);
+        color: #78350f;
+    }
+
+    .role-badge.staff {
+        background: linear-gradient(135deg, #0dcaf0, #0d6efd);
+        color: white;
+    }
+
+    .role-badge.member {
+        background: linear-gradient(135deg, #198754, #20c997);
+        color: white;
+    }
+
+    /* Quick Stats */
+    .sidebar-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        padding: 20px;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-item {
+        text-align: center;
+        padding: 10px 5px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.1);
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #198754;
+        line-height: 1.2;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Navigation */
+    .sidebar-nav {
+        flex: 1;
+        padding: 20px 0;
+        overflow-y: auto;
+    }
+
+    .sidebar-nav .nav {
+        padding: 0 15px;
+    }
+
+    .sidebar-nav .nav-item {
+        margin-bottom: 2px;
+    }
+
+    .sidebar-nav .nav-link {
+        display: flex;
+        align-items: center;
+        padding: 12px 15px;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .sidebar-nav .nav-link::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 0;
+        background: linear-gradient(90deg, rgba(25, 135, 84, 0.1), transparent);
+        transition: width 0.3s ease;
+        z-index: 0;
+    }
+
+    .sidebar-nav .nav-link:hover {
+        color: #198754;
+        background: white;
+        box-shadow: 0 5px 15px rgba(25, 135, 84, 0.1);
+        transform: translateX(5px);
+    }
+
+    .sidebar-nav .nav-link:hover::before {
+        width: 100%;
+    }
+
+    .sidebar-nav .nav-link.active {
+        background: linear-gradient(135deg, #198754, #20c997);
+        color: white;
+        box-shadow: 0 10px 20px rgba(25, 135, 84, 0.2);
+    }
+
+    .sidebar-nav .nav-link.active .nav-icon {
+        color: white;
+    }
+
+    .sidebar-nav .nav-link.active .badge {
+        background: white !important;
+        color: #198754 !important;
+    }
+
+    .nav-icon {
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        margin-right: 12px;
+        color: #198754;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .nav-link:hover .nav-icon {
+        transform: scale(1.1);
+    }
+
+    .nav-text {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+    }
+
+    .nav-indicator {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: transparent;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+
+    .nav-link.active .nav-indicator {
+        background: white;
+        box-shadow: 0 0 10px white;
+    }
+
+    /* Nav Divider */
+    .nav-divider {
+        padding: 20px 15px 10px;
+        margin-top: 10px;
+    }
+
+    .divider-text {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        position: relative;
+        padding-left: 10px;
+    }
+
+    .divider-text::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 12px;
+        background: linear-gradient(135deg, #198754, #20c997);
+        border-radius: 3px;
+    }
+
+    /* Bottom Section */
+    .nav-bottom-section {
+        margin-top: auto;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding-top: 20px;
+    }
+
+    /* Badge Styles */
+    .sidebar-nav .badge {
+        padding: 4px 8px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        border-radius: 20px;
+        margin-left: 8px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .badge.bg-accent {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
+        color: white;
+    }
+
+    /* Sidebar Footer */
+    .sidebar-footer {
+        padding: 20px;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        background: rgba(25, 135, 84, 0.02);
+    }
+
+    .footer-content {
+        text-align: center;
+        font-size: 0.8rem;
+    }
+
+    /* Disabled Links */
+    .nav-link.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .nav-link.disabled:hover {
+        transform: none;
+        box-shadow: none;
+        background: transparent;
+        color: #475569;
+    }
+
+    /* Scrollbar Styling */
+    .sidebar-nav::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb {
+        background: #198754;
+        border-radius: 4px;
+    }
+
+    .sidebar-nav::-webkit-scrollbar-thumb:hover {
+        background: #20c997;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .sidebar-wrapper {
+            min-height: auto;
+        }
+
+        .sidebar-user {
+            padding: 15px;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+        }
+
+        .sidebar-stats {
+            padding: 15px;
+        }
+
+        .stat-value {
+            font-size: 1rem;
+        }
+
+        .sidebar-nav .nav-link {
+            padding: 10px 12px;
+        }
+    }
+
+    /* Animation for active indicator */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.4);
+        }
+        70% {
+            box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+        }
+    }
+
+    .nav-link.active .nav-indicator {
+        animation: pulse 2s infinite;
+    }
+</style>
