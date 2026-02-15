@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to KACAF - Kenya Agroforestry & Climate Action Foundation</title>
+    <title>KACAF - Kenya Agroforestry & Climate Action Foundation</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,6 +18,9 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
     <!-- Custom CSS -->
     <style>
         :root {
@@ -26,11 +29,19 @@
             --light-green: #d1e7dd;
             --dark-green: #0d3625;
             --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
         }
         
         /* Professional Typography */
         body {
             font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
         }
         
         h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
@@ -127,7 +138,7 @@
             color: rgba(255, 255, 255, 0.95);
         }
         
-        /* Navigation Links - Bold & Professional with Enhanced Hover */
+        /* Navigation Links - Bold & Professional */
         .navbar-nav {
             margin-left: auto;
         }
@@ -146,7 +157,6 @@
             border: 1px solid transparent;
         }
         
-        /* Bold Hover Effect */
         .navbar-nav .nav-link:hover {
             background: rgba(255, 255, 255, 0.2);
             color: white !important;
@@ -156,12 +166,10 @@
             backdrop-filter: blur(5px);
         }
         
-        /* Active Link Style with Bold Indicator */
         .navbar-nav .nav-link.active {
             background: rgba(255, 255, 255, 0.25);
             color: white !important;
             font-weight: 900;
-            position: relative;
             border: 1px solid rgba(255, 255, 255, 0.4);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
@@ -179,24 +187,16 @@
             box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
         }
         
-        /* Pulsing effect for active link */
         .navbar-nav .nav-link.active {
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% {
-                box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
-            }
-            50% {
-                box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
-            }
-            100% {
-                box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
-            }
+            0% { box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15); }
+            50% { box-shadow: 0 4px 20px rgba(255, 255, 255, 0.3); }
+            100% { box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15); }
         }
         
-        /* Navbar Toggler - Enhanced */
         .navbar-toggler {
             border: 2px solid rgba(255, 255, 255, 0.6);
             padding: 0.5rem 0.75rem;
@@ -220,26 +220,45 @@
         
         /* Hero Section */
         .hero-section {
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
-                        url("{% static 'images/hero-bg.jpg' %}");
-            background-size: cover;
-            background-position: center;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.7)), 
+                        url("{% static 'images/hero-bg.jpg' %}") center/cover fixed;
             color: white;
-            padding: 100px 0;
-            margin-top: 0;
+            padding: 120px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
         }
         
         /* Impact Counters */
         .impact-counter {
-            text-align: center;
+            background: white;
+            border-radius: 20px;
             padding: 30px 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
         }
         
         .impact-counter:hover {
-            transform: translateY(-5px);
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.2);
         }
         
         .counter-icon {
@@ -250,65 +269,119 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
+            font-size: 2.5rem;
         }
         
         /* Program Cards */
         .program-card {
-            border: 1px solid #dee2e6;
-            border-radius: 10px;
+            background: white;
+            border-radius: 20px;
             overflow: hidden;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
             height: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
         }
         
         .program-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.15);
         }
         
         .program-image {
             height: 200px;
             object-fit: cover;
+            width: 100%;
+        }
+        
+        .program-image-placeholder {
+            height: 200px;
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 5rem;
         }
         
         /* Testimonials */
         .testimonial-card {
-            border-left: 4px solid var(--primary-green);
-            padding-left: 20px;
-            margin-bottom: 30px;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.1);
+        }
+
+        .testimonial-card::before {
+            content: '\201C';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 6rem;
+            color: var(--primary-green);
+            opacity: 0.2;
+            font-family: serif;
         }
         
         /* Partners */
         .partner-logo {
-            height: 60px;
+            height: 80px;
+            width: 100%;
             object-fit: contain;
             filter: grayscale(100%);
-            opacity: 0.7;
-            transition: all 0.3s;
+            opacity: 0.6;
+            transition: all 0.3s ease;
         }
         
         .partner-logo:hover {
             filter: grayscale(0%);
             opacity: 1;
+            transform: scale(1.05);
         }
         
         .partner-link {
             text-decoration: none;
             color: inherit;
             display: block;
+            padding: 1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.03);
+            transition: all 0.3s ease;
         }
         
         .partner-link:hover {
             transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(25, 135, 84, 0.1);
         }
         
         /* CTA Section */
         .cta-section {
-            background: linear-gradient(135deg, var(--primary-green) 0%, var(--secondary-green) 100%);
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
             color: white;
-            padding: 60px 0;
-            border-radius: 10px;
-            margin: 40px 0;
+            padding: 80px 0;
+            border-radius: 30px;
+            margin: 60px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
         }
         
         /* Footer */
@@ -316,49 +389,144 @@
             background: var(--dark-green);
             color: white;
             padding: 60px 0 20px;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green), var(--accent-gold));
         }
         
         .footer-links a {
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: color 0.3s;
+            transition: all 0.3s ease;
             font-weight: 500;
+            display: inline-block;
+            padding: 0.25rem 0;
         }
         
         .footer-links a:hover {
             color: white;
+            transform: translateX(5px);
             text-decoration: underline;
         }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .footer-social a:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-contact-item i {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-green);
+        }
+
+        .footer-newsletter .input-group {
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .footer-newsletter .form-control {
+            border: none;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        .footer-newsletter .form-control::placeholder {
+            color: rgba(255,255,255,0.6);
+        }
+
+        .footer-newsletter .btn {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+        }
+
+        .footer-newsletter .btn:hover {
+            background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+        }
         
-        /* Newsletter Success Message */
         .alert-success {
             background-color: #d4edda;
             border-color: #c3e6cb;
             color: #155724;
+            border-radius: 15px;
+            border-left: 4px solid #155724;
         }
         
-        /* Responsive adjustments - Enhanced */
+        /* Section Titles */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            margin-bottom: 3rem;
+        }
+        
+        /* Responsive */
         @media (max-width: 1200px) {
-            .brand-text h1 {
-                font-size: 1.6rem;
-            }
-            
-            .brand-text p {
-                font-size: 0.8rem;
-            }
-            
-            .navbar-nav .nav-link {
-                padding: 0.7rem 1rem;
-                font-size: 0.95rem;
-            }
+            .brand-text h1 { font-size: 1.6rem; }
+            .brand-text p { font-size: 0.8rem; }
+            .navbar-nav .nav-link { padding: 0.7rem 1rem; font-size: 0.95rem; }
         }
         
         @media (max-width: 991px) {
-            .container-fluid {
-                padding-left: 20px;
-                padding-right: 20px;
-            }
-            
+            .container-fluid { padding-left: 20px; padding-right: 20px; }
             .navbar-nav {
                 padding: 1rem 0;
                 background: rgba(10, 92, 59, 0.95);
@@ -366,87 +534,32 @@
                 margin-top: 15px;
                 backdrop-filter: blur(10px);
             }
-            
             .navbar-nav .nav-link {
                 margin: 5px 15px;
                 padding: 0.9rem 1.2rem;
                 text-align: center;
                 border-radius: 10px;
             }
-            
-            .navbar-nav .nav-link:hover {
-                transform: translateY(-2px);
-            }
-            
-            .navbar-nav .nav-link.active::before {
-                bottom: 5px;
-                width: 60px;
-            }
-            
-            .brand-text h1 {
-                font-size: 1.4rem;
-            }
-            
-            .brand-text p {
-                font-size: 0.7rem;
-            }
-            
-            .brand-logo-container {
-                width: 55px;
-                height: 55px;
-                margin-right: 12px;
-            }
+            .brand-text h1 { font-size: 1.4rem; }
+            .brand-text p { font-size: 0.7rem; }
+            .brand-logo-container { width: 55px; height: 55px; margin-right: 12px; }
         }
         
         @media (max-width: 768px) {
-            .hero-section {
-                padding: 60px 0;
-            }
-            
-            .hero-section h1.display-4 {
-                font-size: 2.5rem;
-            }
-            
-            .brand-text h1 {
-                font-size: 1.2rem;
-            }
-            
-            .brand-text p {
-                font-size: 0.65rem;
-            }
-            
-            .brand-logo-container {
-                width: 45px;
-                height: 45px;
-            }
+            .hero-section { padding: 60px 0; }
+            .hero-section h1.display-4 { font-size: 2.5rem; }
+            .brand-text h1 { font-size: 1.2rem; }
+            .brand-text p { font-size: 0.65rem; }
+            .brand-logo-container { width: 45px; height: 45px; }
+            .section-title { font-size: 2rem; }
         }
         
         @media (max-width: 576px) {
-            .container-fluid {
-                padding-left: 15px;
-                padding-right: 15px;
-            }
-            
-            .brand-text h1 {
-                font-size: 1rem;
-            }
-            
-            .brand-text p {
-                font-size: 0.6rem;
-                line-height: 1.2;
-            }
-            
-            .navbar-nav .nav-link {
-                font-size: 0.9rem;
-                padding: 0.8rem 1rem;
-            }
-            
-            .brand-logo-container {
-                width: 40px;
-                height: 40px;
-                border-radius: 10px;
-                margin-right: 10px;
-            }
+            .container-fluid { padding-left: 15px; padding-right: 15px; }
+            .brand-text h1 { font-size: 1rem; }
+            .brand-text p { font-size: 0.6rem; line-height: 1.2; }
+            .navbar-nav .nav-link { font-size: 0.9rem; padding: 0.8rem 1rem; }
+            .brand-logo-container { width: 40px; height: 40px; border-radius: 10px; margin-right: 10px; }
         }
     </style>
 </head>
@@ -478,39 +591,25 @@
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">
-                                HOME
-                            </a>
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">HOME</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}">
-                                PROGRAMS
-                            </a>
+                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}">PROGRAMS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:event_list' %}">
-                                EVENTS
-                            </a>
+                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:event_list' %}">EVENTS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}">
-                                RESOURCES
-                            </a>
+                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}">RESOURCES</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}">
-                                ANNOUNCEMENTS
-                            </a>
+                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}">ANNOUNCEMENTS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">
-                                ABOUT US
-                            </a>
+                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">ABOUT US</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}">
-                                CONTACT
-                            </a>
+                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}">CONTACT</a>
                         </li>
                     </ul>
                 </div>
@@ -522,9 +621,9 @@
     <main>
         <!-- Hero Section -->
         <section class="hero-section">
-            <div class="container">
+            <div class="container position-relative" style="z-index: 2;">
                 <div class="row align-items-center">
-                    <div class="col-lg-8">
+                    <div class="col-lg-8" data-aos="fade-right">
                         <h1 class="display-4 fw-bold mb-3">
                             <i class="fas fa-tree me-3"></i>
                             Kenya Agroforestry & Climate Action Foundation
@@ -545,25 +644,25 @@
                             </a>
                         </div>
                     </div>
-                    <div class="col-lg-4 text-center">
-                        <div class="bg-white rounded-3 p-4 text-dark shadow">
+                    <div class="col-lg-4 text-center" data-aos="fade-left">
+                        <div class="bg-white rounded-4 p-4 text-dark shadow-lg">
                             <h4 class="mb-3">Our Impact</h4>
-                            <div class="row">
-                                <div class="col-6 mb-3">
-                                    <div class="display-6 text-success">{{ total_trees_planted|default:"0"|intword }}</div>
-                                    <small>Trees Planted</small>
-                                </div>
-                                <div class="col-6 mb-3">
-                                    <div class="display-6 text-success">{{ total_members|default:"0"|intcomma }}</div>
-                                    <small>Members</small>
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <div class="display-6 text-success fw-bold">{{ total_trees_planted|default:"0"|intword }}</div>
+                                    <small class="text-muted">Trees Planted</small>
                                 </div>
                                 <div class="col-6">
-                                    <div class="display-6 text-success">{{ total_area_coverage|default:"0" }}</div>
-                                    <small>Hectares</small>
+                                    <div class="display-6 text-success fw-bold">{{ total_members|default:"0"|intcomma }}</div>
+                                    <small class="text-muted">Members</small>
                                 </div>
                                 <div class="col-6">
-                                    <div class="display-6 text-success">{{ total_beneficiaries|default:"0"|intcomma }}</div>
-                                    <small>Beneficiaries</small>
+                                    <div class="display-6 text-success fw-bold">{{ total_area_coverage|default:"0" }}</div>
+                                    <small class="text-muted">Hectares</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="display-6 text-success fw-bold">{{ total_beneficiaries|default:"0"|intcomma }}</div>
+                                    <small class="text-muted">Beneficiaries</small>
                                 </div>
                             </div>
                         </div>
@@ -575,41 +674,41 @@
         <!-- Impact Counters -->
         <section class="py-5">
             <div class="container">
-                <div class="row">
-                    <div class="col-md-3 col-6 mb-4">
-                        <div class="impact-counter bg-success text-white">
-                            <div class="counter-icon bg-white text-success">
-                                <i class="fas fa-tree fa-3x"></i>
+                <div class="row g-4">
+                    <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="100">
+                        <div class="impact-counter text-center">
+                            <div class="counter-icon bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-tree"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_trees_planted|default:"0"|intword }}</div>
-                            <p class="mb-0">Trees Planted</p>
+                            <div class="display-4 fw-bold text-success">{{ total_trees_planted|default:"0"|intword }}</div>
+                            <p class="mb-0 text-muted">Trees Planted</p>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6 mb-4">
-                        <div class="impact-counter bg-info text-white">
-                            <div class="counter-icon bg-white text-info">
-                                <i class="fas fa-users fa-3x"></i>
+                    <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="200">
+                        <div class="impact-counter text-center">
+                            <div class="counter-icon bg-info bg-opacity-10 text-info">
+                                <i class="fas fa-users"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_members|default:"0"|intcomma }}</div>
-                            <p class="mb-0">Community Members</p>
+                            <div class="display-4 fw-bold text-info">{{ total_members|default:"0"|intcomma }}</div>
+                            <p class="mb-0 text-muted">Community Members</p>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6 mb-4">
-                        <div class="impact-counter bg-warning text-dark">
-                            <div class="counter-icon bg-white text-warning">
-                                <i class="fas fa-map-marked-alt fa-3x"></i>
+                    <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="300">
+                        <div class="impact-counter text-center">
+                            <div class="counter-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-map-marked-alt"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ total_area_coverage|default:"0" }}</div>
-                            <p class="mb-0">Hectares Restored</p>
+                            <div class="display-4 fw-bold text-warning">{{ total_area_coverage|default:"0" }}</div>
+                            <p class="mb-0 text-muted">Hectares Restored</p>
                         </div>
                     </div>
-                    <div class="col-md-3 col-6 mb-4">
-                        <div class="impact-counter bg-primary text-white">
-                            <div class="counter-icon bg-white text-primary">
-                                <i class="fas fa-cloud-sun fa-3x"></i>
+                    <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="400">
+                        <div class="impact-counter text-center">
+                            <div class="counter-icon bg-primary bg-opacity-10 text-primary">
+                                <i class="fas fa-cloud-sun"></i>
                             </div>
-                            <div class="display-4 fw-bold">{{ carbon_sequestered|default:"0"|floatformat:0|intcomma }}</div>
-                            <p class="mb-0">Tons CO₂ Sequestered</p>
+                            <div class="display-4 fw-bold text-primary">{{ carbon_sequestered|default:"0"|floatformat:0|intcomma }}</div>
+                            <p class="mb-0 text-muted">Tons CO₂ Sequestered</p>
                         </div>
                     </div>
                 </div>
@@ -619,28 +718,24 @@
         <!-- Our Programs -->
         <section class="py-5 bg-light">
             <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="display-5 fw-bold mb-3">
-                            <i class="fas fa-project-diagram text-success me-2"></i>
-                            Our Programs
-                        </h2>
-                        <p class="lead text-muted">
-                            Discover our initiatives transforming West Pokot County
-                        </p>
-                    </div>
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">
+                        <i class="fas fa-project-diagram text-success me-2"></i>
+                        Our Programs
+                    </h2>
+                    <p class="section-subtitle">
+                        Discover our initiatives transforming West Pokot County
+                    </p>
                 </div>
-                <div class="row">
+                <div class="row g-4">
                     {% for program in featured_programs|slice:":3" %}
-                    <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
                         <div class="program-card">
                             {% if program.image %}
-                            <img src="{{ program.image.url }}" 
-                                 class="program-image w-100" 
-                                 alt="{{ program.title }}">
+                            <img src="{{ program.image.url }}" class="program-image" alt="{{ program.title }}">
                             {% else %}
-                            <div class="program-image bg-success d-flex align-items-center justify-content-center">
-                                <i class="fas fa-project-diagram fa-5x text-white"></i>
+                            <div class="program-image-placeholder">
+                                <i class="fas fa-seedling"></i>
                             </div>
                             {% endif %}
                             <div class="p-4">
@@ -651,9 +746,8 @@
                                     </span>
                                 </div>
                                 <h5 class="card-title">{{ program.title }}</h5>
-                                <p class="card-text text-muted">{{ program.description|truncatechars:150 }}</p>
+                                <p class="card-text text-muted">{{ program.description|truncatechars:100 }}</p>
                                 
-                                <!-- Stats using your actual model fields -->
                                 <div class="row g-2 mb-3">
                                     <div class="col-6 text-center">
                                         <small class="text-muted d-block">Projects</small>
@@ -665,49 +759,29 @@
                                     </div>
                                 </div>
                                 
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6 text-center">
-                                        <small class="text-muted d-block">Target</small>
-                                        <strong>{{ program.beneficiaries_target|intcomma }}</strong>
-                                    </div>
-                                    <div class="col-6 text-center">
-                                        <small class="text-muted d-block">Reached</small>
-                                        <strong>{{ program.beneficiaries_reached|intcomma }}</strong>
-                                    </div>
-                                </div>
-                                
-                                <!-- Location info from your model -->
                                 <div class="mb-3">
                                     <small class="text-muted d-block">
                                         <i class="fas fa-map-marker-alt me-1"></i> {{ program.county }}
-                                    </small>
-                                    <small class="text-muted d-block">
-                                        <i class="fas fa-calendar me-1"></i> 
-                                        {{ program.start_date|date:"M Y" }} - 
-                                        {% if program.end_date %}{{ program.end_date|date:"M Y" }}{% else %}Ongoing{% endif %}
                                     </small>
                                 </div>
                                 
                                 <a href="{% url 'programs:program_detail' program.id %}" 
                                    class="btn btn-outline-success w-100">
-                                    Learn More
+                                    Learn More <i class="fas fa-arrow-right ms-2"></i>
                                 </a>
                             </div>
                         </div>
                     </div>
                     {% empty %}
                     <div class="col-12 text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No programs available at the moment.
-                        </div>
+                        <div class="alert alert-info">No programs available at the moment.</div>
                     </div>
                     {% endfor %}
                 </div>
                 {% if featured_programs %}
-                <div class="text-center mt-4">
-                    <a href="{% url 'programs:program_list' %}" class="btn btn-success btn-lg">
-                        <i class="fas fa-eye me-2"></i> View All Programs
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <a href="{% url 'programs:program_list' %}" class="btn btn-success btn-lg px-5">
+                        View All Programs <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
                 {% endif %}
@@ -715,8 +789,8 @@
         </section>
 
         <!-- Call to Action -->
-        <section class="cta-section">
-            <div class="container">
+        <section class="cta-section" data-aos="fade-up">
+            <div class="container position-relative" style="z-index: 2;">
                 <div class="row align-items-center">
                     <div class="col-lg-8">
                         <h2 class="display-5 fw-bold mb-3">Join Our Green Revolution</h2>
@@ -746,21 +820,19 @@
         <!-- Upcoming Events -->
         <section class="py-5">
             <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="display-5 fw-bold mb-3">
-                            <i class="fas fa-calendar-alt text-success me-2"></i>
-                            Upcoming Events
-                        </h2>
-                        <p class="lead text-muted">
-                            Join our community events and activities
-                        </p>
-                    </div>
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">
+                        <i class="fas fa-calendar-alt text-success me-2"></i>
+                        Upcoming Events
+                    </h2>
+                    <p class="section-subtitle">
+                        Join our community events and activities
+                    </p>
                 </div>
-                <div class="row">
+                <div class="row g-4">
                     {% for event in upcoming_events|slice:":3" %}
-                    <div class="col-lg-4 col-md-6 mb-4">
-                        <div class="card h-100 border-success">
+                    <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                        <div class="card h-100 border-success event-card">
                             <div class="card-header bg-success text-white">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>
@@ -776,7 +848,7 @@
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p class="card-text text-muted">{{ event.description|truncatechars:150 }}</p>
+                                <p class="card-text text-muted">{{ event.description|truncatechars:100 }}</p>
                                 <div class="mb-3">
                                     <small class="text-muted d-block">
                                         <i class="fas fa-map-marker-alt me-2"></i>
@@ -796,40 +868,23 @@
                                 </div>
                             </div>
                             <div class="card-footer bg-transparent">
-                                {% if event.requires_registration %}
-                                    {% if user.is_authenticated %}
-                                    <a href="{% url 'events:event_register' event.id %}" 
-                                       class="btn btn-success w-100">
-                                        <i class="fas fa-user-plus me-2"></i> Register Now
-                                    </a>
-                                    {% else %}
-                                    <a href="{% url 'accounts:login' %}?next={% url 'events:event_register' event.id %}" 
-                                       class="btn btn-outline-success w-100">
-                                        <i class="fas fa-sign-in-alt me-2"></i> Login to Register
-                                    </a>
-                                    {% endif %}
-                                {% else %}
                                 <a href="{% url 'events:event_detail' event.id %}" 
                                    class="btn btn-outline-success w-100">
-                                    <i class="fas fa-eye me-2"></i> View Details
+                                    View Details <i class="fas fa-arrow-right ms-2"></i>
                                 </a>
-                                {% endif %}
                             </div>
                         </div>
                     </div>
                     {% empty %}
                     <div class="col-12 text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No upcoming events at the moment.
-                        </div>
+                        <div class="alert alert-info">No upcoming events at the moment.</div>
                     </div>
                     {% endfor %}
                 </div>
                 {% if upcoming_events %}
-                <div class="text-center mt-4">
-                    <a href="{% url 'events:event_list' %}" class="btn btn-outline-success btn-lg">
-                        <i class="fas fa-calendar-alt me-2"></i> View All Events
+                <div class="text-center mt-5" data-aos="fade-up">
+                    <a href="{% url 'events:event_list' %}" class="btn btn-outline-success btn-lg px-5">
+                        View All Events <i class="fas fa-arrow-right ms-2"></i>
                     </a>
                 </div>
                 {% endif %}
@@ -839,29 +894,23 @@
         <!-- Testimonials -->
         <section class="py-5 bg-light">
             <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="display-5 fw-bold mb-3">
-                            <i class="fas fa-comment text-success me-2"></i>
-                            What Our Members Say
-                        </h2>
-                        <p class="lead text-muted">
-                            Stories from our community
-                        </p>
-                    </div>
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">
+                        <i class="fas fa-comment text-success me-2"></i>
+                        What Our Members Say
+                    </h2>
+                    <p class="section-subtitle">
+                        Stories from our community
+                    </p>
                 </div>
-                <div class="row">
+                <div class="row g-4">
                     {% for testimonial in testimonials %}
-                    <div class="col-md-4 mb-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
                         <div class="testimonial-card">
                             <div class="d-flex align-items-center mb-3">
                                 {% if testimonial.member.profile.profile_picture %}
                                 <img src="{{ testimonial.member.profile.profile_picture.url }}" 
-                                     class="rounded-circle me-3" 
-                                     width="60" 
-                                     height="60"
-                                     style="object-fit: cover;"
-                                     alt="{{ testimonial.member.get_full_name }}">
+                                     class="rounded-circle me-3" width="60" height="60" style="object-fit: cover;">
                                 {% else %}
                                 <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-3" 
                                      style="width: 60px; height: 60px;">
@@ -870,31 +919,18 @@
                                 {% endif %}
                                 <div>
                                     <h6 class="mb-0">{{ testimonial.member.get_full_name|default:testimonial.member.username }}</h6>
-                                    <small class="text-muted">
-                                        {% if testimonial.member.profile.village %}{{ testimonial.member.profile.village }}, {% endif %}
-                                        {% if testimonial.member.profile.county %}{{ testimonial.member.profile.county }}{% endif %}
-                                    </small>
+                                    <small class="text-muted">{{ testimonial.member.profile.village|default:"West Pokot" }}</small>
                                 </div>
                             </div>
                             <p class="mb-0">
                                 <i class="fas fa-quote-left text-success me-2"></i>
                                 {{ testimonial.content }}
-                                <i class="fas fa-quote-right text-success ms-2"></i>
                             </p>
-                            <div class="mt-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-tree me-1"></i>
-                                    {{ testimonial.member.profile.trees_planted|default:"0" }} trees planted
-                                </small>
-                            </div>
                         </div>
                     </div>
                     {% empty %}
                     <div class="col-12 text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No testimonials available yet.
-                        </div>
+                        <div class="alert alert-info">No testimonials available yet.</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -904,37 +940,32 @@
         <!-- Partners & Supporters -->
         <section class="py-5">
             <div class="container">
-                <div class="row mb-5">
-                    <div class="col-12 text-center">
-                        <h2 class="display-5 fw-bold mb-3">
-                            <i class="fas fa-handshake text-success me-2"></i>
-                            Our Partners
-                        </h2>
-                        <p class="lead text-muted">
-                            Collaborating for greater impact
-                        </p>
-                    </div>
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">
+                        <i class="fas fa-handshake text-success me-2"></i>
+                        Our Partners
+                    </h2>
+                    <p class="section-subtitle">
+                        Collaborating for greater impact
+                    </p>
                 </div>
-                <div class="row">
+                <div class="row g-4 justify-content-center">
                     {% for partner in partners %}
-                    <div class="col-md-3 col-6 mb-4 text-center">
-                        {% if partner.logo %}
-                        <img src="{{ partner.logo.url }}" 
-                             class="partner-logo mb-2" 
-                             alt="{{ partner.name }}">
-                        {% else %}
-                        <div class="partner-logo d-flex align-items-center justify-content-center mb-2">
-                            <i class="fas fa-handshake fa-3x text-muted"></i>
-                        </div>
-                        {% endif %}
-                        <p class="mt-2 mb-0 fw-bold">{{ partner.name }}</p>
+                    <div class="col-md-3 col-6" data-aos="fade-up" data-aos-delay="{{ forloop.counter|add:'100' }}">
+                        <a href="{{ partner.website|default:'#' }}" target="_blank" class="partner-link">
+                            {% if partner.logo %}
+                            <img src="{{ partner.logo.url }}" class="partner-logo" alt="{{ partner.name }}">
+                            {% else %}
+                            <div class="partner-logo d-flex align-items-center justify-content-center">
+                                <i class="fas fa-handshake fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            <p class="mt-3 mb-0 fw-bold text-center">{{ partner.name }}</p>
+                        </a>
                     </div>
                     {% empty %}
                     <div class="col-12 text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            No partners to display at the moment.
-                        </div>
+                        <div class="alert alert-info">No partners to display at the moment.</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -945,7 +976,7 @@
         <section class="py-5 bg-success text-white">
             <div class="container">
                 <div class="row align-items-center">
-                    <div class="col-lg-6 mb-4 mb-lg-0">
+                    <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
                         <h2 class="display-5 fw-bold mb-3">Stay Updated</h2>
                         <p class="lead">
                             Subscribe to our newsletter for the latest updates on our programs, 
@@ -959,7 +990,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" data-aos="fade-left">
                         <div class="card text-dark">
                             <div class="card-body p-4">
                                 <h5 class="card-title mb-3">Subscribe to Newsletter</h5>
@@ -1002,11 +1033,12 @@
         </section>
     </main>
 
-    <!-- Footer -->
+    <!-- Enhanced Footer with Updated Facebook Link -->
     <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4">
+            <div class="row g-4">
+                <!-- About Section -->
+                <div class="col-lg-4">
                     <div class="d-flex align-items-center mb-3">
                         <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
                             <img src="{% static 'images/kacaf-logo.png' %}" 
@@ -1019,42 +1051,89 @@
                             <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
                         </div>
                     </div>
-                    <p>Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County.</p>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <!-- Updated Facebook link with the provided URL -->
+                        <a href="https://facebook.com/profile.php?id=61570834391493" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/kacaf" target="_blank" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com/kacaf" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com/kacaf" target="_blank" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://linkedin.com/company/kacaf" target="_blank" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
                 </div>
-                <div class="col-lg-2 col-md-6 mb-4">
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-4">
                     <h5 class="mb-3">Quick Links</h5>
                     <div class="footer-links">
                         <p><a href="/">Home</a></p>
-                        <p><a href="#about">About Us</a></p>
+                        <p><a href="{% url 'about' %}">About Us</a></p>
                         <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
                         <p><a href="{% url 'events:event_list' %}">Events</a></p>
-                        <p><a href="#">Resources</a></p>
+                        <p><a href="{% url 'resources:resource_list' %}">Resources</a></p>
+                        <p><a href="{% url 'communications:announcement_list' %}">Announcements</a></p>
                     </div>
                 </div>
-                <div class="col-lg-3 col-md-6 mb-4">
+                
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-4">
                     <h5 class="mb-3">Contact Us</h5>
-                    <p><i class="fas fa-map-marker-alt me-2"></i> West Pokot County, Kenya</p>
-                    <p><i class="fas fa-phone me-2"></i> <a href="tel:+254700000000" class="text-white">+254 700 000 000</a></p>
-                    <p><i class="fas fa-envelope me-2"></i> <a href="mailto:info@kacaf.org" class="text-white">info@kacaf.org</a></p>
-                </div>
-                <div class="col-lg-3 mb-4">
-                    <h5 class="mb-3">Follow Us</h5>
-                    <div class="d-flex gap-3 mb-3">
-                        <a href="https://facebook.com/kacaf" target="_blank" class="text-white"><i class="fab fa-facebook fa-2x"></i></a>
-                        <a href="https://twitter.com/kacaf" target="_blank" class="text-white"><i class="fab fa-twitter fa-2x"></i></a>
-                        <a href="https://instagram.com/kacaf" target="_blank" class="text-white"><i class="fab fa-instagram fa-2x"></i></a>
-                        <a href="https://youtube.com/kacaf" target="_blank" class="text-white"><i class="fab fa-youtube fa-2x"></i></a>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>West Pokot County, Kenya</span>
                     </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <a href="tel:+254796761841" class="text-white text-decoration-none">+254 796 761 841</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:info@kacaf.org" class="text-white text-decoration-none">info@kacaf.org</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Mon-Fri: 8:00 AM - 5:00 PM</span>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="small">Subscribe to get updates on our programs and impact.</p>
+                    <form class="footer-newsletter">
+                        <div class="input-group">
+                            <input type="email" class="form-control" placeholder="Your email address">
+                            <button class="btn" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </form>
+                    <p class="small mt-3 mb-0 opacity-75">
+                        <i class="fas fa-shield-alt me-1"></i>
+                        We respect your privacy. Unsubscribe anytime.
+                    </p>
                 </div>
             </div>
-            <hr class="bg-white">
-            <div class="row">
+            
+            <!-- Footer Bottom -->
+            <hr class="bg-white opacity-25 my-4">
+            <div class="row align-items-center">
                 <div class="col-md-6">
-                    <p class="mb-0">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
+                    <p class="mb-0 small">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
                 </div>
                 <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-white me-3">Privacy Policy</a>
-                    <a href="#" class="text-white">Terms of Service</a>
+                    <a href="#" class="text-white small text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-white small text-decoration-none">Terms of Service</a>
                 </div>
             </div>
         </div>
@@ -1063,8 +1142,18 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
     <!-- Custom JS -->
     <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
+        });
+
         // Animate counters on scroll
         function animateCounter(element, start, end, duration) {
             let startTimestamp = null;
@@ -1072,9 +1161,7 @@
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 element.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
+                if (progress < 1) window.requestAnimationFrame(step);
             };
             window.requestAnimationFrame(step);
         }
@@ -1091,27 +1178,20 @@
                     observer.unobserve(entry.target);
                 }
             });
-        });
+        }, { threshold: 0.5 });
 
-        // Observe all counter elements
-        document.querySelectorAll('.impact-counter').forEach(counter => {
-            observer.observe(counter);
-        });
+        document.querySelectorAll('.impact-counter').forEach(counter => observer.observe(counter));
 
-        // Add active class to current page in navigation
+        // Active navigation class
         document.addEventListener('DOMContentLoaded', function() {
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
             
             navLinks.forEach(link => {
                 const href = link.getAttribute('href');
-                if (href === currentPath || 
-                    (currentPath === '/' && href === '/') ||
-                    (currentPath === '/home/' && href === '/') ||
+                if (href === currentPath || (currentPath === '/' && href === '/') || 
                     (href && currentPath.includes(href) && href !== '#' && href !== '/')) {
                     link.classList.add('active');
-                } else {
-                    link.classList.remove('active');
                 }
             });
         });
@@ -1123,20 +1203,6 @@
                 e.preventDefault();
                 alert('Please enter a valid email address');
             }
-        });
-
-        // Add smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
         });
     </script>
 </body>
