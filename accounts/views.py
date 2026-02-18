@@ -57,7 +57,7 @@ def logout_view(request):
 # ---------------------------
 # Public & role dashboards
 # ---------------------------
-d# accounts/views.py
+# accounts/views.py
 from django.shortcuts import render
 from django.utils import timezone
 from django.contrib.auth import get_user_model
