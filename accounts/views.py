@@ -91,10 +91,8 @@ def public_dashboard(request):
     # Get approved testimonials
     testimonials = Testimonial.objects.all().order_by('-created_at')[:3]
     
-    # Get active partners
-    partners = Partner.objects.filter(
-        is_active=True
-    )[:4]
+    # Get all partners (no filter needed)
+    partners = Partner.objects.all()[:4]
     
     # Calculate REAL impact numbers from your database
     
