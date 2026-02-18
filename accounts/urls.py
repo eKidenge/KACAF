@@ -103,4 +103,5 @@ urlpatterns = [
     path('donate/', views.donate, name='donate'),
     path('terms/', views.terms_view, name='terms'),
     path('privacy/', views.privacy_view, name='privacy'),
+    path('event/<int:pk>/', views.event_detail, name='event_detail'),  # Add this line
 ]

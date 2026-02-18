@@ -407,3 +407,20 @@ def event_create(request):
         'form': form,
         'title': 'Create New Event'
     })
+
+def event_detail(request, pk):
+    """Display event details"""
+    event = get_object_or_404(Event, pk=pk, is_public=True)
+    
+    # Get similar events (same type, different dates)
+    similar_events = Event.objects.filter(
+        event_type=event.event_type,
+        is_public=True,
+        status__in=['published', 'ongoing']
+    ).exclude(pk=event.pk)[:3]
+    
+    context = {
+        'event': event,
+        'similar_events': similar_events,
+    }
+    return render(request, 'events/event_detail.html', context)

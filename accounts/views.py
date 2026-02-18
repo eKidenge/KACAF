@@ -12,6 +12,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 import random
 import string
+from django.shortcuts import render, get_object_or_404
+from .models import Event
 
 from .models import MemberProfile, ExecutiveCommittee
 from .serializers import (
@@ -571,3 +573,8 @@ def profile_edit(request):
         "user": request.user,
     }
     return render(request, "accounts/user/profile_edit.html", context)
+
+def event_detail(request, pk):
+    """Display event details"""
+    event = get_object_or_404(Event, pk=pk, is_public=True)
+    return render(request, 'events/event_detail.html', {'event': event})
