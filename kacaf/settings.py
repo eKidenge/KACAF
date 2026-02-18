@@ -93,26 +93,39 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kacaf.wsgi.application'
 
-# Database - Updated for PostgreSQL
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='kacaf_db'),
-        'USER': config('DB_USER', default='kacaf_user'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,
-        'OPTIONS': {
-            'connect_timeout': 10,
-            'sslmode': config('DB_SSL_MODE', default='prefer'),
-        },
-    }
-}
+# Database - Updated for PostgreSQL with Render support
+import dj_database_url
+import os
 
-# Keep dj_database_url as an alternative configuration method
-# Uncomment the line below if you want to use DATABASE_URL environment variable
-# DATABASES['default'] = dj_database_url.config(default=config('DATABASE_URL'), conn_max_age=600, conn_health_checks=True)
+# Check if DATABASE_URL exists in environment (Render provides this)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Use DATABASE_URL from environment (Render)
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            ssl_require=True  # Render requires SSL
+        )
+    }
+else:
+    # Local development with individual DB settings
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='kacaf_db'),
+            'USER': config('DB_USER', default='kacaf_user'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': {
+                'connect_timeout': 10,
+                'sslmode': config('DB_SSL_MODE', default='prefer'),
+            },
+        }
+    }
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
