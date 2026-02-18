@@ -13,7 +13,8 @@ from rest_framework.response import Response
 import random
 import string
 from django.shortcuts import render, get_object_or_404
-from .models import Event
+# accounts/views.py - Change this import
+from events.models import Event  # ✅ Correct import
 
 from .models import MemberProfile, ExecutiveCommittee
 from .serializers import (
