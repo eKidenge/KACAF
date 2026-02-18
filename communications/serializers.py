@@ -41,7 +41,13 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         model = ContactMessage
         fields = '__all__'
         read_only_fields = ['status', 'responded_by', 'response', 'responded_at',
-                           'ip_address', 'user_agent', 'referrer', 'created_at', 'updated_at']
+                           'user_agent', 'referrer', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'ip_address': {  # This line fixes the error
+                'required': False,
+                'allow_null': True,
+            }
+        }
 
 
 class NewsletterSubscriptionSerializer(serializers.Serializer):
