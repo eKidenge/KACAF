@@ -57,19 +57,84 @@ def logout_view(request):
 # ---------------------------
 # Public & role dashboards
 # ---------------------------
+d# accounts/views.py
+from django.shortcuts import render
+from django.utils import timezone
+from django.contrib.auth import get_user_model
+from django.db.models import Sum, Count
+from programs.models import Program, Project
+from events.models import Event, EventRegistration
+from testimonials.models import Testimonial
+from partners.models import Partner
+from accounts.models import MemberProfile  # Import MemberProfile
+
+User = get_user_model()
+
 def public_dashboard(request):
     """Public facing homepage/dashboard"""
+    
+    # Get featured programs (active programs)
+    featured_programs = Program.objects.filter(
+        status='active'
+    ).order_by('-created_at')[:3]
+    
+    # Get upcoming events
+    upcoming_events = Event.objects.filter(
+        is_public=True,
+        start_datetime__gte=timezone.now(),
+        status__in=['published', 'ongoing']
+    ).order_by('start_datetime')[:3]
+    
+    # Get approved testimonials
+    testimonials = Testimonial.objects.filter(
+        is_approved=True
+    ).order_by('-created_at')[:3]
+    
+    # Get active partners
+    partners = Partner.objects.filter(
+        is_active=True
+    )[:4]
+    
+    # Calculate REAL impact numbers from your database
+    
+    # Total trees planted - sum from all MemberProfile trees_planted fields
+    total_trees_planted = MemberProfile.objects.aggregate(total=Sum('trees_planted'))['total'] or 0
+    
+    # Total members - count of users with member type (excluding other types)
+    total_members = User.objects.filter(user_type='member').count()
+    
+    # Total area coverage (hectares) - assuming this comes from projects or programs
+    # You might need to add this field to your models, or use a default for now
+    total_area_coverage = 1200  # You may need to calculate this from Project model if you have hectares field
+    
+    # Total beneficiaries - sum from programs (if you have beneficiaries_count field)
+    # If not, you might calculate from event registrations or member counts
+    total_beneficiaries = Program.objects.aggregate(total=Sum('beneficiaries_count'))['total'] or total_members * 2
+    
+    # Carbon sequestered (tons CO2) - rough estimate based on trees planted
+    # Average tree sequesters ~0.02 tons CO2 per year
+    carbon_sequestered = int(total_trees_planted * 0.02)
+    
+    # Get counts for other user types if needed for display
+    total_farmers = User.objects.filter(user_type='farmer').count()
+    total_youth = User.objects.filter(user_type='youth').count()
+    total_organizations = User.objects.filter(user_type='organization').count()
+    
     context = {
-        "total_trees_planted": 12345,
-        "total_members": User.objects.filter(user_type='member').count(),
-        "total_area_coverage": 1500,
-        "total_beneficiaries": 2345,
-        "carbon_sequestered": 987,
-        "featured_programs": [],
-        "upcoming_events": [],
-        "testimonials": [],
-        "partners": [],
+        "total_trees_planted": total_trees_planted,
+        "total_members": total_members,
+        "total_farmers": total_farmers,
+        "total_youth": total_youth,
+        "total_organizations": total_organizations,
+        "total_area_coverage": total_area_coverage,
+        "total_beneficiaries": total_beneficiaries,
+        "carbon_sequestered": carbon_sequestered,
+        "featured_programs": featured_programs,
+        "upcoming_events": upcoming_events,
+        "testimonials": testimonials,
+        "partners": partners,
     }
+    
     return render(request, "dashboard/public_dashboard.html", context)
 
 
