@@ -9,7 +9,7 @@ pyyaml==6.0.1
 uritemplate==4.1.1
 
 # Database
-psycopg-binary==3.3.1
+#psycopg-binary==3.3.1
 dj-database-url==2.0.0
 
 # Security & Authentication
@@ -74,3 +74,7 @@ Pillow==10.4.0
 # Database
 psycopg2-binary==2.9.9  # Changed from psycopg-binary
 dj-database-url==2.0.0
+
+# Remove psycopg2-binary and add:
+psycopg==3.2.4
+psycopg-binary==3.2.4  # This provides the binary
