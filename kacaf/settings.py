@@ -93,14 +93,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'kacaf.wsgi.application'
 
-# Database
+# Database - Updated for PostgreSQL
 DATABASES = {
-    'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='sqlite:///db.sqlite3'),
-        conn_max_age=600,
-        conn_health_checks=True,
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('DB_NAME', default='kacaf_db'),
+        'USER': config('DB_USER', default='kacaf_user'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,
+        'OPTIONS': {
+            'connect_timeout': 10,
+            'sslmode': config('DB_SSL_MODE', default='prefer'),
+        },
+    }
 }
+
+# Keep dj_database_url as an alternative configuration method
+# Uncomment the line below if you want to use DATABASE_URL environment variable
+# DATABASES['default'] = dj_database_url.config(default=config('DATABASE_URL'), conn_max_age=600, conn_health_checks=True)
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -360,4 +372,3 @@ SWAGGER_SETTINGS = {
 
 # Static files serving with WhiteNoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
