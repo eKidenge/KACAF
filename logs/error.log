@@ -12754,3 +12754,51 @@ Traceback (most recent call last):
     raise NoReverseMatch(msg)
 django.urls.exceptions.NoReverseMatch: Reverse for 'privacy-policy' not found. 'privacy-policy' is not a valid view function or pattern name.
 ERROR 2026-02-15 20:47:31,349 log 580914 139731780236992 "GET /privacy/ HTTP/1.1" 500 129739
+ERROR 2026-02-19 01:15:49,012 log 1501313 140502204675776 Internal Server Error: /api/events/public/events/
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/KACAF/events/views.py", line 487, in public_event_list
+    return render(request, 'events/public_event_list.html', context)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: events/public_event_list.html
+ERROR 2026-02-19 01:15:49,014 basehttp 1501313 140502204675776 "GET /api/events/public/events/ HTTP/1.1" 500 96479
+ERROR 2026-02-19 01:16:11,631 log 1501649 140229849740992 Internal Server Error: /api/events/public/events/
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/KACAF/events/views.py", line 487, in public_event_list
+    return render(request, 'event/public_event_list.html', context)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: event/public_event_list.html
+ERROR 2026-02-19 01:16:11,635 basehttp 1501649 140229849740992 "GET /api/events/public/events/ HTTP/1.1" 500 96588
+ERROR 2026-02-19 01:16:13,134 log 1501649 140229849740992 Internal Server Error: /api/events/public/events/
+Traceback (most recent call last):
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/home/cs/Desktop/PROJECTS/KACAF/events/views.py", line 487, in public_event_list
+    return render(request, 'event/public_event_list.html', context)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/home/cs/Desktop/PROJECTS/django_env/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: event/public_event_list.html
+ERROR 2026-02-19 01:16:13,136 basehttp 1501649 140229849740992 "GET /api/events/public/events/ HTTP/1.1" 500 96587

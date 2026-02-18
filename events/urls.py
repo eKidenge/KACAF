@@ -15,12 +15,15 @@ router.register(r'event-resources', views.EventResourceViewSet, basename='event-
 # Web interface URLs (add these BEFORE the router)
 urlpatterns = [
     # Web views for templates
-    path('events/', views.event_list, name='event_list'),
+    path('events/', views.event_list, name='event_list'),  # Admin/staff event list (login required)
     path('events/create/', views.event_create, name='event_create'),
     path('events/calendar/', views.event_calendar, name='event_calendar'),
     path('public/dashboard/', views.public_dashboard, name='public_dashboard'),
     
-    # ADD THIS LINE - Event detail page
+    # NEW: Public event list - accessible to everyone
+    path('public/events/', views.public_event_list, name='public_event_list'),
+    
+    # Event detail page
     path('events/<int:pk>/', views.event_detail, name='event_detail'),
     
     # API routes (router URLs)

@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Event, EventRegistration, EventPhoto, EventResource
+from django.core.paginator import Paginator
 from .serializers import (
     EventSerializer, EventRegistrationSerializer,
     EventPhotoSerializer, EventResourceSerializer,
@@ -424,3 +425,63 @@ def event_detail(request, pk):
         'similar_events': similar_events,
     }
     return render(request, 'events/event_detail.html', context)
+
+# events/views.py
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.utils import timezone
+from .models import Event
+
+def public_event_list(request):
+    """
+    Public view for listing events - accessible to everyone
+    """
+    # Get current time
+    now = timezone.now()
+    
+    # Get all public events
+    events = Event.objects.filter(
+        is_public=True,
+        status__in=['published', 'ongoing']  # Only show active events
+    )
+    
+    # Get filter type from URL (upcoming, past, all)
+    filter_type = request.GET.get('filter', 'upcoming')
+    
+    if filter_type == 'upcoming':
+        events = events.filter(start_datetime__gte=now)
+    elif filter_type == 'past':
+        events = events.filter(start_datetime__lt=now)
+    # 'all' shows everything without date filter
+    
+    # Order by date (upcoming first, then past)
+    events = events.order_by('-start_datetime' if filter_type == 'past' else 'start_datetime')
+    
+    # Pagination - 9 events per page (3x3 grid)
+    paginator = Paginator(events, 9)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    # Get counts for display
+    total_upcoming = Event.objects.filter(
+        is_public=True,
+        status__in=['published', 'ongoing'],
+        start_datetime__gte=now
+    ).count()
+    
+    total_past = Event.objects.filter(
+        is_public=True,
+        status__in=['published', 'ongoing'],
+        start_datetime__lt=now
+    ).count()
+    
+    context = {
+        'events': page_obj,
+        'filter_type': filter_type,
+        'total_events': events.count(),
+        'total_upcoming': total_upcoming,
+        'total_past': total_past,
+        'is_paginated': page_obj.has_other_pages(),
+    }
+    
+    return render(request, 'events/event/public_event_list.html', context)
