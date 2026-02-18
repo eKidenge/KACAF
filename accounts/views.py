@@ -108,7 +108,7 @@ def public_dashboard(request):
     
     # Total beneficiaries - sum from programs (if you have beneficiaries_count field)
     # If not, you might calculate from event registrations or member counts
-    total_beneficiaries = Program.objects.aggregate(total=Sum('beneficiaries_count'))['total'] or total_members * 2
+    total_beneficiaries = Program.objects.aggregate(total=Sum('beneficiaries_reached'))['total'] or total_members * 2
     
     # Carbon sequestered (tons CO2) - rough estimate based on trees planted
     # Average tree sequesters ~0.02 tons CO2 per year
