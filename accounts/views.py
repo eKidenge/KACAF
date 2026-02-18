@@ -89,9 +89,7 @@ def public_dashboard(request):
     ).order_by('start_datetime')[:3]
     
     # Get approved testimonials
-    testimonials = Testimonial.objects.filter(
-        is_approved=True
-    ).order_by('-created_at')[:3]
+    testimonials = Testimonial.objects.all().order_by('-created_at')[:3]
     
     # Get active partners
     partners = Partner.objects.filter(
