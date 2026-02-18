@@ -70,3 +70,7 @@ tzdata==2024.1
 # For pkg_resources warning
 setuptools==68.2.2  # Downgrade to avoid deprecation warning
 Pillow==10.4.0
+
+# Database
+psycopg2-binary==2.9.9  # Changed from psycopg-binary
+dj-database-url==2.0.0
