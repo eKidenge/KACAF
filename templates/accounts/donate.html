@@ -6,6 +6,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Support Kenya Agroforestry & Climate Action Foundation. Your donation helps transform communities through sustainable agroforestry and climate action in West Pokot County.">
+    <meta name="keywords" content="KACAF, donation, agroforestry, climate action, Kenya, West Pokot, tree planting, conservation">
+    <meta name="author" content="KACAF">
+    <meta property="og:title" content="Donate - KACAF | Support Kenya Agroforestry & Climate Action Foundation">
+    <meta property="og:description" content="Your donation helps transform communities through sustainable agroforestry and climate action in West Pokot County.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:image" content="{% static 'images/kacaf-og-image.jpg' %}">
+    <meta name="twitter:card" content="summary_large_image">
+    
     <title>Donate - KACAF | Support Kenya Agroforestry & Climate Action Foundation</title>
     
     <!-- Bootstrap 5 CSS -->
@@ -22,6 +32,13 @@
     
     <!-- Custom CSS -->
     <style>
+        /* CSS RESET - Ensure consistency across browsers */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary-green: #198754;
             --secondary-green: #20c997;
@@ -31,26 +48,86 @@
             --accent-blue: #0d6efd;
             --gray-100: #f8f9fa;
             --gray-200: #e9ecef;
+            --gray-300: #dee2e6;
             --gray-600: #6c757d;
             --gray-800: #343a40;
             --gray-900: #212529;
+            --font-primary: 'Open Sans', sans-serif;
+            --font-heading: 'Montserrat', sans-serif;
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --shadow-xl: 0 20px 40px rgba(0,0,0,0.1);
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
         }
         
-        /* Professional Typography */
+        /* Base Styles */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        
         body {
-            font-family: 'Open Sans', sans-serif;
+            font-family: var(--font-primary);
             color: var(--gray-800);
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ffffff;
+            line-height: 1.6;
+            font-size: 16px;
         }
         
         h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
-            font-family: 'Montserrat', sans-serif;
+            font-family: var(--font-heading);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+        
+        /* Main content area - expands to fill available space */
+        main {
+            flex: 1 0 auto;
+            width: 100%;
+        }
+        
+        /* Container optimization */
+        .container {
+            max-width: 1280px;
+            padding-left: 15px;
+            padding-right: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+
+        /* Row fixes */
+        .row {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        .col-lg-4, .col-lg-8 {
+            position: relative;
+            width: 100%;
+            padding-right: 15px;
+            padding-left: 15px;
         }
         
         /* Custom Header - Full Width with Enhanced Design */
         .custom-header {
             background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-xl);
             position: sticky;
             top: 0;
             z-index: 1030;
@@ -65,22 +142,17 @@
             width: 100%;
         }
         
-        .container-fluid {
-            padding-left: 30px;
-            padding-right: 30px;
-            max-width: 100%;
-        }
-        
         .header-brand {
             display: flex;
             align-items: center;
             text-decoration: none;
             color: white;
-            transition: transform 0.3s ease;
+            transition: transform var(--transition-normal);
         }
         
         .header-brand:hover {
             transform: scale(1.02);
+            text-decoration: none;
         }
         
         .brand-logo-container {
@@ -92,14 +164,15 @@
             align-items: center;
             justify-content: center;
             margin-right: 18px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
             border: 2px solid rgba(255, 255, 255, 0.3);
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
+            flex-shrink: 0;
         }
         
         .header-brand:hover .brand-logo-container {
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
             border-color: rgba(255, 255, 255, 0.8);
         }
         
@@ -147,7 +220,7 @@
             font-weight: 800;
             font-size: 1rem;
             padding: 0.8rem 1.3rem;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             border-radius: 8px;
             margin: 0 3px;
             text-transform: uppercase;
@@ -160,7 +233,7 @@
             background: rgba(255, 255, 255, 0.2);
             color: white !important;
             transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: var(--shadow-md);
             border-color: rgba(255, 255, 255, 0.3);
             backdrop-filter: blur(5px);
         }
@@ -170,7 +243,7 @@
             color: white !important;
             font-weight: 900;
             border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-sm);
         }
         
         .navbar-nav .nav-link.active::before {
@@ -187,11 +260,17 @@
         }
         
         /* Donation Page Specific Styles */
+        section {
+            width: 100%;
+            overflow: hidden;
+        }
+
         .donation-hero {
-            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.9)), 
-                        url("{% static 'images/donation-bg.jpg' %}") center/cover;
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.97), rgba(25, 135, 84, 0.95)), 
+                        url("{% static 'images/donation-bg.jpg' %}") center/cover no-repeat;
+            background-color: var(--dark-green);
             color: white;
-            padding: 80px 0;
+            padding: 100px 0;
             position: relative;
             overflow: hidden;
         }
@@ -213,13 +292,20 @@
             100% { transform: translateX(50px) translateY(50px); }
         }
 
+        .donation-hero .container {
+            position: relative;
+            z-index: 2;
+        }
+
         .donation-card {
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            box-shadow: var(--shadow-xl);
             border: 1px solid rgba(25, 135, 84, 0.1);
-            transition: all 0.3s ease;
+            transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+            width: 100%;
+            max-width: 100%;
         }
 
         .donation-card:hover {
@@ -249,7 +335,11 @@
             font-size: 1.1rem;
             border: 2px solid var(--primary-green);
             color: var(--primary-green);
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
+            background: transparent;
+            cursor: pointer;
+            width: 100%;
+            max-width: 100%;
         }
 
         .quick-amount-btn:hover,
@@ -267,12 +357,15 @@
             border: 2px solid var(--gray-200);
             border-radius: 15px;
             padding: 15px;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
+            height: auto;
+            max-width: 100%;
         }
 
         .amount-input:focus {
             border-color: var(--primary-green);
             box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+            outline: none;
         }
 
         .payment-method-card {
@@ -280,8 +373,11 @@
             border-radius: 15px;
             padding: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             margin-bottom: 15px;
+            background: white;
+            width: 100%;
+            max-width: 100%;
         }
 
         .payment-method-card:hover,
@@ -297,14 +393,24 @@
             margin-right: 15px;
         }
 
+        .payment-method-card img {
+            max-height: 30px;
+            width: auto;
+            max-width: 100%;
+        }
+
         .impact-stat {
             background: white;
             border-radius: 20px;
             padding: 30px 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            height: 100%;
+            box-shadow: var(--shadow-lg);
+            transition: all var(--transition-normal);
+            width: 100%;
+            max-width: 100%;
             border: 1px solid rgba(25, 135, 84, 0.1);
+            text-align: center;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .impact-stat:hover {
@@ -323,34 +429,48 @@
             font-size: 2.5rem;
         }
 
+        .impact-stat .display-5 {
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            word-break: break-word;
+        }
+
         .recurring-option {
             background: var(--gray-100);
             border-radius: 15px;
             padding: 20px;
             border: 2px solid transparent;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             cursor: pointer;
+            height: 100%;
+            width: 100%;
+            max-width: 100%;
         }
 
         .recurring-option:hover,
         .recurring-option.selected {
             border-color: var(--primary-green);
             background: white;
-            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.1);
+            box-shadow: var(--shadow-md);
         }
 
         .other-payment-card {
             background: var(--gray-100);
             border-radius: 15px;
-            padding: 20px;
-            transition: all 0.3s ease;
+            padding: 25px;
+            transition: all var(--transition-normal);
             height: 100%;
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid transparent;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .other-payment-card:hover {
             transform: translateY(-5px);
             background: white;
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-green);
         }
 
         .btn-donate {
@@ -358,25 +478,131 @@
             color: white;
             font-weight: 700;
             font-size: 1.2rem;
-            padding: 15px;
+            padding: 15px 30px;
             border: none;
             border-radius: 15px;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 100%;
         }
 
         .btn-donate:hover {
             transform: translateY(-3px);
             box-shadow: 0 15px 30px rgba(25, 135, 84, 0.4);
+            color: white;
         }
 
-        /* Footer Styles (same as public dashboard) */
+        .btn-donate:active {
+            transform: translateY(0);
+        }
+
+        .btn-donate:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Card styles */
+        .card {
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .card ul {
+            padding-left: 0;
+            margin-bottom: 0;
+        }
+
+        .card ul li {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .card ul li i {
+            flex-shrink: 0;
+            margin-top: 0.2rem;
+        }
+
+        /* Testimonial Card */
+        .testimonial-card {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            transition: all var(--transition-normal);
+            width: 100%;
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .testimonial-card::before {
+            content: '\201C';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            font-size: 6rem;
+            color: var(--primary-green);
+            opacity: 0.2;
+            font-family: serif;
+        }
+
+        .testimonial-card p {
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green));
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-600);
+            margin-bottom: 3rem;
+        }
+
+        /* Footer Styles */
         .footer {
             background: var(--dark-green);
             color: white;
             padding: 60px 0 20px;
             position: relative;
+            flex-shrink: 0;
+            width: 100%;
+            margin-top: 0;
+            clear: both;
+            z-index: 1;
         }
 
         .footer::before {
@@ -392,7 +618,7 @@
         .footer-links a {
             color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             font-weight: 500;
             display: inline-block;
             padding: 0.25rem 0;
@@ -413,14 +639,16 @@
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border-radius: 50%;
-            transition: all 0.3s ease;
+            transition: all var(--transition-normal);
             font-size: 1.2rem;
+            margin-right: 8px;
         }
 
         .footer-social a:hover {
             background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
             transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-md);
+            color: white;
         }
 
         .footer-contact-item {
@@ -439,17 +667,112 @@
             align-items: center;
             justify-content: center;
             color: var(--secondary-green);
+            flex-shrink: 0;
         }
 
-        /* Responsive */
+        .footer-newsletter .input-group {
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .footer-newsletter .form-control {
+            border: none;
+            padding: 0.75rem 1.25rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            height: auto;
+        }
+
+        .footer-newsletter .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .footer-newsletter .form-control:focus {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+            outline: none;
+        }
+
+        .footer-newsletter .btn {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .footer-newsletter .btn:hover {
+            background: linear-gradient(135deg, var(--secondary-green), var(--primary-green));
+        }
+
+        /* Alert Styles */
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+            border-radius: 15px;
+            border-left: 4px solid #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+            border-radius: 15px;
+            border-left: 4px solid #721c24;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Form elements */
+        .form-control,
+        .form-select {
+            max-width: 100%;
+            border-radius: 10px;
+            border: 2px solid var(--gray-200);
+            padding: 12px;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+            outline: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .brand-text h1 { font-size: 1.6rem; }
+            .brand-text p { font-size: 0.8rem; }
+            .navbar-nav .nav-link { padding: 0.7rem 1rem; font-size: 0.95rem; }
+            .container { max-width: 1140px; }
+        }
+        
         @media (max-width: 991px) {
             .container-fluid { padding-left: 20px; padding-right: 20px; }
             .navbar-nav {
                 padding: 1rem 0;
-                background: rgba(10, 92, 59, 0.95);
+                background: rgba(10, 92, 59, 0.98);
                 border-radius: 15px;
                 margin-top: 15px;
                 backdrop-filter: blur(10px);
+                max-height: 80vh;
+                overflow-y: auto;
             }
             .navbar-nav .nav-link {
                 margin: 5px 15px;
@@ -459,28 +782,69 @@
             }
             .brand-text h1 { font-size: 1.4rem; }
             .brand-text p { font-size: 0.7rem; }
+            .brand-logo-container { width: 55px; height: 55px; margin-right: 12px; }
+            .donation-body { padding: 30px; }
+            .section-title { font-size: 2rem; }
         }
         
         @media (max-width: 768px) {
             .donation-hero { padding: 60px 0; }
+            .donation-hero h1.display-4 { font-size: 2.5rem; }
             .brand-text h1 { font-size: 1.2rem; }
             .brand-text p { font-size: 0.65rem; }
             .brand-logo-container { width: 45px; height: 45px; }
+            .donation-body { padding: 20px; }
+            .quick-amount-btn { padding: 12px; font-size: 1rem; }
+            .amount-input { font-size: 1.2rem; padding: 12px; }
+            .section-title { font-size: 1.8rem; }
+            .footer { padding: 40px 0 20px; }
+            
+            .col-lg-4, .col-lg-8 {
+                padding-right: 10px;
+                padding-left: 10px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .container-fluid { padding-left: 15px; padding-right: 15px; }
+            .brand-text h1 { font-size: 1rem; }
+            .brand-text p { font-size: 0.6rem; line-height: 1.2; }
+            .navbar-nav .nav-link { font-size: 0.9rem; padding: 0.8rem 1rem; }
+            .brand-logo-container { width: 40px; height: 40px; border-radius: 10px; margin-right: 10px; }
+            .donation-hero h1.display-4 { font-size: 2rem; }
+            .donation-body { padding: 15px; }
+            .quick-amount-btn { padding: 10px; font-size: 0.9rem; }
+            .btn-donate { font-size: 1rem; padding: 12px; }
+            .container { padding-left: 10px; padding-right: 10px; }
+        }
+
+        /* Print Styles */
+        @media print {
+            .custom-header, .footer, .btn-donate, .donation-hero {
+                display: none;
+            }
+            body {
+                background: white;
+                color: black;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Custom Header - Exactly the same as public dashboard -->
-    <header class="custom-header">
-        <nav class="navbar navbar-expand-lg">
+    <!-- Custom Header - Production Ready -->
+    <header class="custom-header" role="banner">
+        <nav class="navbar navbar-expand-lg" role="navigation" aria-label="Main navigation">
             <div class="container-fluid">
                 <!-- Brand Logo & Name with Actual Logo -->
-                <a class="header-brand" href="/">
+                <a class="header-brand" href="/" aria-label="KACAF Home">
                     <div class="brand-logo-container">
                         <img src="{% static 'images/kacaf-logo.png' %}" 
-                             alt="KACAF Logo" 
+                             alt="KACAF Logo - Kenya Agroforestry & Climate Action Foundation" 
                              class="brand-logo"
-                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                             width="65"
+                             height="65"
+                             loading="eager"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\' aria-hidden=\'true\'></i>';">
                     </div>
                     <div class="brand-text">
                         <h1>KACAF</h1>
@@ -488,8 +852,9 @@
                     </div>
                 </a>
                 
-                <!-- Mobile Toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <!-- Mobile Toggle with Accessibility -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" 
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
@@ -497,25 +862,25 @@
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">HOME</a>
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/" {% if request.path == '/' %}aria-current="page"{% endif %}>HOME</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}">PROGRAMS</a>
+                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}" {% if 'programs' in request.path %}aria-current="page"{% endif %}>PROGRAMS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:public_event_list' %}">EVENTS</a>
+                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:public_event_list' %}" {% if 'events' in request.path %}aria-current="page"{% endif %}>EVENTS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}">RESOURCES</a>
+                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}" {% if 'resources' in request.path %}aria-current="page"{% endif %}>RESOURCES</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}">ANNOUNCEMENTS</a>
+                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}" {% if 'announcements' in request.path %}aria-current="page"{% endif %}>ANNOUNCEMENTS</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">ABOUT US</a>
+                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}" {% if 'about' in request.path %}aria-current="page"{% endif %}>ABOUT US</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}">CONTACT</a>
+                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}" {% if 'contact' in request.path %}aria-current="page"{% endif %}>CONTACT</a>
                         </li>
                     </ul>
                 </div>
@@ -524,25 +889,25 @@
     </header>
 
     <!-- Main Content -->
-    <main>
+    <main id="main-content" role="main">
         <!-- Donation Hero Section -->
-        <section class="donation-hero">
-            <div class="container position-relative" style="z-index: 2;">
-                <div class="row justify-content-center text-center" data-aos="fade-up">
-                    <div class="col-lg-8">
-                        <i class="fas fa-hand-holding-heart fa-4x mb-4"></i>
-                        <h1 class="display-4 fw-bold mb-3">Support Our Mission</h1>
+        <section class="donation-hero" aria-labelledby="hero-heading">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 text-center" data-aos="fade-up">
+                        <i class="fas fa-hand-holding-heart fa-4x mb-4" aria-hidden="true"></i>
+                        <h1 id="hero-heading" class="display-4 fw-bold mb-3">Support Our Mission</h1>
                         <p class="lead mb-4">
                             Your donation helps us transform communities through sustainable agroforestry, 
                             climate action, and environmental conservation in West Pokot County.
                         </p>
-                        <div class="d-flex justify-content-center gap-3">
+                        <div class="d-flex justify-content-center gap-3 flex-wrap">
                             <div class="bg-white text-dark rounded-4 p-3">
-                                <i class="fas fa-tree text-success me-2"></i>
+                                <i class="fas fa-tree text-success me-2" aria-hidden="true"></i>
                                 <span class="fw-bold">{{ total_trees_planted|default:"50,000+" }}</span> Trees Planted
                             </div>
                             <div class="bg-white text-dark rounded-4 p-3">
-                                <i class="fas fa-users text-success me-2"></i>
+                                <i class="fas fa-users text-success me-2" aria-hidden="true"></i>
                                 <span class="fw-bold">{{ total_members|default:"5,000+" }}</span> Members
                             </div>
                         </div>
@@ -552,25 +917,33 @@
         </section>
 
         <!-- Main Donation Section -->
-        <section class="py-5">
+        <section class="py-5" aria-labelledby="donation-heading">
             <div class="container">
-                <div class="row">
+                <div class="row g-4">
                     <!-- Donation Form Column -->
-                    <div class="col-lg-8 mb-4 mb-lg-0" data-aos="fade-right">
+                    <div class="col-lg-8" data-aos="fade-right">
                         <div class="donation-card">
                             <div class="donation-header">
-                                <i class="fas fa-heart"></i>
-                                <h2 class="h3 mb-0">Make a Donation</h2>
+                                <i class="fas fa-heart" aria-hidden="true"></i>
+                                <h2 id="donation-heading" class="h3 mb-0">Make a Donation</h2>
                                 <p class="mb-0 opacity-75">Your generosity creates lasting impact</p>
                             </div>
                             <div class="donation-body">
-                                <form method="post" action="{% url 'accounts:donate' %}" id="donationForm">
+                                <form method="post" action="{% url 'accounts:donate' %}" id="donationForm" novalidate>
                                     {% csrf_token %}
                                     
+                                    <!-- Display form errors if any -->
+                                    {% if form.errors %}
+                                    <div class="alert alert-danger mb-4" role="alert">
+                                        <i class="fas fa-exclamation-circle me-2"></i>
+                                        Please correct the errors below.
+                                    </div>
+                                    {% endif %}
+
                                     <!-- User Info Alert (if logged in) -->
                                     {% if user.is_authenticated %}
-                                    <div class="alert alert-success mb-4">
-                                        <i class="fas fa-check-circle me-2"></i>
+                                    <div class="alert alert-success mb-4" role="alert">
+                                        <i class="fas fa-check-circle me-2" aria-hidden="true"></i>
                                         Welcome back, <strong>{{ user.get_full_name|default:user.email }}</strong>!
                                         {% if user.user_type == 'donor' %}
                                         <br><small>Thank you for being a valued donor partner.</small>
@@ -580,25 +953,26 @@
 
                                     <!-- Donation Amount -->
                                     <div class="mb-4">
-                                        <label class="form-label fw-bold">Donation Amount (KES)</label>
+                                        <label class="form-label fw-bold" for="amount">Donation Amount (KES)</label>
                                         <div class="row g-2 mb-3">
                                             <div class="col-6 col-md-3">
-                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="500">KES 500</button>
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="500" aria-label="Donate KES 500">KES 500</button>
                                             </div>
                                             <div class="col-6 col-md-3">
-                                                <button type="button" class="btn w-100 quick-amount-btn active" data-amount="1000">KES 1,000</button>
+                                                <button type="button" class="btn w-100 quick-amount-btn active" data-amount="1000" aria-label="Donate KES 1000">KES 1,000</button>
                                             </div>
                                             <div class="col-6 col-md-3">
-                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="5000">KES 5,000</button>
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="5000" aria-label="Donate KES 5000">KES 5,000</button>
                                             </div>
                                             <div class="col-6 col-md-3">
-                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="10000">KES 10,000</button>
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="10000" aria-label="Donate KES 10000">KES 10,000</button>
                                             </div>
                                         </div>
                                         <div class="input-group">
                                             <span class="input-group-text bg-white border-2">KES</span>
                                             <input type="number" class="form-control amount-input" id="amount" name="amount" 
-                                                   min="100" step="100" value="1000" required>
+                                                   min="100" step="100" value="1000" required
+                                                   aria-required="true" aria-label="Donation amount in Kenyan Shillings">
                                         </div>
                                         <small class="text-muted">Minimum donation: KES 100</small>
                                     </div>
@@ -608,7 +982,7 @@
                                         <label class="form-label fw-bold">Donation Type</label>
                                         <div class="row g-3">
                                             <div class="col-md-6">
-                                                <div class="recurring-option selected" data-type="one_time">
+                                                <div class="recurring-option selected" data-type="one_time" role="button" tabindex="0" aria-label="One-time donation">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="donation_type" 
                                                                id="one_time" value="one_time" checked>
@@ -620,7 +994,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="recurring-option" data-type="monthly">
+                                                <div class="recurring-option" data-type="monthly" role="button" tabindex="0" aria-label="Monthly donation">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="donation_type" 
                                                                id="monthly" value="monthly">
@@ -638,9 +1012,9 @@
                                     <div class="mb-4">
                                         <label class="form-label fw-bold">Payment Method</label>
                                         
-                                        <div class="payment-method-card selected" data-method="mpesa">
+                                        <div class="payment-method-card selected" data-method="mpesa" role="button" tabindex="0" aria-label="Pay with M-PESA">
                                             <div class="d-flex align-items-center">
-                                                <i class="fas fa-mobile-alt"></i>
+                                                <i class="fas fa-mobile-alt" aria-hidden="true"></i>
                                                 <div class="flex-grow-1">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="payment_method" 
@@ -651,7 +1025,7 @@
                                                     </div>
                                                     <small class="text-muted">Pay using your M-PESA account</small>
                                                 </div>
-                                                <img src="https://safaricom.co.ke/images/m-pesa-logo.png" alt="M-PESA" height="30">
+                                                <img src="https://safaricom.co.ke/images/m-pesa-logo.png" alt="M-PESA logo" height="30" loading="lazy">
                                             </div>
                                         </div>
 
@@ -659,13 +1033,14 @@
                                         <div id="mpesa_fields" class="mt-3 p-3 bg-light rounded-3">
                                             <label for="mpesa_phone" class="form-label">M-PESA Phone Number</label>
                                             <input type="tel" class="form-control" id="mpesa_phone" name="mpesa_phone" 
-                                                   placeholder="07XX XXX XXX" pattern="[0-9]{10}">
-                                            <small class="text-muted">Enter the phone number registered with M-PESA</small>
+                                                   placeholder="07XX XXX XXX" pattern="[0-9]{10}" 
+                                                   aria-describedby="mpesaHelp">
+                                            <small id="mpesaHelp" class="text-muted">Enter the phone number registered with M-PESA</small>
                                         </div>
 
-                                        <div class="payment-method-card" data-method="card">
+                                        <div class="payment-method-card" data-method="card" role="button" tabindex="0" aria-label="Pay with Credit Card">
                                             <div class="d-flex align-items-center">
-                                                <i class="fas fa-credit-card"></i>
+                                                <i class="fas fa-credit-card" aria-hidden="true"></i>
                                                 <div class="flex-grow-1">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="payment_method" 
@@ -677,15 +1052,15 @@
                                                     <small class="text-muted">Visa, Mastercard, American Express</small>
                                                 </div>
                                                 <div>
-                                                    <i class="fab fa-cc-visa fa-2x me-1"></i>
-                                                    <i class="fab fa-cc-mastercard fa-2x"></i>
+                                                    <i class="fab fa-cc-visa fa-2x me-1" aria-hidden="true"></i>
+                                                    <i class="fab fa-cc-mastercard fa-2x" aria-hidden="true"></i>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="payment-method-card" data-method="bank">
+                                        <div class="payment-method-card" data-method="bank" role="button" tabindex="0" aria-label="Pay with Bank Transfer">
                                             <div class="d-flex align-items-center">
-                                                <i class="fas fa-university"></i>
+                                                <i class="fas fa-university" aria-hidden="true"></i>
                                                 <div class="flex-grow-1">
                                                     <div class="form-check">
                                                         <input class="form-check-input" type="radio" name="payment_method" 
@@ -696,7 +1071,7 @@
                                                     </div>
                                                     <small class="text-muted">Direct bank transfer</small>
                                                 </div>
-                                                <i class="fas fa-building fa-2x"></i>
+                                                <i class="fas fa-building fa-2x" aria-hidden="true"></i>
                                             </div>
                                         </div>
                                     </div>
@@ -704,40 +1079,40 @@
                                     <!-- Donor Information (for non-logged in users) -->
                                     {% if not user.is_authenticated %}
                                     <div class="mb-4">
-                                        <h5 class="mb-3">Your Information</h5>
+                                        <h3 class="h5 mb-3">Your Information</h3>
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">First Name *</label>
-                                                <input type="text" class="form-control" name="first_name" required>
+                                                <label for="first_name" class="form-label">First Name *</label>
+                                                <input type="text" class="form-control" id="first_name" name="first_name" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">Last Name *</label>
-                                                <input type="text" class="form-control" name="last_name" required>
+                                                <label for="last_name" class="form-label">Last Name *</label>
+                                                <input type="text" class="form-control" id="last_name" name="last_name" required>
                                             </div>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Email Address *</label>
-                                            <input type="email" class="form-control" name="email" required>
+                                            <label for="email" class="form-label">Email Address *</label>
+                                            <input type="email" class="form-control" id="email" name="email" required>
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Phone Number</label>
-                                            <input type="tel" class="form-control" name="phone" placeholder="07XX XXX XXX">
+                                            <label for="phone" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phone" name="phone" placeholder="07XX XXX XXX">
                                         </div>
                                     </div>
                                     {% endif %}
 
                                     <!-- Location Information -->
                                     <div class="mb-4">
-                                        <h5 class="mb-3">Location (Optional)</h5>
+                                        <h3 class="h5 mb-3">Location (Optional)</h3>
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">County</label>
-                                                <input type="text" class="form-control" name="county" 
+                                                <label for="county" class="form-label">County</label>
+                                                <input type="text" class="form-control" id="county" name="county" 
                                                        value="{% if user.county %}{{ user.county }}{% else %}West Pokot{% endif %}">
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">Sub-County</label>
-                                                <input type="text" class="form-control" name="sub_county" 
+                                                <label for="sub_county" class="form-label">Sub-County</label>
+                                                <input type="text" class="form-control" id="sub_county" name="sub_county" 
                                                        value="{{ user.sub_county|default:'' }}">
                                             </div>
                                         </div>
@@ -745,8 +1120,8 @@
 
                                     <!-- Donation Allocation -->
                                     <div class="mb-4">
-                                        <label class="form-label fw-bold">Allocate your donation to:</label>
-                                        <select class="form-select" name="allocation">
+                                        <label for="allocation" class="form-label fw-bold">Allocate your donation to:</label>
+                                        <select class="form-select" id="allocation" name="allocation">
                                             <option value="general">🌳 General Fund (Greatest Need)</option>
                                             <option value="tree_planting">🌱 Tree Planting Program</option>
                                             <option value="youth_training">📚 Youth Training & Empowerment</option>
@@ -758,8 +1133,8 @@
 
                                     <!-- Message -->
                                     <div class="mb-4">
-                                        <label class="form-label">Leave a message (Optional)</label>
-                                        <textarea class="form-control" name="message" rows="3" 
+                                        <label for="message" class="form-label">Leave a message (Optional)</label>
+                                        <textarea class="form-control" id="message" name="message" rows="3" 
                                                   placeholder="Share why you're supporting KACAF..."></textarea>
                                     </div>
 
@@ -797,13 +1172,13 @@
                                     </div>
 
                                     <!-- Submit Button -->
-                                    <button type="submit" class="btn btn-donate w-100">
-                                        <i class="fas fa-lock me-2"></i>
-                                        Complete Donation
+                                    <button type="submit" class="btn btn-donate" id="submitDonation">
+                                        <span class="button-text">Complete Donation</span>
+                                        <span class="spinner" style="display: none;"></span>
                                     </button>
 
                                     <p class="text-center text-muted small mt-3">
-                                        <i class="fas fa-shield-alt me-1"></i>
+                                        <i class="fas fa-shield-alt me-1" aria-hidden="true"></i>
                                         Secure payment processed with 256-bit encryption
                                     </p>
                                 </form>
@@ -811,62 +1186,64 @@
                         </div>
                     </div>
 
-                    <!-- Impact Sidebar -->
+                    <!-- Impact Sidebar - FIXED -->
                     <div class="col-lg-4" data-aos="fade-left">
-                        <!-- Impact Stats -->
-                        <div class="impact-stat text-center mb-4">
-                            <div class="impact-icon bg-success bg-opacity-10 text-success">
-                                <i class="fas fa-hand-holding-heart"></i>
-                            </div>
-                            <h3 class="display-5 fw-bold text-success">2,500+</h3>
-                            <p class="mb-0">Lifetime Donors</p>
-                            <small class="text-muted">Join them today</small>
-                        </div>
-
-                        <div class="impact-stat text-center mb-4">
-                            <div class="impact-icon bg-info bg-opacity-10 text-info">
-                                <i class="fas fa-tree"></i>
-                            </div>
-                            <h3 class="display-5 fw-bold text-info">50,000+</h3>
-                            <p class="mb-0">Trees Planted</p>
-                            <small class="text-muted">With donor support</small>
-                        </div>
-
-                        <div class="impact-stat text-center mb-4">
-                            <div class="impact-icon bg-warning bg-opacity-10 text-warning">
-                                <i class="fas fa-users"></i>
-                            </div>
-                            <h3 class="display-5 fw-bold text-warning">5,000+</h3>
-                            <p class="mb-0">Members & Farmers</p>
-                            <small class="text-muted">Benefiting from programs</small>
-                        </div>
-
-                        <!-- Why Donate Card -->
-                        <div class="card border-success mb-4">
-                            <div class="card-body">
-                                <h5 class="card-title"><i class="fas fa-check-circle text-success me-2"></i>Why Donate?</h5>
-                                <ul class="list-unstyled">
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>100% goes to programs</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tax deductible receipts</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Regular impact reports</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Visit our projects</li>
-                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Transparent accounting</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Testimonial -->
-                        <div class="testimonial-card">
-                            <i class="fas fa-quote-left fa-2x text-success opacity-25 mb-3"></i>
-                            <p class="mb-3">"I've been donating to KACAF for 2 years and seeing the impact firsthand - more trees, empowered farmers, and restored land."</p>
-                            <div class="d-flex align-items-center">
-                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-3" 
-                                     style="width: 50px; height: 50px;">
-                                    <i class="fas fa-user text-white"></i>
+                        <div class="d-flex flex-column gap-4">
+                            <!-- Impact Stats -->
+                            <div class="impact-stat text-center">
+                                <div class="impact-icon bg-success bg-opacity-10 text-success">
+                                    <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
                                 </div>
-                                <div>
-                                    <h6 class="mb-0">James Mwangi</h6>
-                                    <small class="text-muted">Monthly Donor</small>
+                                <h3 class="display-5 fw-bold text-success">2,500+</h3>
+                                <p class="mb-0">Lifetime Donors</p>
+                                <small class="text-muted">Join them today</small>
+                            </div>
+
+                            <div class="impact-stat text-center">
+                                <div class="impact-icon bg-info bg-opacity-10 text-info">
+                                    <i class="fas fa-tree" aria-hidden="true"></i>
+                                </div>
+                                <h3 class="display-5 fw-bold text-info">50,000+</h3>
+                                <p class="mb-0">Trees Planted</p>
+                                <small class="text-muted">With donor support</small>
+                            </div>
+
+                            <div class="impact-stat text-center">
+                                <div class="impact-icon bg-warning bg-opacity-10 text-warning">
+                                    <i class="fas fa-users" aria-hidden="true"></i>
+                                </div>
+                                <h3 class="display-5 fw-bold text-warning">5,000+</h3>
+                                <p class="mb-0">Members & Farmers</p>
+                                <small class="text-muted">Benefiting from programs</small>
+                            </div>
+
+                            <!-- Why Donate Card -->
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h4 class="card-title h5"><i class="fas fa-check-circle text-success me-2" aria-hidden="true"></i>Why Donate?</h4>
+                                    <ul class="list-unstyled mb-0">
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2" aria-hidden="true"></i>100% goes to programs</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2" aria-hidden="true"></i>Tax deductible receipts</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2" aria-hidden="true"></i>Regular impact reports</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2" aria-hidden="true"></i>Visit our projects</li>
+                                        <li class="mb-2"><i class="fas fa-check text-success me-2" aria-hidden="true"></i>Transparent accounting</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Testimonial -->
+                            <div class="testimonial-card">
+                                <i class="fas fa-quote-left fa-2x text-success opacity-25 mb-3" aria-hidden="true"></i>
+                                <p class="mb-3">"I've been donating to KACAF for 2 years and seeing the impact firsthand - more trees, empowered farmers, and restored land."</p>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 50px; height: 50px; flex-shrink: 0;" aria-hidden="true">
+                                        <i class="fas fa-user text-white"></i>
+                                    </div>
+                                    <div>
+                                        <h5 class="h6 mb-0">James Mwangi</h5>
+                                        <small class="text-muted">Monthly Donor</small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -876,11 +1253,11 @@
         </section>
 
         <!-- Other Ways to Donate -->
-        <section class="py-5 bg-light">
+        <section class="py-5 bg-light" aria-labelledby="other-ways-heading">
             <div class="container">
                 <div class="text-center mb-5" data-aos="fade-up">
-                    <h2 class="section-title">
-                        <i class="fas fa-handshake text-success me-2"></i>
+                    <h2 id="other-ways-heading" class="section-title">
+                        <i class="fas fa-handshake text-success me-2" aria-hidden="true"></i>
                         Other Ways to Support
                     </h2>
                     <p class="section-subtitle">
@@ -891,9 +1268,9 @@
                     <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                         <div class="other-payment-card">
                             <div class="text-center mb-3">
-                                <i class="fas fa-mobile-alt fa-3x text-success"></i>
+                                <i class="fas fa-mobile-alt fa-3x text-success" aria-hidden="true"></i>
                             </div>
-                            <h5 class="text-center">M-PESA PayBill</h5>
+                            <h3 class="h5 text-center">M-PESA PayBill</h3>
                             <p class="text-center mb-2"><strong>Business No:</strong> 123456</p>
                             <p class="text-center"><strong>Account:</strong> KACAF</p>
                             <p class="text-muted small text-center">Available 24/7</p>
@@ -902,9 +1279,9 @@
                     <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                         <div class="other-payment-card">
                             <div class="text-center mb-3">
-                                <i class="fas fa-university fa-3x text-success"></i>
+                                <i class="fas fa-university fa-3x text-success" aria-hidden="true"></i>
                             </div>
-                            <h5 class="text-center">Bank Transfer</h5>
+                            <h3 class="h5 text-center">Bank Transfer</h3>
                             <p class="text-center mb-2"><strong>Bank:</strong> Equity Bank</p>
                             <p class="text-center mb-2"><strong>Account Name:</strong> KACAF Foundation</p>
                             <p class="text-center"><strong>Account No:</strong> 1234567890</p>
@@ -913,9 +1290,9 @@
                     <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
                         <div class="other-payment-card">
                             <div class="text-center mb-3">
-                                <i class="fas fa-building fa-3x text-success"></i>
+                                <i class="fas fa-building fa-3x text-success" aria-hidden="true"></i>
                             </div>
-                            <h5 class="text-center">Corporate Partnership</h5>
+                            <h3 class="h5 text-center">Corporate Partnership</h3>
                             <p class="text-center">Partner with us for:</p>
                             <ul class="list-unstyled text-center small">
                                 <li>🌳 Tree Planting Events</li>
@@ -923,7 +1300,7 @@
                                 <li>🌍 CSR Initiatives</li>
                             </ul>
                             <p class="text-center mt-2">
-                                <a href="mailto:partnerships@kacaf.org" class="text-success">
+                                <a href="mailto:partnerships@kacaf.org" class="text-success text-decoration-none">
                                     partnerships@kacaf.org
                                 </a>
                             </p>
@@ -934,52 +1311,67 @@
         </section>
 
         <!-- Impact Promise -->
-        <section class="py-5">
+        <section class="py-5" aria-labelledby="impact-heading">
             <div class="container">
                 <div class="row align-items-center">
                     <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
-                        <h2 class="display-5 fw-bold mb-3">Your Impact, Our Promise</h2>
+                        <h2 id="impact-heading" class="display-5 fw-bold mb-3">Your Impact, Our Promise</h2>
                         <div class="d-flex mb-3">
                             <div class="me-3">
-                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                                <i class="fas fa-check-circle fa-2x text-success" aria-hidden="true"></i>
                             </div>
                             <div>
-                                <h5>100% Transparency</h5>
+                                <h3 class="h5">100% Transparency</h3>
                                 <p class="text-muted">We provide detailed reports on how every donation is used</p>
                             </div>
                         </div>
                         <div class="d-flex mb-3">
                             <div class="me-3">
-                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                                <i class="fas fa-check-circle fa-2x text-success" aria-hidden="true"></i>
                             </div>
                             <div>
-                                <h5>Maximum Impact</h5>
+                                <h3 class="h5">Maximum Impact</h3>
                                 <p class="text-muted">Low overhead means more funds go directly to programs</p>
                             </div>
                         </div>
                         <div class="d-flex mb-3">
                             <div class="me-3">
-                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                                <i class="fas fa-check-circle fa-2x text-success" aria-hidden="true"></i>
                             </div>
                             <div>
-                                <h5>Regular Updates</h5>
+                                <h3 class="h5">Regular Updates</h3>
                                 <p class="text-muted">Receive photos and stories from the communities you support</p>
                             </div>
                         </div>
                     </div>
                     <div class="col-lg-6" data-aos="fade-left">
-                        <img src="{% static 'images/impact-illustration.jpg' %}" 
-                             alt="Impact Illustration" 
-                             class="img-fluid rounded-4 shadow-lg"
-                             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400?text=KACAF+Impact'">
+                        <div class="text-center p-4 bg-light rounded-4 shadow-lg">
+                            <i class="fas fa-chart-line fa-5x text-success mb-4" aria-hidden="true"></i>
+                            <h3 class="h4">Our Impact</h3>
+                            <p class="text-muted">50,000+ trees planted • 5,000+ members • 2,500+ donors</p>
+                            <div class="row mt-4">
+                                <div class="col-4">
+                                    <div class="display-6 fw-bold text-success">50K+</div>
+                                    <small>Trees</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="display-6 fw-bold text-success">5K+</div>
+                                    <small>Members</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="display-6 fw-bold text-success">2.5K+</div>
+                                    <small>Donors</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer (exactly the same as public dashboard) -->
-    <footer class="footer">
+    <!-- Footer - Production Ready -->
+    <footer class="footer" role="contentinfo">
         <div class="container">
             <div class="row g-4">
                 <!-- About Section -->
@@ -989,36 +1381,39 @@
                             <img src="{% static 'images/kacaf-logo.png' %}" 
                                  alt="KACAF Logo" 
                                  class="brand-logo"
-                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                                 width="50"
+                                 height="50"
+                                 loading="lazy"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\' aria-hidden=\'true\'></i>';">
                         </div>
                         <div>
-                            <h4 class="mb-0">KACAF</h4>
+                            <h2 class="h4 mb-0">KACAF</h2>
                             <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
                         </div>
                     </div>
                     <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
                     <div class="footer-social d-flex gap-2">
-                        <a href="https://www.facebook.com/groups/1689529035466372/?ref=share&mibextid=NSMWBT" target="_blank" aria-label="Facebook">
-                            <i class="fab fa-facebook-f"></i>
+                        <a href="https://www.facebook.com/groups/1689529035466372/?ref=share&mibextid=NSMWBT" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                            <i class="fab fa-facebook-f" aria-hidden="true"></i>
                         </a>
-                        <a href="https://twitter.com/kacaf" target="_blank" aria-label="Twitter">
-                            <i class="fab fa-twitter"></i>
+                        <a href="https://twitter.com/kacaf" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <i class="fab fa-twitter" aria-hidden="true"></i>
                         </a>
-                        <a href="https://instagram.com/kacaf" target="_blank" aria-label="Instagram">
-                            <i class="fab fa-instagram"></i>
+                        <a href="https://instagram.com/kacaf" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                            <i class="fab fa-instagram" aria-hidden="true"></i>
                         </a>
-                        <a href="https://youtube.com/kacaf" target="_blank" aria-label="YouTube">
-                            <i class="fab fa-youtube"></i>
+                        <a href="https://youtube.com/kacaf" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                            <i class="fab fa-youtube" aria-hidden="true"></i>
                         </a>
-                        <a href="https://www.linkedin.com/company/kenya-agroforerstry-and-climate-action-foundation" target="_blank" aria-label="LinkedIn">
-                            <i class="fab fa-linkedin-in"></i>
+                        <a href="https://www.linkedin.com/company/kenya-agroforerstry-and-climate-action-foundation" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in" aria-hidden="true"></i>
                         </a>
                     </div>
                 </div>
                 
                 <!-- Quick Links -->
                 <div class="col-lg-2 col-md-4">
-                    <h5 class="mb-3">Quick Links</h5>
+                    <h2 class="h5 mb-3">Quick Links</h2>
                     <div class="footer-links">
                         <p><a href="/">Home</a></p>
                         <p><a href="{% url 'about' %}">About Us</a></p>
@@ -1030,31 +1425,31 @@
                 
                 <!-- Contact Info -->
                 <div class="col-lg-3 col-md-4">
-                    <h5 class="mb-3">Contact Us</h5>
+                    <h2 class="h5 mb-3">Contact Us</h2>
                     <div class="footer-contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                         <span>West Pokot County, Kenya</span>
                     </div>
                     <div class="footer-contact-item">
-                        <i class="fas fa-phone-alt"></i>
+                        <i class="fas fa-phone-alt" aria-hidden="true"></i>
                         <a href="tel:+254796761841" class="text-white text-decoration-none">+254 796 761 841</a>
                     </div>
                     <div class="footer-contact-item">
-                        <i class="fas fa-envelope"></i>
+                        <i class="fas fa-envelope" aria-hidden="true"></i>
                         <a href="mailto:info@kacaf.org" class="text-white text-decoration-none">info@kacaf.org</a>
                     </div>
                 </div>
                 
                 <!-- Newsletter -->
                 <div class="col-lg-3 col-md-4">
-                    <h5 class="mb-3">Newsletter</h5>
+                    <h2 class="h5 mb-3">Newsletter</h2>
                     <p class="small">Subscribe to get updates on our programs and impact.</p>
-                    <form class="footer-newsletter" method="post" action="{% url 'communications:newsletter_subscribe' %}">
+                    <form class="footer-newsletter" method="post" action="{% url 'communications:newsletter_subscribe' %}" id="footerNewsletterForm">
                         {% csrf_token %}
                         <div class="input-group">
-                            <input type="email" class="form-control" name="email" placeholder="Your email address" required>
-                            <button class="btn" type="submit">
-                                <i class="fas fa-paper-plane"></i>
+                            <input type="email" class="form-control" name="email" placeholder="Your email address" required aria-label="Email for newsletter">
+                            <button class="btn" type="submit" aria-label="Subscribe">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i>
                             </button>
                         </div>
                     </form>
@@ -1075,106 +1470,250 @@
         </div>
     </footer>
 
+    <!-- Scripts -->
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
     
     <!-- AOS Animation Library -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js" defer></script>
     
     <!-- Custom JS -->
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true,
-            offset: 100
-        });
+        (function() {
+            'use strict';
 
-        // Active navigation class
-        document.addEventListener('DOMContentLoaded', function() {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-            
-            navLinks.forEach(link => {
-                const href = link.getAttribute('href');
-                if (href === currentPath || (currentPath === '/' && href === '/') || 
-                    (href && currentPath.includes(href) && href !== '#' && href !== '/')) {
-                    link.classList.add('active');
+            // Initialize AOS when DOM is ready
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize AOS animations
+                if (typeof AOS !== 'undefined') {
+                    AOS.init({
+                        duration: 1000,
+                        once: true,
+                        offset: 100,
+                        disable: window.innerWidth < 768 // Disable on mobile for performance
+                    });
                 }
-            });
-        });
 
-        // Quick amount selection
-        const quickAmounts = document.querySelectorAll('.quick-amount-btn');
-        const amountInput = document.getElementById('amount');
-        
-        quickAmounts.forEach(btn => {
-            btn.addEventListener('click', function() {
-                quickAmounts.forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                amountInput.value = this.dataset.amount;
-            });
-        });
+                // Active navigation class
+                const currentPath = window.location.pathname;
+                const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+                
+                navLinks.forEach(link => {
+                    const href = link.getAttribute('href');
+                    if (href === currentPath || (currentPath === '/' && href === '/') || 
+                        (href && currentPath.includes(href) && href !== '#' && href !== '/')) {
+                        link.classList.add('active');
+                        link.setAttribute('aria-current', 'page');
+                    }
+                });
 
-        // Payment method selection
-        const paymentMethods = document.querySelectorAll('.payment-method-card');
-        const mpesaFields = document.getElementById('mpesa_fields');
-        
-        paymentMethods.forEach(method => {
-            method.addEventListener('click', function() {
-                paymentMethods.forEach(m => m.classList.remove('selected'));
-                this.classList.add('selected');
+                // Quick amount selection
+                const quickAmounts = document.querySelectorAll('.quick-amount-btn');
+                const amountInput = document.getElementById('amount');
                 
-                const radio = this.querySelector('input[type="radio"]');
-                radio.checked = true;
-                
-                // Show/hide M-PESA fields
-                if (radio.value === 'mpesa') {
-                    mpesaFields.style.display = 'block';
-                    document.getElementById('mpesa_phone').required = true;
-                } else {
-                    mpesaFields.style.display = 'none';
-                    document.getElementById('mpesa_phone').required = false;
+                if (quickAmounts.length && amountInput) {
+                    quickAmounts.forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            quickAmounts.forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                            amountInput.value = this.dataset.amount;
+                            
+                            // Trigger change event for any listeners
+                            amountInput.dispatchEvent(new Event('change', { bubbles: true }));
+                        });
+                    });
                 }
-            });
-        });
 
-        // Recurring option selection
-        const recurringOptions = document.querySelectorAll('.recurring-option');
-        
-        recurringOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                recurringOptions.forEach(o => o.classList.remove('selected'));
-                this.classList.add('selected');
+                // Payment method selection
+                const paymentMethods = document.querySelectorAll('.payment-method-card');
+                const mpesaFields = document.getElementById('mpesa_fields');
+                const mpesaPhone = document.getElementById('mpesa_phone');
                 
-                const radio = this.querySelector('input[type="radio"]');
-                radio.checked = true;
+                if (paymentMethods.length) {
+                    paymentMethods.forEach(method => {
+                        method.addEventListener('click', function() {
+                            paymentMethods.forEach(m => m.classList.remove('selected'));
+                            this.classList.add('selected');
+                            
+                            const radio = this.querySelector('input[type="radio"]');
+                            if (radio) {
+                                radio.checked = true;
+                                
+                                // Show/hide M-PESA fields
+                                if (mpesaFields) {
+                                    if (radio.value === 'mpesa') {
+                                        mpesaFields.style.display = 'block';
+                                        if (mpesaPhone) mpesaPhone.required = true;
+                                    } else {
+                                        mpesaFields.style.display = 'none';
+                                        if (mpesaPhone) mpesaPhone.required = false;
+                                    }
+                                }
+                            }
+                        });
+                        
+                        // Add keyboard support
+                        method.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.click();
+                            }
+                        });
+                    });
+                }
+
+                // Recurring option selection
+                const recurringOptions = document.querySelectorAll('.recurring-option');
+                
+                if (recurringOptions.length) {
+                    recurringOptions.forEach(option => {
+                        option.addEventListener('click', function() {
+                            recurringOptions.forEach(o => o.classList.remove('selected'));
+                            this.classList.add('selected');
+                            
+                            const radio = this.querySelector('input[type="radio"]');
+                            if (radio) radio.checked = true;
+                        });
+                        
+                        // Add keyboard support
+                        option.addEventListener('keydown', function(e) {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.click();
+                            }
+                        });
+                    });
+                }
+
+                // Donation form validation and submission
+                const donationForm = document.getElementById('donationForm');
+                const submitBtn = document.getElementById('submitDonation');
+                
+                if (donationForm) {
+                    donationForm.addEventListener('submit', function(e) {
+                        const amount = document.getElementById('amount');
+                        const consent = document.getElementById('data_consent');
+                        const mpesaRadio = document.getElementById('mpesa');
+                        const mpesaPhone = document.getElementById('mpesa_phone');
+                        
+                        // Validate amount
+                        if (amount && amount.value < 100) {
+                            e.preventDefault();
+                            alert('Minimum donation amount is KES 100');
+                            amount.focus();
+                            return false;
+                        }
+                        
+                        // Validate consent
+                        if (consent && !consent.checked) {
+                            e.preventDefault();
+                            alert('Please consent to data processing to continue');
+                            consent.focus();
+                            return false;
+                        }
+                        
+                        // Validate M-PESA phone if selected
+                        if (mpesaRadio && mpesaRadio.checked && mpesaPhone) {
+                            const phone = mpesaPhone.value.replace(/\s+/g, '');
+                            if (!phone || !/^(07|01)[0-9]{8}$/.test(phone)) {
+                                e.preventDefault();
+                                alert('Please enter a valid M-PESA phone number (e.g., 0712345678)');
+                                mpesaPhone.focus();
+                                return false;
+                            }
+                        }
+                        
+                        // Show loading state
+                        if (submitBtn) {
+                            const buttonText = submitBtn.querySelector('.button-text');
+                            const spinner = submitBtn.querySelector('.spinner');
+                            
+                            if (buttonText) buttonText.style.opacity = '0.7';
+                            if (spinner) spinner.style.display = 'inline-block';
+                            submitBtn.disabled = true;
+                        }
+                    });
+                }
+
+                // Footer newsletter form
+                const footerNewsletter = document.getElementById('footerNewsletterForm');
+                
+                if (footerNewsletter) {
+                    footerNewsletter.addEventListener('submit', function(e) {
+                        const email = this.querySelector('input[name="email"]');
+                        
+                        if (email && !email.value.includes('@')) {
+                            e.preventDefault();
+                            alert('Please enter a valid email address');
+                            email.focus();
+                        }
+                    });
+                }
+
+                // Input validation for M-PESA phone
+                if (mpesaPhone) {
+                    mpesaPhone.addEventListener('input', function() {
+                        this.value = this.value.replace(/[^0-9]/g, '');
+                    });
+                }
+
+                // Smooth scroll for anchor links
+                document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                    anchor.addEventListener('click', function(e) {
+                        const href = this.getAttribute('href');
+                        if (href !== '#') {
+                            e.preventDefault();
+                            const target = document.querySelector(href);
+                            if (target) {
+                                target.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start'
+                                });
+                            }
+                        }
+                    });
+                });
             });
-        });
 
-        // Form validation
-        document.getElementById('donationForm')?.addEventListener('submit', function(e) {
-            const amount = document.getElementById('amount').value;
-            if (amount < 100) {
-                e.preventDefault();
-                alert('Minimum donation amount is KES 100');
-            }
-            
-            const consent = document.getElementById('data_consent');
-            if (!consent.checked) {
-                e.preventDefault();
-                alert('Please consent to data processing to continue');
-            }
-        });
+            // Handle window resize
+            let resizeTimer;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimer);
+                resizeTimer = setTimeout(function() {
+                    if (window.innerWidth < 768 && typeof AOS !== 'undefined') {
+                        AOS.refresh(); // Refresh AOS on resize
+                    }
+                }, 250);
+            });
 
-        // Newsletter form enhancement
-        document.querySelector('form.footer-newsletter')?.addEventListener('submit', function(e) {
-            const email = this.querySelector('input[name="email"]').value;
-            if (!email.includes('@')) {
-                e.preventDefault();
-                alert('Please enter a valid email address');
-            }
-        });
+        })();
+    </script>
+
+    <!-- Optional: Add structured data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "NGO",
+        "name": "Kenya Agroforestry & Climate Action Foundation",
+        "alternateName": "KACAF",
+        "url": "https://kacaf.org",
+        "logo": "{% static 'images/kacaf-logo.png' %}",
+        "sameAs": [
+            "https://www.facebook.com/groups/1689529035466372/",
+            "https://twitter.com/kacaf",
+            "https://instagram.com/kacaf",
+            "https://youtube.com/kacaf",
+            "https://www.linkedin.com/company/kenya-agroforerstry-and-climate-action-foundation"
+        ],
+        "address": {
+            "@type": "PostalAddress",
+            "addressRegion": "West Pokot County",
+            "addressCountry": "Kenya"
+        },
+        "email": "info@kacaf.org",
+        "telephone": "+254796761841",
+        "description": "Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County."
+    }
     </script>
 </body>
 </html>
