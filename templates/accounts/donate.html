@@ -1,0 +1,298 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Donate - KACAF{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="text-center mb-4">Support KACAF</h1>
+            
+            <!-- Donor Information Section (if user is logged in) -->
+            {% if user.is_authenticated %}
+            <div class="alert alert-info mb-4">
+                <h5>Welcome, {{ user.get_full_name|default:user.email }}!</h5>
+                <p class="mb-0">User Type: {{ user.get_user_type_display }}</p>
+                {% if user.membership_type %}
+                <p class="mb-0">Membership: {{ user.get_membership_type_display }}</p>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Make a Donation</h5>
+                    
+                    <form method="post" action="{% url 'accounts:donate' %}" id="donationForm">
+                        {% csrf_token %}
+                        
+                        <!-- Donation Amount -->
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Donation Amount (KES)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">KES</span>
+                                <input type="number" class="form-control" id="amount" name="amount" 
+                                       min="100" step="100" value="1000" required>
+                            </div>
+                            <small class="text-muted">Minimum donation: KES 100</small>
+                        </div>
+                        
+                        <!-- Quick Amount Selection -->
+                        <div class="mb-3">
+                            <label class="form-label">Quick Select</label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="500">KES 500</button>
+                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="1000">KES 1,000</button>
+                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="5000">KES 5,000</button>
+                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="10000">KES 10,000</button>
+                            </div>
+                        </div>
+                        
+                        <!-- Payment Method -->
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Payment Method</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required>
+                                <option value="">Select payment method</option>
+                                <option value="mpesa">M-PESA (Mobile Money)</option>
+                                <option value="card">Credit/Debit Card</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="paypal">PayPal</option>
+                            </select>
+                        </div>
+                        
+                        <!-- M-PESA Specific Fields (shown/hidden based on selection) -->
+                        <div id="mpesa_fields" class="mb-3" style="display: none;">
+                            <label for="mpesa_phone" class="form-label">M-PESA Phone Number</label>
+                            <input type="tel" class="form-control" id="mpesa_phone" name="mpesa_phone" 
+                                   placeholder="07XX XXX XXX" pattern="[0-9]{10}">
+                            <small class="text-muted">Enter the phone number registered with M-PESA</small>
+                        </div>
+                        
+                        <!-- Donor Information (for non-logged in users or to update profile) -->
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Donor Information</h6>
+                            </div>
+                            <div class="card-body">
+                                {% if not user.is_authenticated %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">First Name</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Last Name</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="email" name="email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="phone" class="form-label">Phone Number</label>
+                                    <input type="tel" class="form-control" id="phone" name="phone" 
+                                           placeholder="07XX XXX XXX" pattern="[0-9]{10}">
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Location Information (matches CustomUser model) -->
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="county" class="form-label">County</label>
+                                        <input type="text" class="form-control" id="county" name="county" 
+                                               value="{% if user.county %}{{ user.county }}{% else %}West Pokot{% endif %}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="sub_county" class="form-label">Sub-County</label>
+                                        <input type="text" class="form-control" id="sub_county" name="sub_county" 
+                                               value="{{ user.sub_county|default:'' }}">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="ward" class="form-label">Ward</label>
+                                        <input type="text" class="form-control" id="ward" name="ward" 
+                                               value="{{ user.ward|default:'' }}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="village" class="form-label">Village</label>
+                                        <input type="text" class="form-control" id="village" name="village" 
+                                               value="{{ user.village|default:'' }}">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Donation Preferences -->
+                        <div class="mb-3">
+                            <label class="form-label">Donation Type</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="donation_type" 
+                                       id="one_time" value="one_time" checked>
+                                <label class="form-check-label" for="one_time">
+                                    One-time Donation
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="donation_type" 
+                                       id="monthly" value="monthly">
+                                <label class="form-check-label" for="monthly">
+                                    Monthly Recurring Donation
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Anonymous Donation -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="anonymous" name="anonymous">
+                            <label class="form-check-label" for="anonymous">
+                                Donate anonymously (your name won't be displayed publicly)
+                            </label>
+                        </div>
+                        
+                        <!-- Allocation of Funds -->
+                        <div class="mb-3">
+                            <label class="form-label">Allocate your donation to:</label>
+                            <select class="form-select" id="allocation" name="allocation">
+                                <option value="general">General Fund</option>
+                                <option value="tree_planting">Tree Planting Program</option>
+                                <option value="youth_training">Youth Training</option>
+                                <option value="farmer_support">Farmer Support</option>
+                                <option value="conservation">Conservation Projects</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message (Optional)</label>
+                            <textarea class="form-control" id="message" name="message" rows="3" 
+                                      placeholder="Leave a message with your donation..."></textarea>
+                        </div>
+                        
+                        <!-- Tax Receipt Option -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="tax_receipt" name="tax_receipt" checked>
+                            <label class="form-check-label" for="tax_receipt">
+                                I would like to receive a tax receipt for this donation
+                            </label>
+                        </div>
+                        
+                        <!-- Newsletter Subscription (matches CustomUser model) -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter" 
+                                   {% if user.newsletter_subscription %}checked{% endif %}>
+                            <label class="form-check-label" for="newsletter">
+                                Subscribe to our newsletter for updates on how your donation is making an impact
+                            </label>
+                        </div>
+                        
+                        <!-- Consent Fields (matches CustomUser model) -->
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="data_consent" name="data_consent" required>
+                            <label class="form-check-label" for="data_consent">
+                                I consent to KACAF processing my personal data for donation processing and communication purposes
+                            </label>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-success btn-lg w-100">Proceed to Payment</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Donor Impact Stats -->
+            <div class="row mt-5">
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-primary">{{ total_donors|default:"500+" }}</h3>
+                            <p class="mb-0">Lifetime Donors</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-success">{{ total_raised|default:"2.5M+" }}</h3>
+                            <p class="mb-0">KES Raised</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 class="text-info">{{ trees_planted|default:"50,000+" }}</h3>
+                            <p class="mb-0">Trees Planted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Other Ways to Donate -->
+            <div class="mt-5">
+                <h4>Other Ways to Donate</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6><i class="fas fa-mobile-alt"></i> M-PESA</h6>
+                                <p class="mb-1"><strong>PayBill:</strong> 123456</p>
+                                <p><strong>Account:</strong> KACAF</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <h6><i class="fas fa-university"></i> Bank Transfer</h6>
+                                <p class="mb-1"><strong>Bank:</strong> Equity Bank</p>
+                                <p class="mb-1"><strong>Account Name:</strong> KACAF Foundation</p>
+                                <p><strong>Account Number:</strong> 1234567890</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="text-center mt-3">
+                    For corporate partnerships or large donations, contact us at 
+                    <a href="mailto:donations@kacaf.org">donations@kacaf.org</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript for dynamic form behavior -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Quick amount selection
+    document.querySelectorAll('.quick-amount').forEach(button => {
+        button.addEventListener('click', function() {
+            document.getElementById('amount').value = this.dataset.amount;
+        });
+    });
+    
+    // Show/hide M-PESA fields based on payment method
+    document.getElementById('payment_method').addEventListener('change', function() {
+        const mpesaFields = document.getElementById('mpesa_fields');
+        if (this.value === 'mpesa') {
+            mpesaFields.style.display = 'block';
+            document.getElementById('mpesa_phone').required = true;
+        } else {
+            mpesaFields.style.display = 'none';
+            document.getElementById('mpesa_phone').required = false;
+        }
+    });
+    
+    // Form validation
+    document.getElementById('donationForm').addEventListener('submit', function(e) {
+        const amount = document.getElementById('amount').value;
+        if (amount < 100) {
+            e.preventDefault();
+            alert('Minimum donation amount is KES 100');
+        }
+    });
+});
+</script>
+{% endblock %}
