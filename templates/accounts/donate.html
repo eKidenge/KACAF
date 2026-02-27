@@ -1,298 +1,1180 @@
-{% extends 'base/base.html' %}
 {% load static %}
+{% load humanize %}
 
-{% block title %}Donate - KACAF{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate - KACAF | Support Kenya Agroforestry & Climate Action Foundation</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts for Professional Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-green: #198754;
+            --secondary-green: #20c997;
+            --light-green: #d1e7dd;
+            --dark-green: #0d3625;
+            --accent-gold: #ffc107;
+            --accent-blue: #0d6efd;
+            --gray-100: #f8f9fa;
+            --gray-200: #e9ecef;
+            --gray-600: #6c757d;
+            --gray-800: #343a40;
+            --gray-900: #212529;
+        }
+        
+        /* Professional Typography */
+        body {
+            font-family: 'Open Sans', sans-serif;
+            color: var(--gray-800);
+            overflow-x: hidden;
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-nav .nav-link, .header-brand {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        /* Custom Header - Full Width with Enhanced Design */
+        .custom-header {
+            background: linear-gradient(135deg, #0a5c3b 0%, #198754 50%, #20c997 100%);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1030;
+            width: 100%;
+            left: 0;
+            right: 0;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.15);
+        }
+        
+        .navbar {
+            padding: 10px 0;
+            width: 100%;
+        }
+        
+        .container-fluid {
+            padding-left: 30px;
+            padding-right: 30px;
+            max-width: 100%;
+        }
+        
+        .header-brand {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+        }
+        
+        .header-brand:hover {
+            transform: scale(1.02);
+        }
+        
+        .brand-logo-container {
+            width: 65px;
+            height: 65px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .header-brand:hover .brand-logo-container {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .brand-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .brand-text {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 0;
+            line-height: 1.2;
+            letter-spacing: -0.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #fff, #f0f0f0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .brand-text p {
+            font-size: 0.9rem;
+            margin: 0;
+            opacity: 0.95;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        
+        /* Navigation Links - Bold & Professional */
+        .navbar-nav {
+            margin-left: auto;
+        }
+        
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.8rem 1.3rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            margin: 0 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            border: 1px solid transparent;
+        }
+        
+        .navbar-nav .nav-link:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white !important;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white !important;
+            font-weight: 900;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .navbar-nav .nav-link.active::before {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 4px;
+            background: var(--accent-gold);
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Donation Page Specific Styles */
+        .donation-hero {
+            background: linear-gradient(135deg, rgba(13, 54, 37, 0.95), rgba(25, 135, 84, 0.9)), 
+                        url("{% static 'images/donation-bg.jpg' %}") center/cover;
+            color: white;
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
 
-{% block content %}
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h1 class="text-center mb-4">Support KACAF</h1>
-            
-            <!-- Donor Information Section (if user is logged in) -->
-            {% if user.is_authenticated %}
-            <div class="alert alert-info mb-4">
-                <h5>Welcome, {{ user.get_full_name|default:user.email }}!</h5>
-                <p class="mb-0">User Type: {{ user.get_user_type_display }}</p>
-                {% if user.membership_type %}
-                <p class="mb-0">Membership: {{ user.get_membership_type_display }}</p>
-                {% endif %}
+        .donation-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.1"><path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white"/></svg>');
+            background-size: 50px 50px;
+            animation: moveBackground 20s linear infinite;
+        }
+
+        @keyframes moveBackground {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(50px) translateY(50px); }
+        }
+
+        .donation-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(25, 135, 84, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .donation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -12px rgba(25, 135, 84, 0.3);
+        }
+
+        .donation-header {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .donation-header i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .donation-body {
+            padding: 40px;
+        }
+
+        .quick-amount-btn {
+            padding: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: 2px solid var(--primary-green);
+            color: var(--primary-green);
+            transition: all 0.3s ease;
+        }
+
+        .quick-amount-btn:hover,
+        .quick-amount-btn.active {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            border-color: transparent;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.3);
+        }
+
+        .amount-input {
+            font-size: 1.5rem;
+            font-weight: 700;
+            border: 2px solid var(--gray-200);
+            border-radius: 15px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .amount-input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+
+        .payment-method-card {
+            border: 2px solid var(--gray-200);
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .payment-method-card:hover,
+        .payment-method-card.selected {
+            border-color: var(--primary-green);
+            background: var(--light-green);
+            transform: translateX(5px);
+        }
+
+        .payment-method-card i {
+            font-size: 2rem;
+            color: var(--primary-green);
+            margin-right: 15px;
+        }
+
+        .impact-stat {
+            background: white;
+            border-radius: 20px;
+            padding: 30px 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            border: 1px solid rgba(25, 135, 84, 0.1);
+        }
+
+        .impact-stat:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(25, 135, 84, 0.2);
+        }
+
+        .impact-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+        }
+
+        .recurring-option {
+            background: var(--gray-100);
+            border-radius: 15px;
+            padding: 20px;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .recurring-option:hover,
+        .recurring-option.selected {
+            border-color: var(--primary-green);
+            background: white;
+            box-shadow: 0 10px 20px rgba(25, 135, 84, 0.1);
+        }
+
+        .other-payment-card {
+            background: var(--gray-100);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .other-payment-card:hover {
+            transform: translateY(-5px);
+            background: white;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-donate {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            color: white;
+            font-weight: 700;
+            font-size: 1.2rem;
+            padding: 15px;
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(25, 135, 84, 0.4);
+        }
+
+        /* Footer Styles (same as public dashboard) */
+        .footer {
+            background: var(--dark-green);
+            color: white;
+            padding: 60px 0 20px;
+            position: relative;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-green), var(--secondary-green), var(--accent-gold));
+        }
+        
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: inline-block;
+            padding: 0.25rem 0;
+        }
+        
+        .footer-links a:hover {
+            color: white;
+            transform: translateX(5px);
+            text-decoration: underline;
+        }
+
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .footer-social a:hover {
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        .footer-contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-contact-item i {
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-green);
+        }
+
+        /* Responsive */
+        @media (max-width: 991px) {
+            .container-fluid { padding-left: 20px; padding-right: 20px; }
+            .navbar-nav {
+                padding: 1rem 0;
+                background: rgba(10, 92, 59, 0.95);
+                border-radius: 15px;
+                margin-top: 15px;
+                backdrop-filter: blur(10px);
+            }
+            .navbar-nav .nav-link {
+                margin: 5px 15px;
+                padding: 0.9rem 1.2rem;
+                text-align: center;
+                border-radius: 10px;
+            }
+            .brand-text h1 { font-size: 1.4rem; }
+            .brand-text p { font-size: 0.7rem; }
+        }
+        
+        @media (max-width: 768px) {
+            .donation-hero { padding: 60px 0; }
+            .brand-text h1 { font-size: 1.2rem; }
+            .brand-text p { font-size: 0.65rem; }
+            .brand-logo-container { width: 45px; height: 45px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Custom Header - Exactly the same as public dashboard -->
+    <header class="custom-header">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-fluid">
+                <!-- Brand Logo & Name with Actual Logo -->
+                <a class="header-brand" href="/">
+                    <div class="brand-logo-container">
+                        <img src="{% static 'images/kacaf-logo.png' %}" 
+                             alt="KACAF Logo" 
+                             class="brand-logo"
+                             onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
+                    </div>
+                    <div class="brand-text">
+                        <h1>KACAF</h1>
+                        <p>Kenya Agroforestry & Climate Action Foundation</p>
+                    </div>
+                </a>
+                
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <!-- Navigation Links -->
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">HOME</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'programs' in request.path %}active{% endif %}" href="{% url 'programs:program_list' %}">PROGRAMS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'events' in request.path %}active{% endif %}" href="{% url 'events:public_event_list' %}">EVENTS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'resources' in request.path %}active{% endif %}" href="{% url 'resources:resource_list' %}">RESOURCES</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'communications:announcement_list' %}">ANNOUNCEMENTS</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'about' in request.path %}active{% endif %}" href="{% url 'about' %}">ABOUT US</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if 'contact' in request.path %}active{% endif %}" href="{% url 'communications:contact' %}">CONTACT</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
-            {% endif %}
-            
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Make a Donation</h5>
-                    
-                    <form method="post" action="{% url 'accounts:donate' %}" id="donationForm">
-                        {% csrf_token %}
-                        
-                        <!-- Donation Amount -->
-                        <div class="mb-3">
-                            <label for="amount" class="form-label">Donation Amount (KES)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">KES</span>
-                                <input type="number" class="form-control" id="amount" name="amount" 
-                                       min="100" step="100" value="1000" required>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Donation Hero Section -->
+        <section class="donation-hero">
+            <div class="container position-relative" style="z-index: 2;">
+                <div class="row justify-content-center text-center" data-aos="fade-up">
+                    <div class="col-lg-8">
+                        <i class="fas fa-hand-holding-heart fa-4x mb-4"></i>
+                        <h1 class="display-4 fw-bold mb-3">Support Our Mission</h1>
+                        <p class="lead mb-4">
+                            Your donation helps us transform communities through sustainable agroforestry, 
+                            climate action, and environmental conservation in West Pokot County.
+                        </p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <div class="bg-white text-dark rounded-4 p-3">
+                                <i class="fas fa-tree text-success me-2"></i>
+                                <span class="fw-bold">{{ total_trees_planted|default:"50,000+" }}</span> Trees Planted
                             </div>
-                            <small class="text-muted">Minimum donation: KES 100</small>
-                        </div>
-                        
-                        <!-- Quick Amount Selection -->
-                        <div class="mb-3">
-                            <label class="form-label">Quick Select</label>
-                            <div class="btn-group w-100" role="group">
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="500">KES 500</button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="1000">KES 1,000</button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="5000">KES 5,000</button>
-                                <button type="button" class="btn btn-outline-primary quick-amount" data-amount="10000">KES 10,000</button>
+                            <div class="bg-white text-dark rounded-4 p-3">
+                                <i class="fas fa-users text-success me-2"></i>
+                                <span class="fw-bold">{{ total_members|default:"5,000+" }}</span> Members
                             </div>
                         </div>
-                        
-                        <!-- Payment Method -->
-                        <div class="mb-3">
-                            <label for="payment_method" class="form-label">Payment Method</label>
-                            <select class="form-select" id="payment_method" name="payment_method" required>
-                                <option value="">Select payment method</option>
-                                <option value="mpesa">M-PESA (Mobile Money)</option>
-                                <option value="card">Credit/Debit Card</option>
-                                <option value="bank">Bank Transfer</option>
-                                <option value="paypal">PayPal</option>
-                            </select>
-                        </div>
-                        
-                        <!-- M-PESA Specific Fields (shown/hidden based on selection) -->
-                        <div id="mpesa_fields" class="mb-3" style="display: none;">
-                            <label for="mpesa_phone" class="form-label">M-PESA Phone Number</label>
-                            <input type="tel" class="form-control" id="mpesa_phone" name="mpesa_phone" 
-                                   placeholder="07XX XXX XXX" pattern="[0-9]{10}">
-                            <small class="text-muted">Enter the phone number registered with M-PESA</small>
-                        </div>
-                        
-                        <!-- Donor Information (for non-logged in users or to update profile) -->
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">Donor Information</h6>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Donation Section -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row">
+                    <!-- Donation Form Column -->
+                    <div class="col-lg-8 mb-4 mb-lg-0" data-aos="fade-right">
+                        <div class="donation-card">
+                            <div class="donation-header">
+                                <i class="fas fa-heart"></i>
+                                <h2 class="h3 mb-0">Make a Donation</h2>
+                                <p class="mb-0 opacity-75">Your generosity creates lasting impact</p>
                             </div>
+                            <div class="donation-body">
+                                <form method="post" action="{% url 'accounts:donate' %}" id="donationForm">
+                                    {% csrf_token %}
+                                    
+                                    <!-- User Info Alert (if logged in) -->
+                                    {% if user.is_authenticated %}
+                                    <div class="alert alert-success mb-4">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Welcome back, <strong>{{ user.get_full_name|default:user.email }}</strong>!
+                                        {% if user.user_type == 'donor' %}
+                                        <br><small>Thank you for being a valued donor partner.</small>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Donation Amount -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Donation Amount (KES)</label>
+                                        <div class="row g-2 mb-3">
+                                            <div class="col-6 col-md-3">
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="500">KES 500</button>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <button type="button" class="btn w-100 quick-amount-btn active" data-amount="1000">KES 1,000</button>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="5000">KES 5,000</button>
+                                            </div>
+                                            <div class="col-6 col-md-3">
+                                                <button type="button" class="btn w-100 quick-amount-btn" data-amount="10000">KES 10,000</button>
+                                            </div>
+                                        </div>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-2">KES</span>
+                                            <input type="number" class="form-control amount-input" id="amount" name="amount" 
+                                                   min="100" step="100" value="1000" required>
+                                        </div>
+                                        <small class="text-muted">Minimum donation: KES 100</small>
+                                    </div>
+
+                                    <!-- Donation Type -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Donation Type</label>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <div class="recurring-option selected" data-type="one_time">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="donation_type" 
+                                                               id="one_time" value="one_time" checked>
+                                                        <label class="form-check-label fw-bold" for="one_time">
+                                                            One-time Donation
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-2">Make a single donation today</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="recurring-option" data-type="monthly">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="donation_type" 
+                                                               id="monthly" value="monthly">
+                                                        <label class="form-check-label fw-bold" for="monthly">
+                                                            Monthly Donation
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted d-block mt-2">Provide sustainable monthly support</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Payment Method -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Payment Method</label>
+                                        
+                                        <div class="payment-method-card selected" data-method="mpesa">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-mobile-alt"></i>
+                                                <div class="flex-grow-1">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="payment_method" 
+                                                               id="mpesa" value="mpesa" checked>
+                                                        <label class="form-check-label fw-bold" for="mpesa">
+                                                            M-PESA (Mobile Money)
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted">Pay using your M-PESA account</small>
+                                                </div>
+                                                <img src="https://safaricom.co.ke/images/m-pesa-logo.png" alt="M-PESA" height="30">
+                                            </div>
+                                        </div>
+
+                                        <!-- M-PESA Phone Field -->
+                                        <div id="mpesa_fields" class="mt-3 p-3 bg-light rounded-3">
+                                            <label for="mpesa_phone" class="form-label">M-PESA Phone Number</label>
+                                            <input type="tel" class="form-control" id="mpesa_phone" name="mpesa_phone" 
+                                                   placeholder="07XX XXX XXX" pattern="[0-9]{10}">
+                                            <small class="text-muted">Enter the phone number registered with M-PESA</small>
+                                        </div>
+
+                                        <div class="payment-method-card" data-method="card">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-credit-card"></i>
+                                                <div class="flex-grow-1">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="payment_method" 
+                                                               id="card" value="card">
+                                                        <label class="form-check-label fw-bold" for="card">
+                                                            Credit / Debit Card
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted">Visa, Mastercard, American Express</small>
+                                                </div>
+                                                <div>
+                                                    <i class="fab fa-cc-visa fa-2x me-1"></i>
+                                                    <i class="fab fa-cc-mastercard fa-2x"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="payment-method-card" data-method="bank">
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-university"></i>
+                                                <div class="flex-grow-1">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" name="payment_method" 
+                                                               id="bank" value="bank">
+                                                        <label class="form-check-label fw-bold" for="bank">
+                                                            Bank Transfer
+                                                        </label>
+                                                    </div>
+                                                    <small class="text-muted">Direct bank transfer</small>
+                                                </div>
+                                                <i class="fas fa-building fa-2x"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Donor Information (for non-logged in users) -->
+                                    {% if not user.is_authenticated %}
+                                    <div class="mb-4">
+                                        <h5 class="mb-3">Your Information</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">First Name *</label>
+                                                <input type="text" class="form-control" name="first_name" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Last Name *</label>
+                                                <input type="text" class="form-control" name="last_name" required>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Email Address *</label>
+                                            <input type="email" class="form-control" name="email" required>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" name="phone" placeholder="07XX XXX XXX">
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Location Information -->
+                                    <div class="mb-4">
+                                        <h5 class="mb-3">Location (Optional)</h5>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">County</label>
+                                                <input type="text" class="form-control" name="county" 
+                                                       value="{% if user.county %}{{ user.county }}{% else %}West Pokot{% endif %}">
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label class="form-label">Sub-County</label>
+                                                <input type="text" class="form-control" name="sub_county" 
+                                                       value="{{ user.sub_county|default:'' }}">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Donation Allocation -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-bold">Allocate your donation to:</label>
+                                        <select class="form-select" name="allocation">
+                                            <option value="general">🌳 General Fund (Greatest Need)</option>
+                                            <option value="tree_planting">🌱 Tree Planting Program</option>
+                                            <option value="youth_training">📚 Youth Training & Empowerment</option>
+                                            <option value="farmer_support">👨‍🌾 Farmer Support Program</option>
+                                            <option value="conservation">🦏 Biodiversity Conservation</option>
+                                            <option value="water">💧 Water Conservation Projects</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Message -->
+                                    <div class="mb-4">
+                                        <label class="form-label">Leave a message (Optional)</label>
+                                        <textarea class="form-control" name="message" rows="3" 
+                                                  placeholder="Share why you're supporting KACAF..."></textarea>
+                                    </div>
+
+                                    <!-- Options -->
+                                    <div class="mb-4">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="anonymous" name="anonymous">
+                                            <label class="form-check-label" for="anonymous">
+                                                Donate anonymously <small class="text-muted">(your name won't be displayed publicly)</small>
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="tax_receipt" name="tax_receipt" checked>
+                                            <label class="form-check-label" for="tax_receipt">
+                                                I need a tax receipt for this donation
+                                            </label>
+                                        </div>
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="newsletter" name="newsletter" 
+                                                   {% if user.newsletter_subscription %}checked{% endif %}>
+                                            <label class="form-check-label" for="newsletter">
+                                                Subscribe to newsletter for impact updates
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Consent -->
+                                    <div class="mb-4 p-3 bg-light rounded-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="data_consent" name="data_consent" required>
+                                            <label class="form-check-label" for="data_consent">
+                                                I consent to KACAF processing my personal data for donation processing and communication
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <button type="submit" class="btn btn-donate w-100">
+                                        <i class="fas fa-lock me-2"></i>
+                                        Complete Donation
+                                    </button>
+
+                                    <p class="text-center text-muted small mt-3">
+                                        <i class="fas fa-shield-alt me-1"></i>
+                                        Secure payment processed with 256-bit encryption
+                                    </p>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Impact Sidebar -->
+                    <div class="col-lg-4" data-aos="fade-left">
+                        <!-- Impact Stats -->
+                        <div class="impact-stat text-center mb-4">
+                            <div class="impact-icon bg-success bg-opacity-10 text-success">
+                                <i class="fas fa-hand-holding-heart"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold text-success">2,500+</h3>
+                            <p class="mb-0">Lifetime Donors</p>
+                            <small class="text-muted">Join them today</small>
+                        </div>
+
+                        <div class="impact-stat text-center mb-4">
+                            <div class="impact-icon bg-info bg-opacity-10 text-info">
+                                <i class="fas fa-tree"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold text-info">50,000+</h3>
+                            <p class="mb-0">Trees Planted</p>
+                            <small class="text-muted">With donor support</small>
+                        </div>
+
+                        <div class="impact-stat text-center mb-4">
+                            <div class="impact-icon bg-warning bg-opacity-10 text-warning">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3 class="display-5 fw-bold text-warning">5,000+</h3>
+                            <p class="mb-0">Members & Farmers</p>
+                            <small class="text-muted">Benefiting from programs</small>
+                        </div>
+
+                        <!-- Why Donate Card -->
+                        <div class="card border-success mb-4">
                             <div class="card-body">
-                                {% if not user.is_authenticated %}
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="first_name" class="form-label">First Name</label>
-                                        <input type="text" class="form-control" id="first_name" name="first_name" required>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="last_name" class="form-label">Last Name</label>
-                                        <input type="text" class="form-control" id="last_name" name="last_name" required>
-                                    </div>
+                                <h5 class="card-title"><i class="fas fa-check-circle text-success me-2"></i>Why Donate?</h5>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>100% goes to programs</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tax deductible receipts</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Regular impact reports</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Visit our projects</li>
+                                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Transparent accounting</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Testimonial -->
+                        <div class="testimonial-card">
+                            <i class="fas fa-quote-left fa-2x text-success opacity-25 mb-3"></i>
+                            <p class="mb-3">"I've been donating to KACAF for 2 years and seeing the impact firsthand - more trees, empowered farmers, and restored land."</p>
+                            <div class="d-flex align-items-center">
+                                <div class="rounded-circle bg-success d-flex align-items-center justify-content-center me-3" 
+                                     style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
                                 </div>
-                                <div class="mb-3">
-                                    <label for="email" class="form-label">Email Address</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="phone" class="form-label">Phone Number</label>
-                                    <input type="tel" class="form-control" id="phone" name="phone" 
-                                           placeholder="07XX XXX XXX" pattern="[0-9]{10}">
-                                </div>
-                                {% endif %}
-                                
-                                <!-- Location Information (matches CustomUser model) -->
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="county" class="form-label">County</label>
-                                        <input type="text" class="form-control" id="county" name="county" 
-                                               value="{% if user.county %}{{ user.county }}{% else %}West Pokot{% endif %}">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="sub_county" class="form-label">Sub-County</label>
-                                        <input type="text" class="form-control" id="sub_county" name="sub_county" 
-                                               value="{{ user.sub_county|default:'' }}">
-                                    </div>
-                                </div>
-                                
-                                <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="ward" class="form-label">Ward</label>
-                                        <input type="text" class="form-control" id="ward" name="ward" 
-                                               value="{{ user.ward|default:'' }}">
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="village" class="form-label">Village</label>
-                                        <input type="text" class="form-control" id="village" name="village" 
-                                               value="{{ user.village|default:'' }}">
-                                    </div>
+                                <div>
+                                    <h6 class="mb-0">James Mwangi</h6>
+                                    <small class="text-muted">Monthly Donor</small>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Donation Preferences -->
-                        <div class="mb-3">
-                            <label class="form-label">Donation Type</label>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="donation_type" 
-                                       id="one_time" value="one_time" checked>
-                                <label class="form-check-label" for="one_time">
-                                    One-time Donation
-                                </label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Other Ways to Donate -->
+        <section class="py-5 bg-light">
+            <div class="container">
+                <div class="text-center mb-5" data-aos="fade-up">
+                    <h2 class="section-title">
+                        <i class="fas fa-handshake text-success me-2"></i>
+                        Other Ways to Support
+                    </h2>
+                    <p class="section-subtitle">
+                        Choose the method that works best for you
+                    </p>
+                </div>
+                <div class="row g-4">
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                        <div class="other-payment-card">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-mobile-alt fa-3x text-success"></i>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="donation_type" 
-                                       id="monthly" value="monthly">
-                                <label class="form-check-label" for="monthly">
-                                    Monthly Recurring Donation
-                                </label>
+                            <h5 class="text-center">M-PESA PayBill</h5>
+                            <p class="text-center mb-2"><strong>Business No:</strong> 123456</p>
+                            <p class="text-center"><strong>Account:</strong> KACAF</p>
+                            <p class="text-muted small text-center">Available 24/7</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                        <div class="other-payment-card">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-university fa-3x text-success"></i>
+                            </div>
+                            <h5 class="text-center">Bank Transfer</h5>
+                            <p class="text-center mb-2"><strong>Bank:</strong> Equity Bank</p>
+                            <p class="text-center mb-2"><strong>Account Name:</strong> KACAF Foundation</p>
+                            <p class="text-center"><strong>Account No:</strong> 1234567890</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                        <div class="other-payment-card">
+                            <div class="text-center mb-3">
+                                <i class="fas fa-building fa-3x text-success"></i>
+                            </div>
+                            <h5 class="text-center">Corporate Partnership</h5>
+                            <p class="text-center">Partner with us for:</p>
+                            <ul class="list-unstyled text-center small">
+                                <li>🌳 Tree Planting Events</li>
+                                <li>📚 Training Programs</li>
+                                <li>🌍 CSR Initiatives</li>
+                            </ul>
+                            <p class="text-center mt-2">
+                                <a href="mailto:partnerships@kacaf.org" class="text-success">
+                                    partnerships@kacaf.org
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Impact Promise -->
+        <section class="py-5">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right">
+                        <h2 class="display-5 fw-bold mb-3">Your Impact, Our Promise</h2>
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h5>100% Transparency</h5>
+                                <p class="text-muted">We provide detailed reports on how every donation is used</p>
                             </div>
                         </div>
-                        
-                        <!-- Anonymous Donation -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="anonymous" name="anonymous">
-                            <label class="form-check-label" for="anonymous">
-                                Donate anonymously (your name won't be displayed publicly)
-                            </label>
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h5>Maximum Impact</h5>
+                                <p class="text-muted">Low overhead means more funds go directly to programs</p>
+                            </div>
                         </div>
-                        
-                        <!-- Allocation of Funds -->
-                        <div class="mb-3">
-                            <label class="form-label">Allocate your donation to:</label>
-                            <select class="form-select" id="allocation" name="allocation">
-                                <option value="general">General Fund</option>
-                                <option value="tree_planting">Tree Planting Program</option>
-                                <option value="youth_training">Youth Training</option>
-                                <option value="farmer_support">Farmer Support</option>
-                                <option value="conservation">Conservation Projects</option>
-                            </select>
+                        <div class="d-flex mb-3">
+                            <div class="me-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <div>
+                                <h5>Regular Updates</h5>
+                                <p class="text-muted">Receive photos and stories from the communities you support</p>
+                            </div>
                         </div>
-                        
-                        <!-- Message -->
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Message (Optional)</label>
-                            <textarea class="form-control" id="message" name="message" rows="3" 
-                                      placeholder="Leave a message with your donation..."></textarea>
+                    </div>
+                    <div class="col-lg-6" data-aos="fade-left">
+                        <img src="{% static 'images/impact-illustration.jpg' %}" 
+                             alt="Impact Illustration" 
+                             class="img-fluid rounded-4 shadow-lg"
+                             onerror="this.onerror=null; this.src='https://via.placeholder.com/600x400?text=KACAF+Impact'">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer (exactly the same as public dashboard) -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row g-4">
+                <!-- About Section -->
+                <div class="col-lg-4">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="brand-logo-container me-3" style="width: 50px; height: 50px;">
+                            <img src="{% static 'images/kacaf-logo.png' %}" 
+                                 alt="KACAF Logo" 
+                                 class="brand-logo"
+                                 onerror="this.onerror=null; this.parentElement.innerHTML='<i class=\'fas fa-tree fa-2x text-success\'></i>';">
                         </div>
-                        
-                        <!-- Tax Receipt Option -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="tax_receipt" name="tax_receipt" checked>
-                            <label class="form-check-label" for="tax_receipt">
-                                I would like to receive a tax receipt for this donation
-                            </label>
+                        <div>
+                            <h4 class="mb-0">KACAF</h4>
+                            <p class="mb-0 small">Kenya Agroforestry & Climate Action Foundation</p>
                         </div>
-                        
-                        <!-- Newsletter Subscription (matches CustomUser model) -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="newsletter" name="newsletter" 
-                                   {% if user.newsletter_subscription %}checked{% endif %}>
-                            <label class="form-check-label" for="newsletter">
-                                Subscribe to our newsletter for updates on how your donation is making an impact
-                            </label>
+                    </div>
+                    <p class="mb-3">Empowering communities through sustainable agroforestry and climate action initiatives in West Pokot County and beyond.</p>
+                    <div class="footer-social d-flex gap-2">
+                        <a href="https://www.facebook.com/groups/1689529035466372/?ref=share&mibextid=NSMWBT" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://twitter.com/kacaf" target="_blank" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="https://instagram.com/kacaf" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://youtube.com/kacaf" target="_blank" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/company/kenya-agroforerstry-and-climate-action-foundation" target="_blank" aria-label="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-4">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <div class="footer-links">
+                        <p><a href="/">Home</a></p>
+                        <p><a href="{% url 'about' %}">About Us</a></p>
+                        <p><a href="{% url 'programs:program_list' %}">Programs</a></p>
+                        <p><a href="{% url 'events:public_event_list' %}">Events</a></p>
+                        <p><a href="{% url 'resources:resource_list' %}">Resources</a></p>
+                    </div>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Contact Us</h5>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>West Pokot County, Kenya</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <a href="tel:+254796761841" class="text-white text-decoration-none">+254 796 761 841</a>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <a href="mailto:info@kacaf.org" class="text-white text-decoration-none">info@kacaf.org</a>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="col-lg-3 col-md-4">
+                    <h5 class="mb-3">Newsletter</h5>
+                    <p class="small">Subscribe to get updates on our programs and impact.</p>
+                    <form class="footer-newsletter" method="post" action="{% url 'communications:newsletter_subscribe' %}">
+                        {% csrf_token %}
+                        <div class="input-group">
+                            <input type="email" class="form-control" name="email" placeholder="Your email address" required>
+                            <button class="btn" type="submit">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
-                        
-                        <!-- Consent Fields (matches CustomUser model) -->
-                        <div class="mb-3 form-check">
-                            <input type="checkbox" class="form-check-input" id="data_consent" name="data_consent" required>
-                            <label class="form-check-label" for="data_consent">
-                                I consent to KACAF processing my personal data for donation processing and communication purposes
-                            </label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-success btn-lg w-100">Proceed to Payment</button>
                     </form>
                 </div>
             </div>
             
-            <!-- Donor Impact Stats -->
-            <div class="row mt-5">
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-primary">{{ total_donors|default:"500+" }}</h3>
-                            <p class="mb-0">Lifetime Donors</p>
-                        </div>
-                    </div>
+            <!-- Footer Bottom -->
+            <hr class="bg-white opacity-25 my-4">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <p class="mb-0 small">&copy; {% now "Y" %} KACAF. All rights reserved.</p>
                 </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-success">{{ total_raised|default:"2.5M+" }}</h3>
-                            <p class="mb-0">KES Raised</p>
-                        </div>
-                    </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="/privacy/" class="text-white small text-decoration-none me-3">Privacy Policy</a>
+                    <a href="/terms/" class="text-white small text-decoration-none">Terms of Service</a>
                 </div>
-                <div class="col-md-4">
-                    <div class="card text-center">
-                        <div class="card-body">
-                            <h3 class="text-info">{{ trees_planted|default:"50,000+" }}</h3>
-                            <p class="mb-0">Trees Planted</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Other Ways to Donate -->
-            <div class="mt-5">
-                <h4>Other Ways to Donate</h4>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h6><i class="fas fa-mobile-alt"></i> M-PESA</h6>
-                                <p class="mb-1"><strong>PayBill:</strong> 123456</p>
-                                <p><strong>Account:</strong> KACAF</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <h6><i class="fas fa-university"></i> Bank Transfer</h6>
-                                <p class="mb-1"><strong>Bank:</strong> Equity Bank</p>
-                                <p class="mb-1"><strong>Account Name:</strong> KACAF Foundation</p>
-                                <p><strong>Account Number:</strong> 1234567890</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-center mt-3">
-                    For corporate partnerships or large donations, contact us at 
-                    <a href="mailto:donations@kacaf.org">donations@kacaf.org</a>
-                </p>
             </div>
         </div>
-    </div>
-</div>
+    </footer>
 
-<!-- JavaScript for dynamic form behavior -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Quick amount selection
-    document.querySelectorAll('.quick-amount').forEach(button => {
-        button.addEventListener('click', function() {
-            document.getElementById('amount').value = this.dataset.amount;
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        // Initialize AOS
+        AOS.init({
+            duration: 1000,
+            once: true,
+            offset: 100
         });
-    });
-    
-    // Show/hide M-PESA fields based on payment method
-    document.getElementById('payment_method').addEventListener('change', function() {
+
+        // Active navigation class
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPath || (currentPath === '/' && href === '/') || 
+                    (href && currentPath.includes(href) && href !== '#' && href !== '/')) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Quick amount selection
+        const quickAmounts = document.querySelectorAll('.quick-amount-btn');
+        const amountInput = document.getElementById('amount');
+        
+        quickAmounts.forEach(btn => {
+            btn.addEventListener('click', function() {
+                quickAmounts.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                amountInput.value = this.dataset.amount;
+            });
+        });
+
+        // Payment method selection
+        const paymentMethods = document.querySelectorAll('.payment-method-card');
         const mpesaFields = document.getElementById('mpesa_fields');
-        if (this.value === 'mpesa') {
-            mpesaFields.style.display = 'block';
-            document.getElementById('mpesa_phone').required = true;
-        } else {
-            mpesaFields.style.display = 'none';
-            document.getElementById('mpesa_phone').required = false;
-        }
-    });
-    
-    // Form validation
-    document.getElementById('donationForm').addEventListener('submit', function(e) {
-        const amount = document.getElementById('amount').value;
-        if (amount < 100) {
-            e.preventDefault();
-            alert('Minimum donation amount is KES 100');
-        }
-    });
-});
-</script>
-{% endblock %}
+        
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                paymentMethods.forEach(m => m.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+                
+                // Show/hide M-PESA fields
+                if (radio.value === 'mpesa') {
+                    mpesaFields.style.display = 'block';
+                    document.getElementById('mpesa_phone').required = true;
+                } else {
+                    mpesaFields.style.display = 'none';
+                    document.getElementById('mpesa_phone').required = false;
+                }
+            });
+        });
+
+        // Recurring option selection
+        const recurringOptions = document.querySelectorAll('.recurring-option');
+        
+        recurringOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                recurringOptions.forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                const radio = this.querySelector('input[type="radio"]');
+                radio.checked = true;
+            });
+        });
+
+        // Form validation
+        document.getElementById('donationForm')?.addEventListener('submit', function(e) {
+            const amount = document.getElementById('amount').value;
+            if (amount < 100) {
+                e.preventDefault();
+                alert('Minimum donation amount is KES 100');
+            }
+            
+            const consent = document.getElementById('data_consent');
+            if (!consent.checked) {
+                e.preventDefault();
+                alert('Please consent to data processing to continue');
+            }
+        });
+
+        // Newsletter form enhancement
+        document.querySelector('form.footer-newsletter')?.addEventListener('submit', function(e) {
+            const email = this.querySelector('input[name="email"]').value;
+            if (!email.includes('@')) {
+                e.preventDefault();
+                alert('Please enter a valid email address');
+            }
+        });
+    </script>
+</body>
+</html>
