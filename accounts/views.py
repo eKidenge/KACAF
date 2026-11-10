@@ -1,5 +1,5 @@
 # accounts/views.py
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -7,14 +7,19 @@ from django.views.generic import CreateView, DetailView, ListView
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.views import LoginView
+from django.utils import timezone
+from django.db.models import Sum, Count, Q
 from rest_framework import viewsets, generics, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import random
 import string
-from django.shortcuts import render, get_object_or_404
-# accounts/views.py - Change this import
-from events.models import Event  # ✅ Correct import
+import json
+
+from events.models import Event, EventRegistration
+from programs.models import Program, Project, TreePlanting
+from testimonials.models import Testimonial
+from partners.models import Partner
 
 from .models import MemberProfile, ExecutiveCommittee
 from .serializers import (
@@ -36,7 +41,7 @@ User = get_user_model()
 class CustomLoginView(LoginView):
     """Custom login view with redirect based on user type"""
     template_name = 'accounts/auth/login.html'
-    
+
     def get_success_url(self):
         user = self.request.user
         if user.is_staff or user.is_superuser:
@@ -60,65 +65,39 @@ def logout_view(request):
 # ---------------------------
 # Public & role dashboards
 # ---------------------------
-# accounts/views.py
-from django.shortcuts import render
-from django.utils import timezone
-from django.contrib.auth import get_user_model
-from django.db.models import Sum, Count
-from programs.models import Program, Project
-from events.models import Event, EventRegistration
-from testimonials.models import Testimonial
-from partners.models import Partner
-from accounts.models import MemberProfile  # Import MemberProfile
-
-User = get_user_model()
-
 def public_dashboard(request):
     """Public facing homepage/dashboard"""
-    
-    # Get featured programs (active programs)
+
     featured_programs = Program.objects.filter(
         status='active'
     ).order_by('-created_at')[:3]
-    
-    # Get upcoming events
+
     upcoming_events = Event.objects.filter(
         is_public=True,
         start_datetime__gte=timezone.now(),
         status__in=['published', 'ongoing']
     ).order_by('start_datetime')[:3]
-    
-    # Get approved testimonials
+
     testimonials = Testimonial.objects.all().order_by('-created_at')[:3]
-    
-    # Get all partners (no filter needed)
     partners = Partner.objects.all()[:4]
-    
-    # Calculate REAL impact numbers from your database
-    
-    # Total trees planted - sum from all MemberProfile trees_planted fields
-    total_trees_planted = MemberProfile.objects.aggregate(total=Sum('trees_planted'))['total'] or 0
-    
-    # Total members - count of users with member type (excluding other types)
+
+    total_trees_planted = MemberProfile.objects.aggregate(
+        total=Sum('trees_planted')
+    )['total'] or 0
+
     total_members = User.objects.filter(user_type='member').count()
-    
-    # Total area coverage (hectares) - assuming this comes from projects or programs
-    # You might need to add this field to your models, or use a default for now
-    total_area_coverage = 1200  # You may need to calculate this from Project model if you have hectares field
-    
-    # Total beneficiaries - sum from programs (if you have beneficiaries_count field)
-    # If not, you might calculate from event registrations or member counts
-    total_beneficiaries = Program.objects.aggregate(total=Sum('beneficiaries_reached'))['total'] or total_members * 2
-    
-    # Carbon sequestered (tons CO2) - rough estimate based on trees planted
-    # Average tree sequesters ~0.02 tons CO2 per year
+    total_area_coverage = 1200
+
+    total_beneficiaries = Program.objects.aggregate(
+        total=Sum('beneficiaries_reached')
+    )['total'] or total_members * 2
+
     carbon_sequestered = int(total_trees_planted * 0.02)
-    
-    # Get counts for other user types if needed for display
+
     total_farmers = User.objects.filter(user_type='farmer').count()
     total_youth = User.objects.filter(user_type='youth').count()
     total_organizations = User.objects.filter(user_type='organization').count()
-    
+
     context = {
         "total_trees_planted": total_trees_planted,
         "total_members": total_members,
@@ -133,19 +112,13 @@ def public_dashboard(request):
         "testimonials": testimonials,
         "partners": partners,
     }
-    
+
     return render(request, "dashboard/public_dashboard.html", context)
 
 
 @login_required
 def dashboard_redirect(request):
-    """
-    Redirect users to their appropriate dashboard based on role
-    - Staff/Admin -> admin dashboard
-    - Executive -> executive dashboard
-    - Member -> member dashboard
-    - Others -> member dashboard (fallback)
-    """
+    """Redirect users to their appropriate dashboard based on role"""
     if request.user.is_staff or request.user.is_superuser:
         return redirect('accounts:admin_dashboard')
     elif request.user.user_type == 'executive':
@@ -153,8 +126,6 @@ def dashboard_redirect(request):
     elif request.user.user_type == 'member':
         return redirect('accounts:member_dashboard')
     else:
-        # For other user types (youth, organization, donor, etc.)
-        # You can create specific dashboards for them later
         return redirect('accounts:member_dashboard')
 
 
@@ -216,12 +187,11 @@ def admin_dashboard(request):
 @login_required
 def executive_dashboard(request):
     """Executive committee dashboard"""
-    # Check if user has executive committee profile
     try:
         executive_profile = request.user.executive_role
     except ExecutiveCommittee.DoesNotExist:
         executive_profile = None
-    
+
     context = {
         "executive_members": ExecutiveCommittee.objects.filter(is_active=True),
         "current_member": executive_profile,
@@ -236,27 +206,162 @@ def executive_dashboard(request):
 
 @login_required
 def member_dashboard(request):
-    """Regular member dashboard"""
-    # Get member profile - handle case where it doesn't exist
+    """Regular member dashboard — supplies every variable the template expects."""
+    # Get or create the member profile
+    profile, _ = MemberProfile.objects.get_or_create(user=request.user)
+
+    now = timezone.now()
+
+    # ---- Trees ----
+    tree_qs = TreePlanting.objects.filter(farmer=request.user)
+    user_trees_count = tree_qs.aggregate(total=Sum('quantity'))['total'] or 0
+
+    monthly_trees = tree_qs.filter(
+        planting_date__year=now.year,
+        planting_date__month=now.month
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    yearly_trees = tree_qs.filter(
+        planting_date__year=now.year
+    ).aggregate(total=Sum('quantity'))['total'] or 0
+
+    # Survival rate = average of survival_rate across the user's plantings
+    survival_agg = tree_qs.aggregate(
+        total_rate=Sum('survival_rate'),
+        count=Count('id')
+    )
+    if survival_agg['count']:
+        user_trees_survival_rate = round(
+            survival_agg['total_rate'] / survival_agg['count']
+        )
+    else:
+        user_trees_survival_rate = 0
+
+    # Carbon: ~0.02 tons CO2 per tree per year; ~4.6 tons per car per year
+    carbon_sequestration = round(float(user_trees_count) * 0.02, 2)
+    equivalent_cars = round(carbon_sequestration / 4.6, 1)
+
+    # Species chart data — must be JSON-encoded strings for Chart.js
+    species_qs = (
+        tree_qs.values('species')
+        .annotate(n=Sum('quantity'))
+        .order_by('-n')
+    )
+    tree_species_labels = json.dumps([s['species'] or 'Unknown' for s in species_qs])
+    tree_species_data = json.dumps([s['n'] for s in species_qs])
+
+    # ---- Events ----
+    registrations = EventRegistration.objects.filter(user=request.user)
+    registered_events = registrations.count()
+    registered_events_list = list(registrations.values_list('event_id', flat=True))
+
+    upcoming_events_qs = Event.objects.filter(
+        is_public=True,
+        start_datetime__gte=now,
+        status__in=['published', 'ongoing'],
+    ).order_by('start_datetime')[:5]
+
+    upcoming_events_count = upcoming_events_qs.count()
+
+    # 'attended' may not exist on EventRegistration; guard it
+    attended_events = 0
+    if hasattr(EventRegistration, 'attended'):
+        attended_events = registrations.filter(attended=True).count()
+
+    # ---- Contributions ----
+    total_contributions = getattr(profile, 'total_donations', 0) or 0
+    volunteer_hours = getattr(profile, 'volunteer_hours', 0) or 0
+    training_completed = getattr(profile, 'training_completed', 0) or 0
+
+    # ---- Level system ----
+    tree_points = min(user_trees_count, 50)
+    event_points = min(attended_events * 2, 20)
+    training_points = min(training_completed * 3, 30)
+    current_points = tree_points + event_points + training_points
+
+    LEVELS = [
+        (0, 'Seedling'),
+        (25, 'Sapling'),
+        (50, 'Young Tree'),
+        (75, 'Mature Tree'),
+        (100, 'Forest Guardian'),
+    ]
+
+    user_level = 1
+    user_level_title = LEVELS[0][1]
+    next_level_points = LEVELS[1][0]
+
+    for i, (threshold, title) in enumerate(LEVELS):
+        if current_points >= threshold:
+            user_level = i + 1
+            user_level_title = title
+            if i + 1 < len(LEVELS):
+                next_level_points = LEVELS[i + 1][0]
+            else:
+                next_level_points = threshold
+
+    if next_level_points and current_points < next_level_points:
+        level_progress = min(100, int((current_points / next_level_points) * 100))
+    else:
+        level_progress = 100
+
+    # ---- Recent activity ----
+    recent_activities = []
+    for tp in tree_qs.order_by('-created_at')[:3]:
+        recent_activities.append({
+            'title': f'Planted {tp.quantity} × {tp.species}',
+            'description': tp.planting_site,
+            'timestamp': tp.created_at,
+            'type': 'tree_planting',
+        })
+
+    # ---- Announcements (optional) ----
+    announcements = []
     try:
-        profile = request.user.member_profile
-    except (MemberProfile.DoesNotExist, AttributeError):
-        # Create a profile if it doesn't exist and user is a member
-        if request.user.user_type == 'member':
-            profile = MemberProfile.objects.create(user=request.user)
-        else:
-            profile = None
-    
+        from communications.models import Announcement
+        announcements = Announcement.objects.order_by('-publish_date')[:3]
+    except Exception:
+        announcements = []
+
     context = {
-        "profile": profile,
-        "membership_status": "Active" if request.user.is_active else "Inactive",
-        "joined_date": getattr(request.user, 'join_date', request.user.date_joined),
-        "contributions": profile.total_donations if profile else 0,
-        "trees_planted": profile.trees_planted if profile else 0,
-        "events_attended": profile.events_attended if profile else 0,
-        "training_completed": profile.training_completed if profile else 0,
-        "programs_enrolled": [],
-        "certificates": [],
+        'profile': profile,
+
+        # Trees & impact
+        'user_trees_count': user_trees_count,
+        'monthly_trees': monthly_trees,
+        'yearly_trees': yearly_trees,
+        'recent_trees_count': monthly_trees,
+        'user_trees_survival_rate': user_trees_survival_rate,
+        'carbon_sequestration': carbon_sequestration,
+        'equivalent_cars': equivalent_cars,
+        'tree_species_labels': tree_species_labels,
+        'tree_species_data': tree_species_data,
+
+        # Events
+        'registered_events': registered_events,
+        'registered_events_list': registered_events_list,
+        'upcoming_events': upcoming_events_qs,
+        'upcoming_events_count': upcoming_events_count,
+        'attended_events': attended_events,
+
+        # Contributions
+        'total_contributions': total_contributions,
+        'volunteer_hours': volunteer_hours,
+
+        # Level / gamification
+        'user_level': user_level,
+        'user_level_title': user_level_title,
+        'current_points': current_points,
+        'next_level_points': next_level_points,
+        'level_progress': level_progress,
+        'tree_points': tree_points,
+        'event_points': event_points,
+        'training_points': training_points,
+
+        # Lists
+        'recent_activities': recent_activities,
+        'achievements': [],
+        'announcements': announcements,
     }
     return render(request, "dashboard/member_dashboard.html", context)
 
@@ -266,18 +371,14 @@ def member_dashboard(request):
 # ---------------------------
 @login_required
 def profile(request):
-    """
-    Renders the user's profile page.
-    """
+    """Renders the user's profile page."""
     user_profile = None
     try:
         user_profile = request.user.member_profile
     except (MemberProfile.DoesNotExist, AttributeError):
-        # Create a profile if it doesn't exist and user is a member
         if request.user.user_type == 'member':
             user_profile = MemberProfile.objects.create(user=request.user)
-    
-    # Get executive profile if user is executive
+
     executive_profile = None
     try:
         executive_profile = request.user.executive_role
@@ -299,27 +400,29 @@ class UserCreateView(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     """View for creating new users (staff only)"""
     model = User
     template_name = 'accounts/user_form.html'
-    fields = ['email', 'first_name', 'last_name', 'user_type', 'is_active', 'is_staff', 'is_superuser']
+    fields = ['email', 'first_name', 'last_name', 'user_type',
+              'is_active', 'is_staff', 'is_superuser']
     success_url = reverse_lazy('accounts:admin_dashboard')
-    
+
     def test_func(self):
         return self.request.user.is_staff
-    
+
     def form_valid(self, form):
-        temp_password = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        temp_password = ''.join(
+            random.choices(string.ascii_letters + string.digits, k=10)
+        )
         user = form.save(commit=False)
         user.set_password(temp_password)
         user.username = form.cleaned_data['email']
         user.save()
-        
-        # Create MemberProfile ONLY for members, not for other user types
+
         if user.user_type == 'member':
             MemberProfile.objects.get_or_create(user=user)
-        
-        # Executive committee members should be added through the executive committee management
-        # not automatically created here
-            
-        messages.success(self.request, f'User {user.email} created successfully. Temporary password: {temp_password}')
+
+        messages.success(
+            self.request,
+            f'User {user.email} created successfully. Temporary password: {temp_password}'
+        )
         return super().form_valid(form)
 
 
@@ -327,27 +430,25 @@ class UserDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     model = User
     template_name = 'accounts/user_detail.html'
     context_object_name = 'user_obj'
-    
+
     def test_func(self):
         user_obj = self.get_object()
         return self.request.user.is_staff or self.request.user.id == user_obj.id
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user_obj = self.get_object()
-        
-        # Get member profile if exists
+
         try:
             context['member_profile'] = user_obj.member_profile
         except (MemberProfile.DoesNotExist, AttributeError):
             context['member_profile'] = None
-            
-        # Get executive profile if exists
+
         try:
             context['executive_profile'] = user_obj.executive_role
         except (ExecutiveCommittee.DoesNotExist, AttributeError):
             context['executive_profile'] = None
-            
+
         return context
 
 
@@ -356,29 +457,27 @@ class UserListView(LoginRequiredMixin, UserPassesTestMixin, ListView):
     template_name = 'accounts/user_list.html'
     context_object_name = 'users'
     paginate_by = 20
-    
+
     def test_func(self):
         return self.request.user.is_staff
-    
+
     def get_queryset(self):
         queryset = User.objects.all().order_by('-date_joined')
-        
-        # Filter by user_type if provided
+
         user_type = self.request.GET.get('user_type')
         if user_type:
             queryset = queryset.filter(user_type=user_type)
-            
-        # Search by email or name
+
         search = self.request.GET.get('search')
         if search:
             queryset = queryset.filter(
-                models.Q(email__icontains=search) |
-                models.Q(first_name__icontains=search) |
-                models.Q(last_name__icontains=search)
+                Q(email__icontains=search) |
+                Q(first_name__icontains=search) |
+                Q(last_name__icontains=search)
             )
-            
+
         return queryset
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['user_type_choices'] = User.USER_TYPE_CHOICES
@@ -407,56 +506,52 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def members(self, request):
-        """Get all member users"""
         members = User.objects.filter(user_type='member')
         serializer = self.get_serializer(members, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def executives(self, request):
-        """Get all executive users"""
         executives = User.objects.filter(user_type='executive')
         serializer = self.get_serializer(executives, many=True)
         return Response(serializer.data)
 
 
 # ---------------------------
-# Registration view - FIXED VERSION
+# Registration view
 # ---------------------------
 def register_view(request):
     """
-    Registration view for new members - uses Django Form for HTML template
+    Registration view for new members.
+
+    After successful registration we send the user to the login page
+    (rather than an empty dashboard) so they can log in cleanly.
     """
     if request.method == 'POST':
         form = UserRegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            # Save the form - this creates both CustomUser and MemberProfile
             user = form.save()
-            
-            # Log the user in after registration
-            login(request, user)
-            
-            messages.success(request, "Registration successful! Welcome to KACAF.")
-            
-            # Redirect to appropriate dashboard
-            if user.user_type == 'executive':
-                return redirect('accounts:executive_dashboard')
-            else:
-                return redirect('accounts:member_dashboard')
+            messages.success(
+                request,
+                "Registration successful! Please log in to continue."
+            )
+            return redirect('accounts:login')
         else:
-            # Print form errors for debugging
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{field}: {error}")
     else:
         form = UserRegistrationForm()
-    
+
     return render(request, "accounts/auth/register.html", {"form": form})
 
 
+# ---------------------------
+# API view sets
+# ---------------------------
 class MemberProfileViewSet(viewsets.ModelViewSet):
     queryset = MemberProfile.objects.all()
     serializer_class = MemberProfileSerializer
@@ -469,19 +564,17 @@ class MemberProfileViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-    
+
     @action(detail=True, methods=['post'])
     def increment_trees(self, request, pk=None):
-        """Increment trees planted count"""
         profile = self.get_object()
         count = request.data.get('count', 1)
         profile.trees_planted += int(count)
         profile.save()
         return Response({'trees_planted': profile.trees_planted})
-    
+
     @action(detail=True, methods=['post'])
     def increment_events(self, request, pk=None):
-        """Increment events attended count"""
         profile = self.get_object()
         profile.events_attended += 1
         profile.save()
@@ -504,10 +597,9 @@ class ExecutiveCommitteeViewSet(viewsets.ModelViewSet):
         qs = ExecutiveCommittee.objects.filter(is_active=True).order_by("order")
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=False, methods=['get'])
     def positions(self, request):
-        """Get all available positions"""
         return Response(dict(ExecutiveCommittee.POSITIONS))
 
 
@@ -529,47 +621,41 @@ class ChangePasswordView(generics.UpdateAPIView):
         user.set_password(serializer.validated_data["new_password"])
         user.save()
 
-        return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
-    
+        return Response(
+            {"message": "Password updated successfully."},
+            status=status.HTTP_200_OK
+        )
 
+
+# ---------------------------
+# Static pages
+# ---------------------------
 def about_view(request):
-    """About page"""
     return render(request, "base/about.html")
 
 
 def donate(request):
-    """Donation page"""
     return render(request, "accounts/donate.html")
 
 
 def terms_view(request):
-    """Render the Terms and Conditions page"""
     return render(request, 'accounts/terms.html')
 
 
 def privacy_view(request):
-    """Render the Privacy Policy page"""
     return render(request, 'accounts/privacy.html')
 
 
-# accounts/views.py - Add this function
-
 @login_required
 def profile_edit(request):
-    """
-    View for editing user profile
-    """
+    """View for editing user profile"""
     if request.method == 'POST':
-        # Handle form submission
-        # You'll need to create a form for this
         messages.success(request, "Profile updated successfully!")
         return redirect('accounts:profile')
-    
-    # GET request - display edit form
-    context = {
-        "user": request.user,
-    }
+
+    context = {"user": request.user}
     return render(request, "accounts/user/profile_edit.html", context)
+
 
 def event_detail(request, pk):
     """Display event details"""
